@@ -513,7 +513,7 @@ container RuimtelijkeData: Using = "Units;Geography;Model", FreeData = "True"
 				{
 					attribute<Classifications/Isolatieniveau> RB := recollect_by_cond(MinimaleIsolatieNiveausNa1991/bouwjaar_rel > 1991[uint16], MinimaleIsolatieNiveausNa1991/BouwjaarNa1991/IsolatieNiveauNieuw/RB/IsolatieNiveau, Isolatie_temp/RB);
 					attribute<Classifications/Isolatieniveau> RO := recollect_by_cond(MinimaleIsolatieNiveausNa1991/bouwjaar_rel > 1991[uint16], MinimaleIsolatieNiveausNa1991/BouwjaarNa1991/IsolatieNiveauNieuw/RO/IsolatieNiveau, Isolatie_temp/RO);
-					attribute<Classifications/Isolatieniveau> DR := recollect_by_cond(MinimaleIsolatieNiveausNa1991/bouwjaar_rel > 1991[uint16], MinimaleIsolatieNiveausNa1991/BouwjaarNa1991/IsolatieNiveauNieuw/RO/IsolatieNiveau, Isolatie_temp/DR);
+					attribute<Classifications/Isolatieniveau> DR := recollect_by_cond(MinimaleIsolatieNiveausNa1991/bouwjaar_rel > 1991[uint16], MinimaleIsolatieNiveausNa1991/BouwjaarNa1991/IsolatieNiveauNieuw/DR/IsolatieNiveau, Isolatie_temp/DR);
 					attribute<Classifications/Isolatieniveau> PL := recollect_by_cond(MinimaleIsolatieNiveausNa1991/bouwjaar_rel > 1991[uint16], MinimaleIsolatieNiveausNa1991/BouwjaarNa1991/IsolatieNiveauNieuw/PL/IsolatieNiveau, Isolatie_temp/PL);
 					attribute<Classifications/Isolatieniveau> VL := recollect_by_cond(MinimaleIsolatieNiveausNa1991/bouwjaar_rel > 1991[uint16], MinimaleIsolatieNiveausNa1991/BouwjaarNa1991/IsolatieNiveauNieuw/VL/IsolatieNiveau, Isolatie_temp/VL);
 					attribute<Classifications/Isolatieniveau> MG := recollect_by_cond(MinimaleIsolatieNiveausNa1991/bouwjaar_rel > 1991[uint16], MinimaleIsolatieNiveausNa1991/BouwjaarNa1991/IsolatieNiveauNieuw/MG/IsolatieNiveau, Isolatie_temp/MG);
