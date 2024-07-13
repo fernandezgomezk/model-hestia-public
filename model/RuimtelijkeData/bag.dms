@@ -115,6 +115,13 @@ container BAG: url="%HestiaDataDir%/BAG/20230223_actualisatie_BAG_WP.txt"
 			// relatie naar buurt voor o.a. ruimtelijke selectie
 			attribute<RegioIndelingen/buurt>    buurt_rel    := point_in_polygon(geometry, RegioIndelingen/buurt/geometry);
 			attribute<RegioIndelingen/gemeente> gemeente_rel := RegioIndelingen/buurt/gemeente_rel[buurt_rel];
+						attribute<string> PROV_NAAM := RegioIndelingen/buurt/PROV_NAAM[buurt_rel];
+		    attribute<string> ER_NAAM := RegioIndelingen/buurt/ER_NAAM[buurt_rel];
+			attribute<string> GM_NAAM := RegioIndelingen/buurt/GM_NAAM[buurt_rel];
+			attribute<string> GM_CODE := RegioIndelingen/buurt/GM_code[buurt_rel];
+			attribute<string> WK_CODE := RegioIndelingen/buurt/WK_CODE[buurt_rel];
+			attribute<string> BU_NAAM := RegioIndelingen/buurt/BU_NAAM[buurt_rel];
+			attribute<string> BU_CODE := RegioIndelingen/buurt/BU_CODE[buurt_rel];
 
 			attribute<Classifications/BouwjaarWoning>  BouwjaarWoning_rel := isNull(pand_rel -> bouwjaar_gecorrigeerd ) ? Classifications/BouwjaarWoning/onbekend : classify(pand_rel -> bouwjaar_gecorrigeerd ,Classifications/BouwjaarWoning/ClassBreak);
 			attribute<Classifications/Eigendom>        Eigendom_rel       := EigendomStaat/pand/Eigendom_rel[pand_rel];
