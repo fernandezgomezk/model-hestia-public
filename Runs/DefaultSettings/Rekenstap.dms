@@ -24,17 +24,17 @@ container Rekenstap
 				parameter<string> VR_vKD:         ['Criteria/Never'];
 				parameter<string> VR_mKD:         ['Criteria/Never'];
 
-				parameter<string> HR_zKD_hTWds:   ['Criteria/NoAlloc'];
-				parameter<string> HR_vKD_hTWds:   ['Criteria/NoAlloc'];
-				parameter<string> HR_mKD_hTWds:   ['Criteria/NoAlloc'];
+				parameter<string> HR_zKD_hTWds:   ['Criteria/Never'];
+				parameter<string> HR_vKD_hTWds:   ['Criteria/Never'];
+				parameter<string> HR_mKD_hTWds:   ['Criteria/Never'];
 
-				parameter<string> HR_zKD_TWds:    ['Criteria/NoAlloc'];
-				parameter<string> HR_vKD_TWds:    ['Criteria/NoAlloc'];
-				parameter<string> HR_mKD_TWds:    ['Criteria/NoAlloc'];
+				parameter<string> HR_zKD_TWds:    ['Criteria/Never'];
+				parameter<string> HR_vKD_TWds:    ['Criteria/Never'];
+				parameter<string> HR_mKD_TWds:    ['Criteria/Never'];
 
-				parameter<string> HR_zKD:         ['Criteria/NoAlloc'];
-				parameter<string> HR_vKD:         ['Criteria/NoAlloc'];
-				parameter<string> HR_mKD:         ['Criteria/NoAlloc'];
+				parameter<string> HR_zKD:         ['Criteria/Never'];
+				parameter<string> HR_vKD:         ['Criteria/Never'];
+				parameter<string> HR_mKD:         ['Criteria/Never'];
 
 				parameter<string> Pellet_zKD:     ['Criteria/Never'];
 				parameter<string> Pellet_vKD:     ['Criteria/Never'];
@@ -51,8 +51,8 @@ container Rekenstap
 				parameter<string> LweWP_zKD:      ['Criteria/NoAlloc'];
 				parameter<string> LweWP_wKD:      ['Criteria/NoAlloc'];
 
-				parameter<string> BweWP_zKD:      ['Criteria/NoAlloc'];
-				parameter<string> BweWP_wKD:      ['Criteria/NoAlloc'];
+				parameter<string> BweWP_zKD:      ['Criteria/Never'];
+				parameter<string> BweWP_wKD:      ['Criteria/Never'];
 
 				parameter<string> LleWP_zKD:      ['Criteria/Never'];
 				parameter<string> LleWP_wKD:      ['Criteria/Never'];
@@ -89,17 +89,17 @@ container Rekenstap
 				parameter<string> IR_TWds_vKD:    ['Criteria/Never'];
 				parameter<string> IR_TWds_mKD:    ['Criteria/Never'];
 
-				parameter<string> HWP_zKD_TWg:    ['Criteria/NoAlloc'];
-				parameter<string> HWP_wKD_TWg:    ['Criteria/NoAlloc'];
+				parameter<string> HWP_zKD_TWg:    ['Criteria/Never'];
+				parameter<string> HWP_wKD_TWg:    ['Criteria/Never'];
 
-				parameter<string> HWP_zKD_TWeb:   ['Criteria/NoAlloc'];
-				parameter<string> HWP_wKD_TWeb:   ['Criteria/NoAlloc'];
+				parameter<string> HWP_zKD_TWeb:   ['Criteria/Never'];
+				parameter<string> HWP_wKD_TWeb:   ['Criteria/Never'];
 
-				parameter<string> HWP_zKD_hTWds:  ['Criteria/NoAlloc'];
-				parameter<string> HWP_wKD_hTWds:  ['Criteria/NoAlloc'];
+				parameter<string> HWP_zKD_hTWds:  ['Criteria/Never'];
+				parameter<string> HWP_wKD_hTWds:  ['Criteria/Never'];
 
-				parameter<string> HWP_zKD_TWds:   ['Criteria/NoAlloc'];
-				parameter<string> HWP_wKD_TWds:   ['Criteria/NoAlloc'];
+				parameter<string> HWP_zKD_TWds:   ['Criteria/Never'];
+				parameter<string> HWP_wKD_TWds:   ['Criteria/Never'];
 
 				parameter<string> hIR_zKD_TWg:    ['Criteria/Never'];
 				parameter<string> hIR_vKD_TWg:    ['Criteria/Never'];

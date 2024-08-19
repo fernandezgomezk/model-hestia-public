@@ -108,25 +108,13 @@ template AllocatieResultatenComponent
 		attribute<Classifications/IsolatieNiveau> DS_voor		:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/DS[org_rel];
 		attribute<Classifications/IsolatieNiveau> KR_na    		:= BO/Bouwdelen/Isolatie/KR[org_rel];
         attribute<Classifications/IsolatieNiveau> KR_voor    	:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/KR[org_rel];
-		attribute<Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes> VT_na    := BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/VT[org_rel];
+		attribute<Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes> VT_na    := BO/InstallatiePerProduct/VT[org_rel];
         attribute<Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes> VT_voor    := Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/VT[org_rel];
         attribute<Invoer/Kengetallen/OverigeInstallaties/DK/Installatietypes> DK_na		:= BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/DK[org_rel];
-		attribute<Invoer/Kengetallen/OverigeInstallaties/KK/Installatietypes> KK_na		:= BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/KK[org_rel];
-		attribute<Invoer/Kengetallen/OverigeInstallaties/KK/Installatietypes> KK_voor    := Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/KK[org_rel];
         attribute<Classifications/Installatie> RVb_na		:= BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/RVb[org_rel];
 		attribute<Classifications/Installatie> RVb_voor		:= Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/RVb[org_rel];
         attribute<Classifications/Installatie> RVp_na		:= BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/RVp[org_rel];
-		attribute<Classifications/Installatie> RVp_voor		:= Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/RVp[org_rel]; //toegevoegd op 11/07/2023
-        attribute<Classifications/Installatie> TWb_na		:= BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/TWb[org_rel];//toegevoegd op 11/07/2023
-		attribute<Classifications/Installatie> TWb_voor		:= Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/TWb[org_rel];//toegevoegd op 11/07/2023
-        attribute<Classifications/Installatie> TWp_na		:= BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/TWp[org_rel];//toegevoegd op 11/07/2023
-		attribute<Classifications/Installatie> TWp_voor		:= Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/TWp[org_rel];//toegevoegd op 11/07/2023
-		attribute<Eur> Ki30_LO							:= BO/eenmalig/Ki30_LO[org_rel];//toegevoegd op 11/07/2023
-		attribute<Eur> Ki20_LO							:= BO/eenmalig/Ki20_LO[org_rel];//toegevoegd op 11/07/2023
-		attribute<Eur> Ki15_LO							:= BO/eenmalig/Ki15_LO[org_rel];//toegevoegd op 11/07/2023
-		attribute<Eur> Ki_LTAS							:= BO/eenmalig/Ki_LTAS[org_rel];//toegevoegd op 04/07/2024
-		attribute<Eur> Ki_KK							:= BO/eenmalig/Ki_KK[org_rel];//toegevoegd op 04/07/2024
-
+		attribute<Classifications/Installatie> RVp_voor		:= Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/RVp[org_rel];
 		}
 		parameter<string> OutputFolder := '%localDataProjDir%/Results/IsolatieStandaard/';
         unit<uint32> variable := SubItem_PropValues(table,'name');
