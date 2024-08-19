@@ -41,4 +41,3 @@ nrm_EPC14,Bouwbesluit VT 2006-2023,2006,2023,normering,bestaande bouw,VT_Mec_Vst
 nrm_EPC15,Bouwbesluit/EPC 2011-2014 MuurDak ,2011,2014,normering,bestaande bouw,"MG_N3,DP_N3,DS_N3",,,,,gerenoveerd aandeel (procent): 25,0.1,
 nrm_EPC16,Bouwbesluit/EPC 2015-2019 MuurDak,2015,2019,normering,bestaande bouw,"MG_N3,DP_N3,DS_N3",,,,,gerenoveerd aandeel (procent): 25,0.1,
 act_WP_1,warmtepomp installatieactivatie 2024,2024,2024,activatie,alle,"RV,TW",,,,,,1,
-nrm_WP_2,warmtepomp normering,2024,2024,verbod,alle,"VR, HR, Olieketel, Bioketel, Pelletkachel, eWP_lw, eWP_bw, eWP_ll, IR, H2R, eBoiler, EWVgroot, EWVklein, mWKK, eWP_lw_u, eWP_bw_uG, eWP_bw_uK, hWP_lw_u, DS_keuken, DS_douche",,,,"Huidig label: A,B,C,D,E,F,G,N",,1,	
