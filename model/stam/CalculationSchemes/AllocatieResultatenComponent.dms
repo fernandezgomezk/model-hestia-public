@@ -54,7 +54,7 @@ template AllocatieResultatenComponent
 
 		container Func2Meter := CalculationSchemes/FunctioneelToMetervraag ( BO_Base , false);
 		
-		container Resultaten_Iso_hWP
+		container Resultaten_Iso
 	    {
         unit<uint32> table := select_with_org_rel(isdefined(BO/code))
 		{attribute<String> identificatie						:= BO/code[org_rel];
@@ -128,9 +128,9 @@ template AllocatieResultatenComponent
 		attribute<Eur> Ki_KK							:= BO/eenmalig/Ki_KK[org_rel];//toegevoegd op 04/07/2024
 
 		}
-		parameter<string> OutputFolder := '%localDataProjDir%/Results/CPB_Warmtepompen/Iso_hWP/';
+		parameter<string> OutputFolder := '%localDataProjDir%/Results/CPB_Warmtepompen/Iso/';
         unit<uint32> variable := SubItem_PropValues(table,'name');
-        container export_csv := Model/CalculationSchemes/Rapportage/WriteTable32ToCSV(table, AsList(variable/name, ';'), OutputFolder+rekenstapname+'_Iso_hWP_export.csv');
+        container export_csv := Model/CalculationSchemes/Rapportage/WriteTable32ToCSV(table, AsList(variable/name, ';'), OutputFolder+rekenstapname+'_Iso_export.csv');
         }
 		
 		container Metervraag := BO_Base/Metervraag
