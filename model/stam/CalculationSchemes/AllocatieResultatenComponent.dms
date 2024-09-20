@@ -126,7 +126,16 @@ template AllocatieResultatenComponent
 		attribute<Eur> Ki15_LO							:= BO/eenmalig/Ki15_LO[org_rel];//toegevoegd op 11/07/2023
 		attribute<Eur> Ki_LTAS							:= BO/eenmalig/Ki_LTAS[org_rel];//toegevoegd op 04/07/2024
 		attribute<Eur> Ki_KK							:= BO/eenmalig/Ki_KK[org_rel];//toegevoegd op 04/07/2024
-
+		attribute<Classifications/Installatie> KDb_na		:= BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/KDb[org_rel];
+		attribute<Classifications/Installatie> KDp_na		:= BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/KDp[org_rel];
+		attribute<Units/kW> Capaciteit_RVb_na						  	:= BO/Func2Meter/eEffect/CapaciteitPerProduct/RVb[org_rel];
+		attribute<Units/kW> Capaciteit_RVp_na						  	:= BO/Func2Meter/eEffect/CapaciteitPerProduct/RVp[org_rel];
+		attribute<Units/kW> Capaciteit_TWb_na					  	:= BO/Func2Meter/eEffect/CapaciteitPerProduct/TWb[org_rel];
+		attribute<Units/kW> Capaciteit_TWp_na					  	:= BO/Func2Meter/eEffect/CapaciteitPerProduct/TWp[org_rel];
+		attribute<Units/kW> Capaciteit_KDb_na					  	:= BO/Func2Meter/eEffect/CapaciteitPerProduct/KDb[org_rel];
+		attribute<Units/kW> Capaciteit_KDp_na					  	:= BO/Func2Meter/eEffect/CapaciteitPerProduct/KDp[org_rel];
+		//attribute<int32> Narekening := round(float64(Ki15_LO - (2109.126[Units/Eur] + 3046.8454[Eur] + Capaciteit_RVb_na * 420.835[Eur_kW])));
+		
 		}
 		parameter<string> OutputFolder := '%localDataProjDir%/Results/CPB_Warmtepompen/Iso_hWP/';
         unit<uint32> variable := SubItem_PropValues(table,'name');
