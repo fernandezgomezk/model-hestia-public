@@ -211,7 +211,9 @@ template select_with_org_relGebouwOptieT
 	{	
 		parameter<bool>   Afweging_VT         := SpecifiekeInstellingen/InstallatieSet/InstallatieSetcriteria/Afweging_VT, IsHidden = "True";
 		parameter<bool>   Afweging_DK         := SpecifiekeInstellingen/InstallatieSet/InstallatieSetcriteria/Afweging_DK, IsHidden = "True";
-		parameter<bool>   Afweging_KK         := SpecifiekeInstellingen/InstallatieSet/InstallatieSetcriteria/Afweging_KK, IsHidden = "True";
+		//parameter<bool>   Afweging_KK         := SpecifiekeInstellingen/InstallatieSet/InstallatieSetcriteria/Afweging_KK, IsHidden = "True";
+		parameter<bool>   Afweging_KK         := LocatieSpecifiekeOpties/GebouwOpties/Afweging_KK, IsHidden = "True";
+
 
 		#include<Ventilatie.dms>
 		#include<Dak.dms>
