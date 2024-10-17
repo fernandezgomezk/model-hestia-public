@@ -370,7 +370,19 @@ container VastgoedProjectie
 	unit<uint32> results := ='union_unit('+AsItemList('NieuwbouwObjecten/'+Periode/name+'/BebouwingsObject')+')'
 	{
 		attribute<Classifications/combines/WBE> ModelObjectKey := =replace(unionExpr, '@ATTR', 'ModelObjectKey');
-		attribute<string> code := =replace(unionExpr, '@ATTR', 'code');
+		attribute<string> code 			:= =replace(unionExpr, '@ATTR', 'code');
+		attribute<string> buurtnaam 	:= const('nvt', .);
+		attribute<uint8> nr_verdiepingen:= uint8(const(0, .));
+		attribute<float64> footprint 	:= float64(const(0, .));
+
+		attribute<string> BU_CODE      	:= const('nvt', .); 
+		attribute<float64> Buurt_area   := float64(const(0, .)); 
+		attribute<string> WK_CODE      	:= const('nvt', .); 
+		attribute<string> Gemeente_name := const('nvt', .); 
+		attribute<string> GM_code      	:= const('nvt', .); 
+		attribute<string> PROV_naam    	:= const('nvt', .); 
+		attribute<string> res_regio    	:= const('nvt', .); 
+
 		attribute<string> label := =replace(unionExpr, '@ATTR', 'label');
 		attribute<rdc_meter> Geometry := =replace(unionExpr, '@ATTR', 'Geometry');
 		attribute<Invoer/RuimtelijkeData/StudieGebied/buurt> buurt_rel := =replace(unionExpr, '@ATTR', 'buurt_rel');

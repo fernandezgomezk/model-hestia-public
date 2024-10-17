@@ -115,6 +115,15 @@ container BAG: url="%HestiaDataDir%/BAG/20230223_actualisatie_BAG_WP.txt"
 			// relatie naar buurt voor o.a. ruimtelijke selectie
 			attribute<RegioIndelingen/buurt>    buurt_rel    := point_in_polygon(geometry, RegioIndelingen/buurt/geometry);
 			attribute<RegioIndelingen/gemeente> gemeente_rel := RegioIndelingen/buurt/gemeente_rel[buurt_rel];
+			attribute<string> 					buurtnaam 	 := RegioIndelingen/buurt/BU_NAAM[buurt_rel];
+			attribute<string> 					BU_CODE      := RegioIndelingen/buurt/BU_CODE[buurt_rel]; 
+			attribute<float64> 					Buurt_area   := RegioIndelingen/buurt/AreaInKm2[buurt_rel]; 
+			attribute<string> 					WK_CODE      := RegioIndelingen/buurt/WK_CODE[buurt_rel]; 
+			attribute<string> 					Gemeente_name:= RegioIndelingen/buurt/GM_NAAM[buurt_rel]; 
+			attribute<string> 					GM_code      := RegioIndelingen/buurt/GM_code[buurt_rel]; 
+			attribute<string> 					PROV_naam    := RegioIndelingen/buurt/PROV_naam[buurt_rel]; 
+			attribute<string> 					res_regio    := RegioIndelingen/buurt/ER_NAAM[buurt_rel]; 
+
 
 			attribute<Classifications/BouwjaarWoning>  BouwjaarWoning_rel := isNull(pand_rel -> bouwjaar_gecorrigeerd ) ? Classifications/BouwjaarWoning/onbekend : classify(pand_rel -> bouwjaar_gecorrigeerd ,Classifications/BouwjaarWoning/ClassBreak);
 			attribute<Classifications/Eigendom>        Eigendom_rel       := EigendomStaat/pand/Eigendom_rel[pand_rel];
@@ -204,13 +213,23 @@ container BAG: url="%HestiaDataDir%/BAG/20230223_actualisatie_BAG_WP.txt"
 	,	FreeData   = "False"
 	,	KeepData   = "True"
 	{
-		attribute<string>                                 identificatie              := select_data(., import/vbo/identificatie);
+		attribute<string>                               identificatie              	:= select_data(., import/vbo/identificatie);
+		attribute<string>                               buurtnaam              		:= select_data(., import/vbo/buurtnaam);
+
+		attribute<string> 								BU_CODE      				:= select_data(., import/vbo/BU_CODE);
+		attribute<float64> 								Buurt_area   				:= select_data(., import/vbo/Buurt_area);
+		attribute<string> 								WK_CODE      				:= select_data(., import/vbo/WK_CODE);
+		attribute<string> 								Gemeente_name 				:= select_data(., import/vbo/Gemeente_name);
+		attribute<string> 								GM_code      				:= select_data(., import/vbo/GM_code);
+		attribute<string> 								PROV_naam    				:= select_data(., import/vbo/PROV_naam);
+		attribute<string> 								res_regio    				:= select_data(., import/vbo/res_regio);
+	
 		attribute<string>                                 label                      := rjoin(select_data(., import/vbo/nummeraanduiding_id), import/nummeraanduiding/identificatie, import/nummeraanduiding/adres_key);
 
 		attribute<rdc_meter>                              geometry                   := select_data(., import/vbo/geometry);
 
 		attribute<RegioIndelingen/gemeente>    			  gemeente_rel               := select_data(., import/vbo/gemeente_rel);
-
+		
 		attribute<import/nummeraanduiding>                nummeraanduiding_rel       := rlookup(select_data(., import/vbo/nummeraanduiding_id), import/nummeraanduiding/identificatie);
 		
 		attribute<string>                                 postcode                   := import/nummeraanduiding/postcode[nummeraanduiding_rel];
@@ -225,6 +244,8 @@ container BAG: url="%HestiaDataDir%/BAG/20230223_actualisatie_BAG_WP.txt"
 
 		attribute<Units/yr_uint16>                        bouwjaar                   := pand_rel->bouwjaar_gecorrigeerd;
 		attribute<Units/yr_uint16>                        sloopjaar                  := pand_rel->sloopjaar_gecorrigeerd, IsHidden = "True";
+		attribute<Units/m2>                               footprint              	 := pand_rel->footprint;
+
 		attribute<Classifications/BouwjaarWoning>         BouwjaarWoning_rel         := select_data(., import/vbo/BouwjaarWoning_rel), IsHidden = "True";
 		attribute<Classifications/Eigendom>               Eigendom_rel               := select_data(., import/vbo/Eigendom_rel);
 		attribute<bool>                                   Gasloos                    := Gasnetten/Gasloos[pand_rel];

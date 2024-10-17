@@ -96,6 +96,51 @@ Template FunctioneelToMetervraag
 		, VraagBO
 		, GJ_yr);
 	
+	container metervraag_per_product_per_input
+	{
+
+		attribute<GJ_yr> metervraag_gas_rv_basis (VraagBO) := BemeterdeGebouwInput_rel/RVb == Classifications/BemeterdeGebouwInput/V/gas ? metervraag_per_product/RVb : float64(0);
+		attribute<GJ_yr> metervraag_gas_rv_piek (VraagBO) := BemeterdeGebouwInput_rel/RVp == Classifications/BemeterdeGebouwInput/V/gas ? metervraag_per_product/RVp : float64(0);
+
+		attribute<GJ_yr> metervraag_elektriciteit_rv_basis (VraagBO) := BemeterdeGebouwInput_rel/RVb == Classifications/BemeterdeGebouwInput/V/E ? metervraag_per_product/RVb : float64(0);
+		attribute<GJ_yr> metervraag_elektriciteit_rv_piek (VraagBO) := BemeterdeGebouwInput_rel/RVp == Classifications/BemeterdeGebouwInput/V/E ? metervraag_per_product/RVp : float64(0);
+
+		attribute<GJ_yr> metervraag_warmte_rv_basis (VraagBO) := BemeterdeGebouwInput_rel/RVb == Classifications/BemeterdeGebouwInput/V/warmte ? metervraag_per_product/RVb : float64(0);
+		attribute<GJ_yr> metervraag_warmte_rv_piek (VraagBO) := BemeterdeGebouwInput_rel/RVp == Classifications/BemeterdeGebouwInput/V/warmte ? metervraag_per_product/RVp : float64(0);
+
+		attribute<GJ_yr> metervraag_biomassa_rv_basis (VraagBO) := BemeterdeGebouwInput_rel/RVb == Classifications/BemeterdeGebouwInput/V/biomassa ? metervraag_per_product/RVb : float64(0);
+		attribute<GJ_yr> metervraag_biomassa_rv_piek (VraagBO) := BemeterdeGebouwInput_rel/RVp == Classifications/BemeterdeGebouwInput/V/biomassa ? metervraag_per_product/RVp : float64(0);
+
+		attribute<GJ_yr> metervraag_olie_rv_basis (VraagBO) := BemeterdeGebouwInput_rel/RVb == Classifications/BemeterdeGebouwInput/V/olie ? metervraag_per_product/RVb : float64(0);
+		attribute<GJ_yr> metervraag_olie_rv_piek (VraagBO) := BemeterdeGebouwInput_rel/RVp == Classifications/BemeterdeGebouwInput/V/olie ? metervraag_per_product/RVp : float64(0);
+
+		attribute<GJ_yr> metervraag_gas_tw_basis (VraagBO) := BemeterdeGebouwInput_rel/TWb == Classifications/BemeterdeGebouwInput/V/gas ? metervraag_per_product/TWb : float64(0);
+		attribute<GJ_yr> metervraag_gas_tw_piek (VraagBO) := BemeterdeGebouwInput_rel/TWp == Classifications/BemeterdeGebouwInput/V/gas ? metervraag_per_product/TWp : float64(0);
+
+		attribute<GJ_yr> metervraag_elektriciteit_tw_basis (VraagBO) := BemeterdeGebouwInput_rel/TWb == Classifications/BemeterdeGebouwInput/V/E ? metervraag_per_product/TWb : float64(0);
+		attribute<GJ_yr> metervraag_elektriciteit_tw_piek (VraagBO) := BemeterdeGebouwInput_rel/TWp == Classifications/BemeterdeGebouwInput/V/E ? metervraag_per_product/TWp : float64(0);
+
+		attribute<GJ_yr> metervraag_warmte_tw_basis (VraagBO) := BemeterdeGebouwInput_rel/TWb == Classifications/BemeterdeGebouwInput/V/warmte ? metervraag_per_product/TWb : float64(0);
+		attribute<GJ_yr> metervraag_warmte_tw_piek (VraagBO) := BemeterdeGebouwInput_rel/TWp == Classifications/BemeterdeGebouwInput/V/warmte ? metervraag_per_product/TWp : float64(0);
+
+		attribute<GJ_yr> metervraag_biomassa_tw_basis (VraagBO) := BemeterdeGebouwInput_rel/TWb == Classifications/BemeterdeGebouwInput/V/biomassa ? metervraag_per_product/TWb : float64(0);
+		attribute<GJ_yr> metervraag_biomassa_tw_piek (VraagBO) := BemeterdeGebouwInput_rel/TWp == Classifications/BemeterdeGebouwInput/V/biomassa ? metervraag_per_product/TWp : float64(0);
+
+		attribute<GJ_yr> metervraag_olie_tw_basis (VraagBO) := BemeterdeGebouwInput_rel/TWb == Classifications/BemeterdeGebouwInput/V/olie ? metervraag_per_product/TWb : float64(0);
+		attribute<GJ_yr> metervraag_olie_tw_piek (VraagBO) := BemeterdeGebouwInput_rel/TWp == Classifications/BemeterdeGebouwInput/V/olie ? metervraag_per_product/TWp : float64(0);
+
+		/* attribute<GJ_yr> metervraag_gas_koken (VraagBO) := BemeterdeGebouwInput_rel/RVb == Classifications/BemeterdeGebouwInput/V/gas ? metervraag_per_product/RVb : float64(0);
+		attribute<GJ_yr> metervraag_elektriciteit_koken (VraagBO) := BemeterdeGebouwInput_rel/RVb == Classifications/BemeterdeGebouwInput/V/elektriciteit ? metervraag_per_product/RVb : float64(0);
+
+		attribute<GJ_yr> metervraag_elektriciteit_kd_basis (VraagBO) := BemeterdeGebouwInput_rel/RVb == Classifications/BemeterdeGebouwInput/V/elektriciteit ? metervraag_per_product/RVb : float64(0);
+		attribute<GJ_yr> metervraag_elektriciteit_kd_piek (VraagBO) := BemeterdeGebouwInput_rel/RVb == Classifications/BemeterdeGebouwInput/V/elektriciteit ? metervraag_per_product/RVb : float64(0);
+
+		attribute<GJ_yr> metervraag_elektriciteit_ventilatie (VraagBO) := BemeterdeGebouwInput_rel/RVb == Classifications/BemeterdeGebouwInput/V/elektriciteit ? metervraag_per_product/RVb : float64(0);
+		attribute<GJ_yr> metervraag_elektriciteit_ea (VraagBO) := BemeterdeGebouwInput_rel/RVb == Classifications/BemeterdeGebouwInput/V/elektriciteit ? metervraag_per_product/RVb : float64(0);
+*/
+
+	}
+	
 	container Koken
 	{
 		attribute<Invoer/Kengetallen/OverigeInstallaties/KK/Installatietypes> Installatietype_rel (VraagBO) := VraagBO/InstallatiePerProduct/KK;
@@ -191,6 +236,7 @@ Template FunctioneelToMetervraag
 	container result := metervraag_per_input
 	{
 		attribute<GJ_yr> e     (VraagBO) := metervraag_per_input/e + VraagBO/Functioneel/EA + eEffect/Vj_elek + koken/Vj_elek;
+
 		attribute<GJ_yr> gas   (VraagBO) := metervraag_per_input/gas + Koken/Vj_gas    ;
 		attribute<GJ_yr> Total (VraagBO) := ='add('+AsItemList(Classifications/BemeterdeGebouwInput/name)+')';
 

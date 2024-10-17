@@ -22,6 +22,8 @@ template AllocatieResultatenComponent
 	unit<uint32> BO := BO_base
 	{
 		attribute<Classifications/Schillabel>  Schillabel_rel   := BO_base/Schillabel_rel;
+		attribute<Classifications/Schillabel>  Energielabel_rel   := BO_base/Energielabel_rel;
+
         
 		attribute<bool> KoudeGebouw := (IsDefined(BemeterdeGebouwInput_rel/KDb) || IsDefined(BemeterdeGebouwInput_rel/KDp)) && not(KoudeGebied);
 		attribute<bool> KoudeGebied := BO/InstallatiePerProduct/Kdb == Classifications/Installatie/V/Gebiedsoptie || BO/InstallatiePerProduct/Kdp == Classifications/Installatie/V/Gebiedsoptie;
@@ -46,7 +48,9 @@ template AllocatieResultatenComponent
 			attribute<GJ_yr> V_TW      (BO) := BO_Base/Functioneel/TW;
 			attribute<GJ_yr> V_Warmte  (BO) := V_RV + V_TW;
 			attribute<GJ_yr> V_KD      (BO) := BO_Base/Functioneel/KD;
+			attribute<GJ_yr> V_KK      (BO) := BO_Base/Functioneel/KK;
 			attribute<GJ_yr> V_VT      (BO) := BO_Base/Functioneel/VT;
+		
 			attribute<GJ_yr> EA        (BO) := BO_base/Functioneel/EA;
 			attribute<GJ_yr> Totaal_LO (BO) :=    V_RV * float64(Aansluitingen/Warmte == 0.0[nrAsl]) + V_TW * float64(Aansluitingen/Warmte == 0.0[nrAsl])
 												+ V_VT + V_KD * float64(KoudeGebouw);
@@ -58,22 +62,24 @@ template AllocatieResultatenComponent
 	    {
         unit<uint32> table := select_with_org_rel(isdefined(BO/code))
 		{attribute<String> vbo_id						:= BO/code[org_rel];
-		attribute<Classifications/Eigendom > eigendomstype		:= BO/Eigendom_rel_org[org_rel];
-		attribute<Uint8> woningtype								:= BO/BebouwingsType[org_rel]; 
-		// attribute<Uint8> BebouwingsType							:= BO/BebouwingsType[org_rel];
-		//attribute<Eur_yr> Kj_gas       							:= BO/jaarlijks/Kj_gas[org_rel];
-		//attribute<Eur_yr> Kj_e       							:= BO/jaarlijks/Kj_e[org_rel];
-		//attribute<GJ_yr> Aardgas       							:= Woning/Metervraag/AardGas[org_rel];
-		//attribute<GJ_yr> Elektriciteit       					:= Woning/Metervraag/Elektriciteit[org_rel];
-		//attribute<string> heeft_gas       						:= Woning/Metervraag/Aardgas[org_rel] > 0[GJ_yr] || Woning/Metervraag/Waterstof[org_rel] > 0[GJ_yr] ? 'ja' : 'nee';
-		attribute<GJ_yr> Functioneel_RuimteVerwarming			:= Functioneel/V_RV[org_rel];
-		attribute<GJ_yr> Functioneel_Tapwater					:= Functioneel/V_TW[org_rel];
-		attribute<GJ_yr> Netto_warmtevraag						:= BebouwingsComponenten/Woning/BO/EnergielabelBerekening/warmteverlies/Totaal[org_rel];
-		attribute<Eur> Ki_gv       								:= BO/eenmalig/Ki_gv[org_rel];
-		attribute<Eur> Ki_VT		       						:= BO/eenmalig/Ki_VT[org_rel];
-		attribute<classifications/schillabel> Energielabel_rel	:= BO/Energielabel_rel[org_rel];
-		attribute<UInt16> bouwjaar								:= BO/bouwjaar[org_rel];
-		attribute<m2> oppervlakte								:= BO/oppervlakte[org_rel];
+		attribute<UInt32> eigendomstype					:= BO/Eigendom_rel[org_rel];
+		attribute<Uint8> woningtype						:= BO/BebouwingsType[org_rel]; 
+		attribute<UInt16> bouwjaar						:= BO/bouwjaar[org_rel];
+		attribute<UInt16> sloopjaar						:= BO/sloopjaar[org_rel];
+		attribute<UInt8> nr_verdiepingen				:= BO/nr_verdiepingen[org_rel];
+		attribute<m2> gebruiksoppervlak					:= BO/oppervlakte[org_rel];
+		attribute<m2> footprint							:= BO/footprint[org_rel];
+		attribute<string> adres							:= BO/adres[org_rel];
+		attribute<string> BU_NAAM						:= BO/buurtnaam[org_rel];
+		attribute<string> BU_CODE						:= BO/BU_code[org_rel];
+		attribute<float64> Buurt_area					:= BO/Buurt_area[org_rel];
+		attribute<string> WK_CODE						:= BO/WK_CODE[org_rel];
+		attribute<string> Gemeente_name					:= BO/Gemeente_name[org_rel];
+		attribute<string> GM_code						:= BO/GM_code[org_rel];
+		attribute<string> PROV_NAAM						:= BO/PROV_NAAM[org_rel];
+		attribute<string> res_regio						:= BO/res_regio[org_rel];
+				//attribute<string> heeft_gas       						:= Woning/Metervraag/Aardgas[org_rel] > 0[GJ_yr] || Woning/Metervraag/Waterstof[org_rel] > 0[GJ_yr] ? 'ja' : 'nee';
+
 		attribute<m2> vloer_opp									:= BO/Bouwdelen/VL [org_rel];
 		attribute<m2> schuin_dak_opp							:= BO/Bouwdelen/DS [org_rel];
 		attribute<m2> plat_dak_opp								:= BO/Bouwdelen/DP [org_rel];
@@ -84,39 +90,80 @@ template AllocatieResultatenComponent
 		attribute<m2> raam_onder_opp							:= BO/Bouwdelen/RO [org_rel];
 		attribute<m2> deur_opp									:= BO/Bouwdelen/DR [org_rel];
 		attribute<m2> schill_opp								:= vloer_opp + schuin_dak_opp + plat_dak_opp + massieve_gevel_opp + spouwmuur_opp + paneel_opp + raam_boven_opp + raam_onder_opp + deur_opp;
-		attribute<Classifications/IsolatieNiveau> RB_na			:= BO/Bouwdelen/Isolatie/RB [org_rel];
-		attribute<Classifications/IsolatieNiveau> RB_voor		:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/RB[org_rel];
-		attribute<Classifications/IsolatieNiveau> RO_na			:= BO/Bouwdelen/Isolatie/RO[org_rel];
-		attribute<Classifications/IsolatieNiveau> RO_voor		:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/RO[org_rel];
-		attribute<Classifications/IsolatieNiveau> DR_na			:= BO/Bouwdelen/Isolatie/DR[org_rel];
-		attribute<Classifications/IsolatieNiveau> DR_voor		:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/DR[org_rel];
-		attribute<Classifications/IsolatieNiveau> PL_na			:= BO/Bouwdelen/Isolatie/PL[org_rel];
-		attribute<Classifications/IsolatieNiveau> PL_voor		:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/PL[org_rel];
-		attribute<Classifications/IsolatieNiveau> VL_na			:= BO/Bouwdelen/Isolatie/VL[org_rel];
-		attribute<Classifications/IsolatieNiveau> VL_voor		:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/VL[org_rel];
-		attribute<Classifications/IsolatieNiveau> MG_na			:= BO/Bouwdelen/Isolatie/MG[org_rel];
-		attribute<Classifications/IsolatieNiveau> MG_voor		:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/MG[org_rel];
-		attribute<Classifications/IsolatieNiveau> MS_na			:= BO/Bouwdelen/Isolatie/MS[org_rel];
-		attribute<Classifications/IsolatieNiveau> MS_voor		:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/MS[org_rel];
-		attribute<Classifications/IsolatieNiveau> DP_na			:= BO/Bouwdelen/Isolatie/DP[org_rel];
-		attribute<Classifications/IsolatieNiveau> DP_voor		:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/DP[org_rel];
-		attribute<Classifications/IsolatieNiveau> DS_na			:= BO/Bouwdelen/Isolatie/DS[org_rel];
-		attribute<Classifications/IsolatieNiveau> DS_voor		:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/DS[org_rel];
-		attribute<Classifications/IsolatieNiveau> KR_na    		:= BO/Bouwdelen/Isolatie/KR[org_rel];
-        attribute<Classifications/IsolatieNiveau> KR_voor    	:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/KR[org_rel];
-		attribute<Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes> VT_na    := BO/InstallatiePerProduct/VT[org_rel];
-        attribute<Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes> VT_voor    := Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/VT[org_rel];
-		attribute<UInt16> LastVervanging_RB    := BO/Bouwdelen/LastVervanging/RB[org_rel];
-		attribute<UInt16> LastVervanging_RO    := BO/Bouwdelen/LastVervanging/RO[org_rel];
-		attribute<UInt16> LastVervanging_DS    := BO/Bouwdelen/LastVervanging/DS[org_rel];
-		attribute<UInt16> LastVervanging_DP    := BO/Bouwdelen/LastVervanging/DP[org_rel];
-		attribute<UInt16> LastVervanging_MS    := BO/Bouwdelen/LastVervanging/MS[org_rel];
-		attribute<UInt16> LastVervanging_MG    := BO/Bouwdelen/LastVervanging/MG[org_rel];
-		attribute<UInt16> LastVervanging_PL    := BO/Bouwdelen/LastVervanging/PL[org_rel];
-		attribute<UInt16> LastVervanging_VL    := BO/Bouwdelen/LastVervanging/VL[org_rel];
-		attribute<UInt16> LastVervanging_DR    := BO/Bouwdelen/LastVervanging/DR[org_rel];
-		attribute<UInt16> LastVervanging_KR    := BO/Bouwdelen/LastVervanging/KR[org_rel];
-		attribute<UInt16> LastVervanging_VT    := BO/InstallatiePerProduct/LastVervanging/VT[org_rel];
+	
+		attribute<Classifications/IsolatieNiveau> schuin_dak_isolatie		:= BO/Bouwdelen/Isolatie/DS[org_rel];
+		attribute<Classifications/IsolatieNiveau> plat_dak_isolatie			:= BO/Bouwdelen/Isolatie/DP[org_rel];
+		attribute<Classifications/IsolatieNiveau> massieve_gevel_isolatie	:= BO/Bouwdelen/Isolatie/MG[org_rel];
+		attribute<Classifications/IsolatieNiveau> spouwmuur_isolatie		:= BO/Bouwdelen/Isolatie/MS[org_rel];
+		attribute<Classifications/IsolatieNiveau> vloer_isolatie			:= BO/Bouwdelen/Isolatie/VL[org_rel];
+		attribute<Classifications/IsolatieNiveau> paneel_isolatie			:= BO/Bouwdelen/Isolatie/PL[org_rel];
+		attribute<Classifications/IsolatieNiveau> raam_boven_isolatie		:= BO/Bouwdelen/Isolatie/RB [org_rel];
+		attribute<Classifications/IsolatieNiveau> raam_onder_isolatie		:= BO/Bouwdelen/Isolatie/RO[org_rel];
+		attribute<Classifications/IsolatieNiveau> deur_isolatie				:= BO/Bouwdelen/Isolatie/DR[org_rel];
+		attribute<Classifications/IsolatieNiveau> kier_isolatie	    		:= BO/Bouwdelen/Isolatie/KR[org_rel];
+
+		attribute<Classifications/Installatie> installatie_rv_basis     								:= BO/InstallatiePerProduct/RVb[org_rel]; 
+		attribute<Classifications/Installatie> installatie_rv_piek      								:= BO/InstallatiePerProduct/RVp[org_rel]; 
+		attribute<Classifications/Installatie> installatie_tw_basis     								:= BO/InstallatiePerProduct/TWb[org_rel]; 
+		attribute<Classifications/Installatie> installatie_tw_piek      								:= BO/InstallatiePerProduct/TWp[org_rel]; 
+		attribute<Invoer/Kengetallen/OverigeInstallaties/KK/Installatietypes>  installatie_koken  		:= BO/InstallatiePerProduct/KK[org_rel]; 
+		attribute<Classifications/Installatie> installatie_kd_basis     								:= BO/InstallatiePerProduct/KDb[org_rel]; 
+		attribute<Classifications/Installatie> installatie_kd_piek      								:= BO/InstallatiePerProduct/KDp[org_rel]; 
+		attribute<Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes>  installatie_ventilatie	:= BO/InstallatiePerProduct/VT[org_rel]; 
+		attribute<Invoer/Kengetallen/OverigeInstallaties/DK/Installatietypes>  installatie_dak          := BO/InstallatiePerProduct/DK[org_rel]; 
+
+		attribute<Classifications/Schillabel> energielabel_afgemeld						:= BO/Schillabel_rel[org_rel];
+		attribute<Classifications/Schillabel> energielabel_default						:= BO/Default_Energielabel_rel[org_rel];
+		attribute<Classifications/Schillabel> energielabel_berekend						:= BebouwingsComponenten/Woning/BO/EnergielabelBerekening/Energielabel_rel[org_rel];		
+
+		attribute<GJ_yr> functionele_vraag_rv			:= Functioneel/V_RV[org_rel];
+		attribute<GJ_yr> functionele_vraag_tw			:= Functioneel/V_TW[org_rel];
+		attribute<GJ_yr> functionele_vraag_koken		:= Functioneel/V_KK[org_rel];
+		attribute<GJ_yr> functionele_vraag_kd			:= Functioneel/V_KD[org_rel];
+		attribute<GJ_yr> functionele_vraag_ea			:= Functioneel/EA[org_rel];
+		
+		attribute<GJ_yr> metervraag_gas       					:= Woning/Metervraag/Gas[org_rel];
+		attribute<GJ_yr> metervraag_elektriciteit				:= Woning/Metervraag/E[org_rel];
+		attribute<GJ_yr> metervraag_warmte						:= BebouwingsComponenten/Woning/BO/EnergielabelBerekening/warmteverlies/Totaal[org_rel];		
+		attribute<GJ_yr> metervraag_biomassa       				:= Woning/Metervraag/Biomassa[org_rel];
+		attribute<GJ_yr> metervraag_olie       					:= Woning/Metervraag/Olie[org_rel];
+		
+		attribute<GJ_yr> opbrengst_zon_pv      					:= Woning/Metervraag/Oj_e_ZonPV[org_rel];
+
+		attribute<GJ_yr> metervraag_gas_rv_basis           		:= Woning/Metervraag/metervraag_gas_rv_basis[org_rel];
+		attribute<GJ_yr> metervraag_gas_rv_piek            		:= Woning/Metervraag/metervraag_gas_rv_piek[org_rel];
+		attribute<GJ_yr> metervraag_elektriciteit_rv_basis  	:= Woning/Metervraag/metervraag_elektriciteit_rv_basis[org_rel];
+		attribute<GJ_yr> metervraag_elektriciteit_rv_piek   	:= Woning/Metervraag/metervraag_elektriciteit_rv_piek[org_rel];
+		attribute<GJ_yr> metervraag_warmte_rv_basis         	:= Woning/Metervraag/metervraag_warmte_rv_basis[org_rel];
+		attribute<GJ_yr> metervraag_warmte_rv_piek          	:= Woning/Metervraag/metervraag_warmte_rv_piek[org_rel];
+		attribute<GJ_yr> metervraag_biomassa_rv_basis       	:= Woning/Metervraag/metervraag_biomassa_rv_basis[org_rel];
+		attribute<GJ_yr> metervraag_biomassa_rv_piek        	:= Woning/Metervraag/metervraag_biomassa_rv_piek[org_rel];
+		attribute<GJ_yr> metervraag_olie_rv_basis            	:= Woning/Metervraag/metervraag_olie_rv_basis[org_rel];
+		attribute<GJ_yr> metervraag_olie_rv_piek             	:= Woning/Metervraag/metervraag_olie_rv_piek[org_rel];
+		attribute<GJ_yr> metervraag_gas_tw_basis            	:= Woning/Metervraag/metervraag_gas_tw_basis[org_rel];
+		attribute<GJ_yr> metervraag_gas_tw_piek             	:= Woning/Metervraag/metervraag_gas_tw_piek[org_rel];
+		attribute<GJ_yr> metervraag_elektriciteit_tw_basis  	:= Woning/Metervraag/metervraag_elektriciteit_tw_basis[org_rel];
+		attribute<GJ_yr> metervraag_elektriciteit_tw_piek   	:= Woning/Metervraag/metervraag_elektriciteit_tw_piek[org_rel];
+		attribute<GJ_yr> metervraag_warmte_tw_basis         	:= Woning/Metervraag/metervraag_warmte_tw_basis[org_rel];
+		attribute<GJ_yr> metervraag_warmte_tw_piek          	:= Woning/Metervraag/metervraag_warmte_tw_piek[org_rel];
+		attribute<GJ_yr> metervraag_biomassa_tw_basis       	:= Woning/Metervraag/metervraag_biomassa_tw_basis[org_rel];
+		attribute<GJ_yr> metervraag_biomassa_tw_piek        	:= Woning/Metervraag/metervraag_biomassa_tw_piek[org_rel];
+		attribute<GJ_yr> metervraag_olie_tw_basis           	:= Woning/Metervraag/metervraag_olie_tw_basis[org_rel];
+		attribute<GJ_yr> metervraag_olie_tw_piek            	:= Woning/Metervraag/metervraag_olie_tw_piek[org_rel];
+		attribute<GJ_yr> metervraag_gas_koken               	:= Woning/Metervraag/metervraag_gas_koken[org_rel];
+		attribute<GJ_yr> metervraag_elektriciteit_koken     	:= Woning/Metervraag/metervraag_elektriciteit_koken[org_rel];
+		attribute<GJ_yr> metervraag_elektriciteit_kd_basis  	:= Woning/Metervraag/metervraag_elektriciteit_kd_basis[org_rel];
+		attribute<GJ_yr> metervraag_elektriciteit_kd_piek   	:= Woning/Metervraag/metervraag_elektriciteit_kd_piek[org_rel];
+		attribute<GJ_yr> metervraag_elektriciteit_ventilatie 	:= Woning/Metervraag/metervraag_elektriciteit_ventilatie[org_rel];
+		attribute<GJ_yr> metervraag_elektriciteit_ea        	:= Woning/Metervraag/metervraag_elektriciteit_ea[org_rel];
+
+		attribute<Eur_GJ> kosten_gas_variabel      			:= BO/jaarlijks/kosten_gas_variabel[org_rel];
+		attribute<Eur_yr> kosten_gas_vast	    			:= BO/jaarlijks/Kj_vastrecht_G[org_rel];
+		attribute<Eur_GJ> kosten_elektriciteit_variabel     := BO/jaarlijks/kosten_elektriciteit_variabel[org_rel];
+		attribute<Eur_yr> kosten_elektriciteit_vast    		:= BO/jaarlijks/Kj_vastrecht_E[org_rel];
+		
+
+		
 		} 
 		parameter<string> OutputFolder := '%localDataProjDir%/Results/IsolatieStandaard/';
         unit<uint32> variable := SubItem_PropValues(table,'name');
@@ -184,12 +231,16 @@ template AllocatieResultatenComponent
 			//Elektriciteit
 			attribute<classifications/gebruiksgrootteklasse> e_gebruiksgrootteklasse_rel (BO) := classify(Metervraag/e, Prijzen/Elektriciteit/Staffel/ClassBreak);
 			attribute<Eur_yr> Kj_e           (BO) := Metervraag/e * Prijzen/Elektriciteit/Staffel/KGJ_eindgebruik_excl[e_gebruiksgrootteklasse_rel];
+			attribute<Eur_GJ> kosten_elektriciteit_variabel        (BO) :=  Prijzen/Elektriciteit/Staffel/KGJ_eindgebruik_excl[g_gebruiksgrootteklasse_rel];
+
 			attribute<Eur_yr> Km_e           (BO) := Metervraag/e * Prijzen/Elektriciteit/Staffel/KGJ_Maatschappelijk [e_gebruiksgrootteklasse_rel];
 			attribute<Eur_yr> Kj_e_EH        (BO) := Metervraag/e * Prijzen/Elektriciteit/Staffel/KGJ_EnergieHeffing[e_gebruiksgrootteklasse_rel];
 
 			//Gas
 			attribute<classifications/gebruiksgrootteklasse> g_gebruiksgrootteklasse_rel (BO) := classify(Metervraag/gas, Prijzen/Aardgas/Staffel/ClassBreak);
 			attribute<Eur_yr> Kj_gas         (BO) := Metervraag/gas * Prijzen/Aardgas/Staffel/KGJ_eindgebruik_excl[g_gebruiksgrootteklasse_rel];
+			attribute<Eur_GJ> kosten_gas_variabel        (BO) :=  Prijzen/Aardgas/Staffel/KGJ_eindgebruik_excl[g_gebruiksgrootteklasse_rel];
+
 			attribute<Eur_yr> Km_gas         (BO) := Metervraag/gas * Prijzen/Aardgas/Staffel/KGJ_Maatschappelijk [g_gebruiksgrootteklasse_rel];
 			attribute<Eur_yr> Kj_gas_EH      (BO) := Metervraag/gas * Prijzen/Aardgas/Staffel/KGJ_EnergieHeffing[g_gebruiksgrootteklasse_rel];
 

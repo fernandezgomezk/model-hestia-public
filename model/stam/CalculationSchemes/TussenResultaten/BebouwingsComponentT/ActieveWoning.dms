@@ -191,6 +191,8 @@ unit<uint32> ActieveWoning := select_with_org_rel(BO/Activatie/ProductActief || 
 	unit<uint32> BebouwingsObjectMetGebouwOptie := BO
 	{
 		attribute<Classifications/Schillabel>  Schillabel_rel   (BO) := makedefined(GeschikteOptie/SchilLabel_rel   [Choice_per_BO/GeschikteOptie_rel], BO/SchilLabel_rel);
+		attribute<Classifications/Schillabel>  energielabel_afgemeld   (BO) := makedefined(GeschikteOptie/energielabel_afgemeld   [Choice_per_BO/GeschikteOptie_rel], BO/energielabel_afgemeld);
+
 		attribute<Classifications/Schillabel>  Energielabel_rel (BO) := makedefined(GeschikteOptie/Energielabel_rel [Choice_per_BO/GeschikteOptie_rel], BO/Energielabel_rel);
 		attribute<Classifications/GebouwOptie> GebouwOptie_rel  (BO) := makedefined(GeschikteOptie/GebouwOptie_rel  [Choice_per_BO/GeschikteOptie_rel], BO/GebouwOptie_rel);
 		
@@ -247,7 +249,49 @@ unit<uint32> ActieveWoning := select_with_org_rel(BO/Activatie/ProductActief || 
 															, BO/metervraagBerekening/eEffect/volume/Vj_elek        
 															+ BO/metervraagBerekening/eEffect/capaciteit/Vj_elek) ;
 
+			attribute<GJ_yr> metervraag_gas_rv_basis       (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_gas_rv_basis     [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_gas_rv_basis    );
+			attribute<GJ_yr> metervraag_gas_rv_piek        (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_gas_rv_piek      [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_gas_rv_piek    );
+
+			attribute<GJ_yr> metervraag_elektriciteit_rv_basis (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_elektriciteit_rv_basis [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_elektriciteit_rv_basis);
+			attribute<GJ_yr> metervraag_elektriciteit_rv_piek (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_elektriciteit_rv_piek [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_elektriciteit_rv_piek);
+
+			attribute<GJ_yr> metervraag_warmte_rv_basis     (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_warmte_rv_basis     [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_warmte_rv_basis);
+			attribute<GJ_yr> metervraag_warmte_rv_piek      (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_warmte_rv_piek      [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_warmte_rv_piek);
+
+			attribute<GJ_yr> metervraag_biomassa_rv_basis   (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_biomassa_rv_basis   [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_biomassa_rv_basis);
+			attribute<GJ_yr> metervraag_biomassa_rv_piek    (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_biomassa_rv_piek    [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_biomassa_rv_piek);
+
+			attribute<GJ_yr> metervraag_olie_rv_basis        (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_olie_rv_basis        [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_olie_rv_basis);
+			attribute<GJ_yr> metervraag_olie_rv_piek         (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_olie_rv_piek         [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_olie_rv_piek);
+
+			attribute<GJ_yr> metervraag_gas_tw_basis         (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_gas_tw_basis         [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_gas_tw_basis);
+			attribute<GJ_yr> metervraag_gas_tw_piek          (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_gas_tw_piek          [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_gas_tw_piek);
+
+			attribute<GJ_yr> metervraag_elektriciteit_tw_basis (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_elektriciteit_tw_basis [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_elektriciteit_tw_basis);
+			attribute<GJ_yr> metervraag_elektriciteit_tw_piek  (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_elektriciteit_tw_piek  [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_elektriciteit_tw_piek);
+
+			attribute<GJ_yr> metervraag_warmte_tw_basis      (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_warmte_tw_basis      [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_warmte_tw_basis);
+			attribute<GJ_yr> metervraag_warmte_tw_piek       (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_warmte_tw_piek       [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_warmte_tw_piek);
+
+			attribute<GJ_yr> metervraag_biomassa_tw_basis    (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_biomassa_tw_basis    [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_biomassa_tw_basis);
+			attribute<GJ_yr> metervraag_biomassa_tw_piek     (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_biomassa_tw_piek     [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_biomassa_tw_piek);
+
+			attribute<GJ_yr> metervraag_olie_tw_basis         (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_olie_tw_basis         [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_olie_tw_basis);
+			attribute<GJ_yr> metervraag_olie_tw_piek          (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_olie_tw_piek          [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_olie_tw_piek);
+
+			attribute<GJ_yr> metervraag_gas_koken            (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_gas_koken            [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_gas_koken);
+			attribute<GJ_yr> metervraag_elektriciteit_koken   (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_elektriciteit_koken   [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_elektriciteit_koken);
+
+			attribute<GJ_yr> metervraag_elektriciteit_kd_basis (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_elektriciteit_kd_basis [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_elektriciteit_kd_basis);
+			attribute<GJ_yr> metervraag_elektriciteit_kd_piek  (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_elektriciteit_kd_piek  [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_elektriciteit_kd_piek);
+
+			attribute<GJ_yr> metervraag_elektriciteit_ventilatie (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_elektriciteit_ventilatie [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_elektriciteit_ventilatie);
+			attribute<GJ_yr> metervraag_elektriciteit_ea        (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_elektriciteit_ea        [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_elektriciteit_ea);
+
+
 		} 
+
+		 
 
 		container functioneel := for_each_nedv(
 				Classifications/FunctioneleVraag/name,
@@ -299,6 +343,13 @@ unit<uint32> ActieveWoning := select_with_org_rel(BO/Activatie/ProductActief || 
 			attribute<Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes> VT (BO) := makedefined(GeschikteOptie/InstallatiePerProduct/VT[Choice_per_BO/GeschikteOptie_rel], BO/InstallatiePerProduct/VT);
 			attribute<Invoer/Kengetallen/OverigeInstallaties/DK/Installatietypes> DK (BO) := makedefined(GeschikteOptie/InstallatiePerProduct/DK[Choice_per_BO/GeschikteOptie_rel], BO/InstallatiePerProduct/DK);
 			attribute<Invoer/Kengetallen/OverigeInstallaties/KK/Installatietypes> KK (BO) := makedefined(GeschikteOptie/InstallatiePerProduct/KK[Choice_per_BO/GeschikteOptie_rel], BO/InstallatiePerProduct/KK);
+			attribute<Classifications/Installatie> RVb (BO):= makedefined(GeschikteOptie/InstallatiePerProduct/RVb[Choice_per_BO/GeschikteOptie_rel], BO/InstallatiePerProduct/RVb);
+			attribute<Classifications/Installatie> RVp (BO):= makedefined(GeschikteOptie/InstallatiePerProduct/RVp[Choice_per_BO/GeschikteOptie_rel], BO/InstallatiePerProduct/RVp);
+			attribute<Classifications/Installatie> TWb (BO):= makedefined(GeschikteOptie/InstallatiePerProduct/TWb[Choice_per_BO/GeschikteOptie_rel], BO/InstallatiePerProduct/TWb);
+			attribute<Classifications/Installatie> TWp (BO):= makedefined(GeschikteOptie/InstallatiePerProduct/TWp[Choice_per_BO/GeschikteOptie_rel], BO/InstallatiePerProduct/TWp);
+			attribute<Classifications/Installatie> KDb (BO):= makedefined(GeschikteOptie/InstallatiePerProduct/KDb[Choice_per_BO/GeschikteOptie_rel], BO/InstallatiePerProduct/KDb);
+			attribute<Classifications/Installatie> KDp (BO):= makedefined(GeschikteOptie/InstallatiePerProduct/KDp[Choice_per_BO/GeschikteOptie_rel], BO/InstallatiePerProduct/KDp);
+
 
 			container LastVervanging := for_each_nedv(
 				classifications/Product/name,
