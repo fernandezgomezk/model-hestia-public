@@ -279,14 +279,10 @@ unit<uint32> ActieveWoning := select_with_org_rel(BO/Activatie/ProductActief || 
 			attribute<GJ_yr> metervraag_olie_tw_basis         (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_olie_tw_basis         [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_olie_tw_basis);
 			attribute<GJ_yr> metervraag_olie_tw_piek          (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_olie_tw_piek          [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_olie_tw_piek);
 
-			attribute<GJ_yr> metervraag_gas_koken            (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_gas_koken            [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_gas_koken);
-			attribute<GJ_yr> metervraag_elektriciteit_koken   (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_elektriciteit_koken   [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_elektriciteit_koken);
+			attribute<GJ_yr> metervraag_gas_koken (BO) := makedefined( GeschikteOptie/Upref/Func2Meter/koken/Vj_gas             [ Choice_per_BO/GeschikteOptie_rel ], BO/metervraagBerekening/koken/Vj_gas              ) ;
 
 			attribute<GJ_yr> metervraag_elektriciteit_kd_basis (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_elektriciteit_kd_basis [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_elektriciteit_kd_basis);
 			attribute<GJ_yr> metervraag_elektriciteit_kd_piek  (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_elektriciteit_kd_piek  [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_elektriciteit_kd_piek);
-
-			attribute<GJ_yr> metervraag_elektriciteit_ventilatie (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_elektriciteit_ventilatie [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_elektriciteit_ventilatie);
-			attribute<GJ_yr> metervraag_elektriciteit_ea        (BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_elektriciteit_ea        [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_elektriciteit_ea);
 
 
 		} 

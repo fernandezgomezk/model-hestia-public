@@ -124,7 +124,7 @@ template AllocatieResultatenComponent
 		
 		attribute<GJ_yr> metervraag_gas       					:= Woning/Metervraag/Gas[org_rel];
 		attribute<GJ_yr> metervraag_elektriciteit				:= Woning/Metervraag/E[org_rel];
-		attribute<GJ_yr> metervraag_warmte						:= BebouwingsComponenten/Woning/BO/EnergielabelBerekening/warmteverlies/Totaal[org_rel];		
+		attribute<GJ_yr> metervraag_warmte						:= Woning/Metervraag/warmte_30[org_rel] + Woning/Metervraag/warmte_50[org_rel] + Woning/Metervraag/warmte_70[org_rel];
 		attribute<GJ_yr> metervraag_biomassa       				:= Woning/Metervraag/Biomassa[org_rel];
 		attribute<GJ_yr> metervraag_olie       					:= Woning/Metervraag/Olie[org_rel];
 		
@@ -151,11 +151,12 @@ template AllocatieResultatenComponent
 		attribute<GJ_yr> metervraag_olie_tw_basis           	:= Woning/Metervraag/metervraag_olie_tw_basis[org_rel];
 		attribute<GJ_yr> metervraag_olie_tw_piek            	:= Woning/Metervraag/metervraag_olie_tw_piek[org_rel];
 		attribute<GJ_yr> metervraag_gas_koken               	:= Woning/Metervraag/metervraag_gas_koken[org_rel];
-		attribute<GJ_yr> metervraag_elektriciteit_koken     	:= Woning/Metervraag/metervraag_elektriciteit_koken[org_rel];
+		attribute<GJ_yr> metervraag_elektriciteit_koken     	:= Woning/Metervraag/Vj_e_koken[org_rel];
 		attribute<GJ_yr> metervraag_elektriciteit_kd_basis  	:= Woning/Metervraag/metervraag_elektriciteit_kd_basis[org_rel];
 		attribute<GJ_yr> metervraag_elektriciteit_kd_piek   	:= Woning/Metervraag/metervraag_elektriciteit_kd_piek[org_rel];
-		attribute<GJ_yr> metervraag_elektriciteit_ventilatie 	:= Woning/Metervraag/metervraag_elektriciteit_ventilatie[org_rel];
-		attribute<GJ_yr> metervraag_elektriciteit_ea        	:= Woning/Metervraag/metervraag_elektriciteit_ea[org_rel];
+		attribute<GJ_yr> metervraag_elektriciteit_ventilatie 	:= Woning/Metervraag/Vj_e_VT[org_rel];
+		attribute<GJ_yr> metervraag_elektriciteit_ea        	:= Woning/Metervraag/Vj_e_EA[org_rel];
+
 
 		attribute<Eur_GJ> kosten_gas_variabel      			:= BO/jaarlijks/kosten_gas_variabel[org_rel];
 		attribute<Eur_yr> kosten_gas_vast	    			:= BO/jaarlijks/Kj_vastrecht_G[org_rel];

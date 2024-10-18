@@ -33,6 +33,8 @@ container Prijzen
 			attribute<Eur_GJ> KGJ_eindgebruik_excl := ='union_data(., ' + AsItemList('bron/' + name + '/eindgebruik_excl[JaarIndex] ') + ')';
 			attribute<Eur_GJ> KGJ_Maatschappelijk  := ='union_data(., ' + AsItemList('bron/' + name + '/Maatschappelijk [JaarIndex] ') + ')';
 			attribute<Eur_GJ> KGJ_EnergieHeffing   := ='union_data(., ' + AsItemList('bron/' + name + '/EnergieHeffing  [JaarIndex] ') + ')';
+
+			
 		}
 
 		container Bijstook

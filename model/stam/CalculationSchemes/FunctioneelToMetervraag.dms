@@ -105,8 +105,12 @@ Template FunctioneelToMetervraag
 		attribute<GJ_yr> metervraag_elektriciteit_rv_basis (VraagBO) := BemeterdeGebouwInput_rel/RVb == Classifications/BemeterdeGebouwInput/V/E ? metervraag_per_product/RVb : float64(0);
 		attribute<GJ_yr> metervraag_elektriciteit_rv_piek (VraagBO) := BemeterdeGebouwInput_rel/RVp == Classifications/BemeterdeGebouwInput/V/E ? metervraag_per_product/RVp : float64(0);
 
-		attribute<GJ_yr> metervraag_warmte_rv_basis (VraagBO) := BemeterdeGebouwInput_rel/RVb == Classifications/BemeterdeGebouwInput/V/warmte ? metervraag_per_product/RVb : float64(0);
-		attribute<GJ_yr> metervraag_warmte_rv_piek (VraagBO) := BemeterdeGebouwInput_rel/RVp == Classifications/BemeterdeGebouwInput/V/warmte ? metervraag_per_product/RVp : float64(0);
+		attribute<GJ_yr> metervraag_warmte_rv_basis (VraagBO)	:= 	(BemeterdeGebouwInput_rel/RVb == Classifications/BemeterdeGebouwInput/V/warmte_30 ? metervraag_per_product/RVb : float64(0)) +
+																	(BemeterdeGebouwInput_rel/RVb == Classifications/BemeterdeGebouwInput/V/warmte_50 ? metervraag_per_product/RVb : float64(0)) +
+																	(BemeterdeGebouwInput_rel/RVb == Classifications/BemeterdeGebouwInput/V/warmte_70 ? metervraag_per_product/RVb : float64(0));																	
+		attribute<GJ_yr> metervraag_warmte_rv_piek (VraagBO) 	:= 	(BemeterdeGebouwInput_rel/RVp == Classifications/BemeterdeGebouwInput/V/warmte_30 ? metervraag_per_product/RVp : float64(0)) +
+																	(BemeterdeGebouwInput_rel/RVp == Classifications/BemeterdeGebouwInput/V/warmte_50 ? metervraag_per_product/RVp : float64(0)) +
+																	(BemeterdeGebouwInput_rel/RVp == Classifications/BemeterdeGebouwInput/V/warmte_70 ? metervraag_per_product/RVp : float64(0));
 
 		attribute<GJ_yr> metervraag_biomassa_rv_basis (VraagBO) := BemeterdeGebouwInput_rel/RVb == Classifications/BemeterdeGebouwInput/V/biomassa ? metervraag_per_product/RVb : float64(0);
 		attribute<GJ_yr> metervraag_biomassa_rv_piek (VraagBO) := BemeterdeGebouwInput_rel/RVp == Classifications/BemeterdeGebouwInput/V/biomassa ? metervraag_per_product/RVp : float64(0);
@@ -120,8 +124,12 @@ Template FunctioneelToMetervraag
 		attribute<GJ_yr> metervraag_elektriciteit_tw_basis (VraagBO) := BemeterdeGebouwInput_rel/TWb == Classifications/BemeterdeGebouwInput/V/E ? metervraag_per_product/TWb : float64(0);
 		attribute<GJ_yr> metervraag_elektriciteit_tw_piek (VraagBO) := BemeterdeGebouwInput_rel/TWp == Classifications/BemeterdeGebouwInput/V/E ? metervraag_per_product/TWp : float64(0);
 
-		attribute<GJ_yr> metervraag_warmte_tw_basis (VraagBO) := BemeterdeGebouwInput_rel/TWb == Classifications/BemeterdeGebouwInput/V/warmte ? metervraag_per_product/TWb : float64(0);
-		attribute<GJ_yr> metervraag_warmte_tw_piek (VraagBO) := BemeterdeGebouwInput_rel/TWp == Classifications/BemeterdeGebouwInput/V/warmte ? metervraag_per_product/TWp : float64(0);
+		attribute<GJ_yr> metervraag_warmte_tw_basis (VraagBO) 	:=	(BemeterdeGebouwInput_rel/TWb == Classifications/BemeterdeGebouwInput/V/warmte_30 ? metervraag_per_product/TWb : float64(0)) +
+																	(BemeterdeGebouwInput_rel/TWb == Classifications/BemeterdeGebouwInput/V/warmte_50 ? metervraag_per_product/TWb : float64(0)) +
+																	(BemeterdeGebouwInput_rel/TWb == Classifications/BemeterdeGebouwInput/V/warmte_70 ? metervraag_per_product/TWb : float64(0));
+		attribute<GJ_yr> metervraag_warmte_tw_piek (VraagBO) 	:= 	(BemeterdeGebouwInput_rel/TWp == Classifications/BemeterdeGebouwInput/V/warmte_30 ? metervraag_per_product/TWp : float64(0)) +
+																	(BemeterdeGebouwInput_rel/TWp == Classifications/BemeterdeGebouwInput/V/warmte_50 ? metervraag_per_product/TWp : float64(0)) +
+																	(BemeterdeGebouwInput_rel/TWp == Classifications/BemeterdeGebouwInput/V/warmte_70 ? metervraag_per_product/TWp : float64(0));
 
 		attribute<GJ_yr> metervraag_biomassa_tw_basis (VraagBO) := BemeterdeGebouwInput_rel/TWb == Classifications/BemeterdeGebouwInput/V/biomassa ? metervraag_per_product/TWb : float64(0);
 		attribute<GJ_yr> metervraag_biomassa_tw_piek (VraagBO) := BemeterdeGebouwInput_rel/TWp == Classifications/BemeterdeGebouwInput/V/biomassa ? metervraag_per_product/TWp : float64(0);
@@ -129,15 +137,8 @@ Template FunctioneelToMetervraag
 		attribute<GJ_yr> metervraag_olie_tw_basis (VraagBO) := BemeterdeGebouwInput_rel/TWb == Classifications/BemeterdeGebouwInput/V/olie ? metervraag_per_product/TWb : float64(0);
 		attribute<GJ_yr> metervraag_olie_tw_piek (VraagBO) := BemeterdeGebouwInput_rel/TWp == Classifications/BemeterdeGebouwInput/V/olie ? metervraag_per_product/TWp : float64(0);
 
-		/* attribute<GJ_yr> metervraag_gas_koken (VraagBO) := BemeterdeGebouwInput_rel/RVb == Classifications/BemeterdeGebouwInput/V/gas ? metervraag_per_product/RVb : float64(0);
-		attribute<GJ_yr> metervraag_elektriciteit_koken (VraagBO) := BemeterdeGebouwInput_rel/RVb == Classifications/BemeterdeGebouwInput/V/elektriciteit ? metervraag_per_product/RVb : float64(0);
-
-		attribute<GJ_yr> metervraag_elektriciteit_kd_basis (VraagBO) := BemeterdeGebouwInput_rel/RVb == Classifications/BemeterdeGebouwInput/V/elektriciteit ? metervraag_per_product/RVb : float64(0);
-		attribute<GJ_yr> metervraag_elektriciteit_kd_piek (VraagBO) := BemeterdeGebouwInput_rel/RVb == Classifications/BemeterdeGebouwInput/V/elektriciteit ? metervraag_per_product/RVb : float64(0);
-
-		attribute<GJ_yr> metervraag_elektriciteit_ventilatie (VraagBO) := BemeterdeGebouwInput_rel/RVb == Classifications/BemeterdeGebouwInput/V/elektriciteit ? metervraag_per_product/RVb : float64(0);
-		attribute<GJ_yr> metervraag_elektriciteit_ea (VraagBO) := BemeterdeGebouwInput_rel/RVb == Classifications/BemeterdeGebouwInput/V/elektriciteit ? metervraag_per_product/RVb : float64(0);
-*/
+		attribute<GJ_yr> metervraag_elektriciteit_kd_basis (VraagBO) := BemeterdeGebouwInput_rel/KDb == Classifications/BemeterdeGebouwInput/V/E ? metervraag_per_product/KDb : float64(0);
+		attribute<GJ_yr> metervraag_elektriciteit_kd_piek (VraagBO) := BemeterdeGebouwInput_rel/KDp == Classifications/BemeterdeGebouwInput/V/E ? metervraag_per_product/KDp : float64(0);
 
 	}
 	
