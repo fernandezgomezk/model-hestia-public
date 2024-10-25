@@ -21,7 +21,9 @@ template AllocatieResultatenComponent
 
 	unit<uint32> BO := BO_base
 	{
-		attribute<Classifications/Schillabel>  Schillabel_rel   := BO_base/Schillabel_rel;
+		attribute<Classifications/Schillabel>  	Schillabel_rel   		:= BO_base/Schillabel_rel;
+		attribute<Classifications/Energielabel> energielabel_afgemeld   := BO_base/energielabel_afgemeld;
+
 		attribute<Classifications/Schillabel>  Energielabel_rel   := BO_base/Energielabel_rel;
 
         
@@ -72,7 +74,7 @@ template AllocatieResultatenComponent
 		attribute<string> adres							:= BO/adres[org_rel];
 		attribute<string> BU_NAAM						:= BO/buurtnaam[org_rel];
 		attribute<string> BU_CODE						:= BO/BU_code[org_rel];
-		attribute<float64> Buurt_area					:= BO/Buurt_area[org_rel];
+		attribute<m2> Buurt_area						:= BO/Buurt_area[org_rel];
 		attribute<string> WK_CODE						:= BO/WK_CODE[org_rel];
 		attribute<string> Gemeente_name					:= BO/Gemeente_name[org_rel];
 		attribute<string> GM_code						:= BO/GM_code[org_rel];
@@ -80,16 +82,16 @@ template AllocatieResultatenComponent
 		attribute<string> res_regio						:= BO/res_regio[org_rel];
 				//attribute<string> heeft_gas       						:= Woning/Metervraag/Aardgas[org_rel] > 0[GJ_yr] || Woning/Metervraag/Waterstof[org_rel] > 0[GJ_yr] ? 'ja' : 'nee';
 
-		attribute<m2> vloer_opp									:= BO/Bouwdelen/VL [org_rel];
-		attribute<m2> schuin_dak_opp							:= BO/Bouwdelen/DS [org_rel];
-		attribute<m2> plat_dak_opp								:= BO/Bouwdelen/DP [org_rel];
-		attribute<m2> massieve_gevel_opp						:= BO/Bouwdelen/MG [org_rel];
-		attribute<m2> spouwmuur_opp								:= BO/Bouwdelen/MS [org_rel];
-		attribute<m2> paneel_opp								:= BO/Bouwdelen/PL [org_rel];
-		attribute<m2> raam_boven_opp							:= BO/Bouwdelen/RB [org_rel];
-		attribute<m2> raam_onder_opp							:= BO/Bouwdelen/RO [org_rel];
-		attribute<m2> deur_opp									:= BO/Bouwdelen/DR [org_rel];
-		attribute<m2> schill_opp								:= vloer_opp + schuin_dak_opp + plat_dak_opp + massieve_gevel_opp + spouwmuur_opp + paneel_opp + raam_boven_opp + raam_onder_opp + deur_opp;
+		attribute<m2> vloer_opp							:= BO/Bouwdelen/VL [org_rel];
+		attribute<m2> schuin_dak_opp					:= BO/Bouwdelen/DS [org_rel];
+		attribute<m2> plat_dak_opp						:= BO/Bouwdelen/DP [org_rel];
+		attribute<m2> massieve_gevel_opp				:= BO/Bouwdelen/MG [org_rel];
+		attribute<m2> spouwmuur_opp						:= BO/Bouwdelen/MS [org_rel];
+		attribute<m2> paneel_opp						:= BO/Bouwdelen/PL [org_rel];
+		attribute<m2> raam_boven_opp					:= BO/Bouwdelen/RB [org_rel];
+		attribute<m2> raam_onder_opp					:= BO/Bouwdelen/RO [org_rel];
+		attribute<m2> deur_opp							:= BO/Bouwdelen/DR [org_rel];
+		attribute<m2> schill_opp						:= vloer_opp + schuin_dak_opp + plat_dak_opp + massieve_gevel_opp + spouwmuur_opp + paneel_opp + raam_boven_opp + raam_onder_opp + deur_opp;
 	
 		attribute<Classifications/IsolatieNiveau> schuin_dak_isolatie		:= BO/Bouwdelen/Isolatie/DS[org_rel];
 		attribute<Classifications/IsolatieNiveau> plat_dak_isolatie			:= BO/Bouwdelen/Isolatie/DP[org_rel];
@@ -112,15 +114,15 @@ template AllocatieResultatenComponent
 		attribute<Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes>  installatie_ventilatie	:= BO/InstallatiePerProduct/VT[org_rel]; 
 		attribute<Invoer/Kengetallen/OverigeInstallaties/DK/Installatietypes>  installatie_dak          := BO/InstallatiePerProduct/DK[org_rel]; 
 
-		attribute<Classifications/Schillabel> energielabel_afgemeld						:= BO/Schillabel_rel[org_rel];
-		attribute<Classifications/Schillabel> energielabel_default						:= BO/Default_Energielabel_rel[org_rel];
-		attribute<Classifications/Schillabel> energielabel_berekend						:= BebouwingsComponenten/Woning/BO/EnergielabelBerekening/Energielabel_rel[org_rel];		
+		attribute<Classifications/Energielabel> energielabel_afgemeld		:= BO/Energielabel_afgemeld[org_rel];
+		attribute<Classifications/Schillabel> energielabel_default		:= BO/Default_Energielabel_rel[org_rel];
+		attribute<Classifications/Schillabel> energielabel_berekend		:= BebouwingsComponenten/Woning/BO/EnergielabelBerekening/Energielabel_rel[org_rel];		
 
-		attribute<GJ_yr> functionele_vraag_rv			:= Functioneel/V_RV[org_rel];
-		attribute<GJ_yr> functionele_vraag_tw			:= Functioneel/V_TW[org_rel];
-		attribute<GJ_yr> functionele_vraag_koken		:= Functioneel/V_KK[org_rel];
-		attribute<GJ_yr> functionele_vraag_kd			:= Functioneel/V_KD[org_rel];
-		attribute<GJ_yr> functionele_vraag_ea			:= Functioneel/EA[org_rel];
+		attribute<GJ_yr> functionele_vraag_rv					:= Functioneel/V_RV[org_rel];
+		attribute<GJ_yr> functionele_vraag_tw					:= Functioneel/V_TW[org_rel];
+		attribute<GJ_yr> functionele_vraag_koken				:= Functioneel/V_KK[org_rel];
+		attribute<GJ_yr> functionele_vraag_kd					:= Functioneel/V_KD[org_rel];
+		attribute<GJ_yr> functionele_vraag_ea					:= Functioneel/EA[org_rel];
 		
 		attribute<GJ_yr> metervraag_gas       					:= Woning/Metervraag/Gas[org_rel];
 		attribute<GJ_yr> metervraag_elektriciteit				:= Woning/Metervraag/E[org_rel];
@@ -158,17 +160,17 @@ template AllocatieResultatenComponent
 		attribute<GJ_yr> metervraag_elektriciteit_ea        	:= Woning/Metervraag/Vj_e_EA[org_rel];
 
 
-		attribute<Eur_GJ> kosten_gas_variabel      			:= BO/jaarlijks/kosten_gas_variabel[org_rel];
-		attribute<Eur_yr> kosten_gas_vast	    			:= BO/jaarlijks/Kj_vastrecht_G[org_rel];
-		attribute<Eur_GJ> kosten_elektriciteit_variabel     := BO/jaarlijks/kosten_elektriciteit_variabel[org_rel];
-		attribute<Eur_yr> kosten_elektriciteit_vast    		:= BO/jaarlijks/Kj_vastrecht_E[org_rel];
+		attribute<Eur_GJ> kosten_gas_variabel      				:= BO/jaarlijks/kosten_gas_variabel[org_rel];
+		attribute<Eur_yr> kosten_gas_vast	    				:= BO/jaarlijks/Kj_vastrecht_G[org_rel];
+		attribute<Eur_GJ> kosten_elektriciteit_variabel     	:= BO/jaarlijks/kosten_elektriciteit_variabel[org_rel];
+		attribute<Eur_yr> kosten_elektriciteit_vast    			:= BO/jaarlijks/Kj_vastrecht_E[org_rel];
 		
 
 		
 		} 
-		parameter<string> OutputFolder := '%localDataProjDir%/Results/IsolatieStandaard/';
+		parameter<string> OutputFolder := '%localDataProjDir%/Results/Uitdraai_EDW/';
         unit<uint32> variable := SubItem_PropValues(table,'name');
-        container export_csv := Model/CalculationSchemes/Rapportage/WriteTable32ToCSV(table, AsList(variable/name, ';'), OutputFolder+rekenstapname+'IsolatieStandaard_export.csv');
+        container export_csv := Model/CalculationSchemes/Rapportage/WriteTable32ToCSV(table, AsList(variable/name, ';'), OutputFolder+rekenstapname+'Uitdraai_EDW.csv');
         }
 		
 		container Metervraag := BO_Base/Metervraag

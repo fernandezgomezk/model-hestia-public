@@ -25,7 +25,9 @@ template StartingStateComponent
 		attribute<Classifications/SchilLabel>  SchilLabel_rel  := =(BebouwingsSector_rel == Classifications/BebouwingsSector/V/Woning) 
 			? 'MakeDefined(BebouwingsObjectSrc/SchilLabel_rel, Classifications/schillabel/V/N)'
 			: 'MakeDefined(BebouwingsObjectSrc/SchilLabel_rel, Default_Energielabel_rel';
-		attribute<Classifications/SchilLabel>  Energielabel_rel := Schillabel_rel;
+		attribute<Classifications/Energielabel>  Energielabel_afgemeld := =(BebouwingsSector_rel == Classifications/BebouwingsSector/V/Woning) 
+			? 'MakeDefined(BebouwingsObjectSrc/Energielabel_afgemeld, Classifications/Energielabel/V/N)'
+			: 'MakeDefined(BebouwingsObjectSrc/Energielabel_afgemeld, Default_Energielabel_rel';
 		attribute<uint32>                      SchilLabel_date := BebouwingsObjectSrc/SchilLabel_date;
 
 		attribute<Classifications/SchilLabel>  DefaultLabel_rel := MakeDefined(BebouwingsObjectSrc/SchilLabel_rel, Default_Energielabel_rel);

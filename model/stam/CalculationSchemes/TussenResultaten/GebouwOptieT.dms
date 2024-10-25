@@ -37,6 +37,8 @@ template select_with_org_relGebouwOptieT
 	{
 		attribute<BO>                              BO_rel                 := select_data(GeschiktObject, ActiefObject/BO_rel);
 		attribute<Classifications/SchilLabel>      SchilLabel_rel         := select_data(GeschiktObject, ActiefObject/SchilLabel_rel);
+		attribute<Classifications/SchilLabel>      Energielabel_afgemeld  := select_data(GeschiktObject, ActiefObject/Energielabel_afgemeld);
+
 		attribute<Classifications/SchilLabel>      Energielabel_rel       := ../Energielabel_rel;
 		attribute<Classifications/GebouwOptie>     GebouwOptie_rel        := select_data(GeschiktObject, ../GebouwOptie_rel);
 		attribute<Classifications/IsolatieAmbitie> MinIsolatieAmbitie_rel := select_data(GeschiktObject, ../MinIsolatieAmbitie_rel);

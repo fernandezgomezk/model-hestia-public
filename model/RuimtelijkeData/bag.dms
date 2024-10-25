@@ -117,7 +117,7 @@ container BAG: url="%HestiaDataDir%/BAG/20230223_actualisatie_BAG_WP.txt"
 			attribute<RegioIndelingen/gemeente> gemeente_rel := RegioIndelingen/buurt/gemeente_rel[buurt_rel];
 			attribute<string> 					buurtnaam 	 := RegioIndelingen/buurt/BU_NAAM[buurt_rel];
 			attribute<string> 					BU_CODE      := RegioIndelingen/buurt/BU_CODE[buurt_rel]; 
-			attribute<float64> 					Buurt_area   := RegioIndelingen/buurt/AreaInKm2[buurt_rel]; 
+			attribute<m2> 						Buurt_area   := RegioIndelingen/buurt/Area[buurt_rel]; 
 			attribute<string> 					WK_CODE      := RegioIndelingen/buurt/WK_CODE[buurt_rel]; 
 			attribute<string> 					Gemeente_name:= RegioIndelingen/buurt/GM_NAAM[buurt_rel]; 
 			attribute<string> 					GM_code      := RegioIndelingen/buurt/GM_code[buurt_rel]; 
@@ -217,7 +217,7 @@ container BAG: url="%HestiaDataDir%/BAG/20230223_actualisatie_BAG_WP.txt"
 		attribute<string>                               buurtnaam              		:= select_data(., import/vbo/buurtnaam);
 
 		attribute<string> 								BU_CODE      				:= select_data(., import/vbo/BU_CODE);
-		attribute<float64> 								Buurt_area   				:= select_data(., import/vbo/Buurt_area);
+		attribute<m2> 								Buurt_area   				:= select_data(., import/vbo/Buurt_area);
 		attribute<string> 								WK_CODE      				:= select_data(., import/vbo/WK_CODE);
 		attribute<string> 								Gemeente_name 				:= select_data(., import/vbo/Gemeente_name);
 		attribute<string> 								GM_code      				:= select_data(., import/vbo/GM_code);

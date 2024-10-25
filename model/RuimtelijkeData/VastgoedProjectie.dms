@@ -402,6 +402,9 @@ container VastgoedProjectie
 		attribute<Geography/rdc_grids/m100> gridm100_rel := =replace(unionExpr, '@ATTR', 'gridm100_rel');
 		attribute<Classifications/Eigendom> Eigendom_rel := =replace(unionExpr, '@ATTR', 'Eigendom_rel');
 		attribute<Classifications/SchilLabel> SchilLabel_rel := =replace(unionExpr, '@ATTR', 'SchilLabel_rel');
+		
+		attribute<Classifications/Energielabel> Energielabel_afgemeld := uint8(const(12,.));
+
 		attribute<Classifications/SchilLabel> Default_Energielabel_rel := const(Classifications/SchilLabel/V/A, results);
 		attribute<uint32> SchilLabel_date := const((0/0), results);
 

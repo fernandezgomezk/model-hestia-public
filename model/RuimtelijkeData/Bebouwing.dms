@@ -32,7 +32,7 @@ container Bebouwing : isHidden = "True"
 
 		attribute<Classifications/SchilLabel> SchilLabel_rel  := /Invoer/RuimtelijkeData/EnergieLabel/LabelToFSS/VBO/Schillabel_afgemeld[/Invoer/RuimtelijkeData/BAG/vbo_woonfunctie_studiegebied/org_rel];
 		attribute<uint32>                     SchilLabel_date := /Invoer/RuimtelijkeData/EnergieLabel/LabelToFSS/VBO/SchilLabel_datum[/Invoer/RuimtelijkeData/BAG/vbo_woonfunctie_studiegebied/org_rel];
-		attribute<Classifications/SchilLabel> Energielabel_rel := /Invoer/RuimtelijkeData/EnergieLabel/LabelToFSS/VBO/Energielabel_afgemeld[/Invoer/RuimtelijkeData/BAG/vbo_woonfunctie_studiegebied/org_rel];
+		attribute<Classifications/Energielabel> Energielabel_afgemeld := /Invoer/RuimtelijkeData/EnergieLabel/LabelToFSS/VBO/Energielabel_afgemeld[/Invoer/RuimtelijkeData/BAG/vbo_woonfunctie_studiegebied/org_rel];
 
 		
 		attribute<Geography/rdc_grids/m25> grid25m_rel := geometry[Geography/rdc_grids/m25];
@@ -66,7 +66,7 @@ container Bebouwing : isHidden = "True"
 		attribute<string> adres  		:= =replace(unionExpr, '@ATTR', 'label');
 		
 		attribute<string> BU_CODE  		:= =replace(unionExpr, '@ATTR', 'BU_CODE');
-		attribute<float64> Buurt_area  	:= =replace(unionExpr, '@ATTR', 'Buurt_area');
+		attribute<m2> Buurt_area  	:= =replace(unionExpr, '@ATTR', 'Buurt_area');
 		attribute<string> WK_CODE  		:= =replace(unionExpr, '@ATTR', 'WK_CODE');
 
 		attribute<string> Gemeente_name := =replace(unionExpr, '@ATTR', 'Gemeente_name');
@@ -97,7 +97,7 @@ container Bebouwing : isHidden = "True"
 //		attribute<Geography/rdc_grids/m100> gridm100_rel := =replace(unionExpr, '@ATTR', 'gridm100_rel');
 		attribute<Classifications/Eigendom> Eigendom_rel     := =replace(unionExpr, '@ATTR', 'Eigendom_rel');
 		attribute<Classifications/SchilLabel> SchilLabel_rel := =replace(unionExpr, '@ATTR', 'SchilLabel_rel');
-		attribute<Classifications/SchilLabel> Energielabel_rel := =replace(unionExpr, '@ATTR', 'Energielabel_rel');
+		attribute<Classifications/Energielabel> Energielabel_afgemeld:= =replace(unionExpr, '@ATTR', 'Energielabel_afgemeld');
 		attribute<Classifications/SchilLabel> Default_Energielabel_rel := =replace(unionExpr, '@ATTR', 'Default_Energielabel_rel');
 		
 		attribute<uint32> SchilLabel_date := =replace(unionExpr, '@ATTR', 'SchilLabel_date');
