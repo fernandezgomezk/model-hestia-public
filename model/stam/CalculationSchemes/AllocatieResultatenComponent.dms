@@ -63,23 +63,23 @@ template AllocatieResultatenComponent
 		container Uitdraai_EDW
 	    {
         unit<uint32> table := select_with_org_rel(isdefined(BO/code))
-		{attribute<String> vbo_id						:= BO/code[org_rel];
-		attribute<UInt32> eigendomstype					:= BO/Eigendom_rel[org_rel];
-		attribute<Uint8> woningtype						:= BO/BebouwingsType[org_rel]; 
-		attribute<UInt16> bouwjaar						:= BO/bouwjaar[org_rel];
-		attribute<UInt16> sloopjaar						:= BO/sloopjaar[org_rel];
-		attribute<UInt8> nr_verdiepingen				:= BO/nr_verdiepingen[org_rel];
-		attribute<m2> gebruiksoppervlak					:= BO/oppervlakte[org_rel];
-		attribute<m2> footprint							:= BO/footprint[org_rel];
-		attribute<string> adres							:= BO/adres[org_rel];
-		attribute<string> BU_NAAM						:= BO/buurtnaam[org_rel];
-		attribute<string> BU_CODE						:= BO/BU_code[org_rel];
-		attribute<m2> Buurt_area						:= BO/Buurt_area[org_rel];
-		attribute<string> WK_CODE						:= BO/WK_CODE[org_rel];
-		attribute<string> Gemeente_name					:= BO/Gemeente_name[org_rel];
-		attribute<string> GM_code						:= BO/GM_code[org_rel];
-		attribute<string> PROV_NAAM						:= BO/PROV_NAAM[org_rel];
-		attribute<string> res_regio						:= BO/res_regio[org_rel];
+		{attribute<String> vbo_id							:= BO/code[org_rel];
+		attribute<Classifications/Eigendom> eigendomstype	:= BO/Eigendom_rel[org_rel];
+		attribute<classifications/WoningType> woningtype	:= BO/BebouwingsType[org_rel]; 
+		attribute<yr_uint16> bouwjaar						:= BO/bouwjaar[org_rel];
+		attribute<yr_uint16> sloopjaar						:= BO/sloopjaar[org_rel];
+		attribute<UInt8> nr_verdiepingen					:= BO/nr_verdiepingen[org_rel];
+		attribute<m2> gebruiksoppervlak						:= BO/oppervlakte[org_rel];
+		attribute<m2> footprint								:= BO/footprint[org_rel];
+		attribute<string> adres								:= BO/adres[org_rel];
+		attribute<string> BU_NAAM							:= BO/buurtnaam[org_rel];
+		attribute<string> BU_CODE							:= BO/BU_code[org_rel];
+		attribute<m2> Buurt_area							:= BO/Buurt_area[org_rel];
+		attribute<string> WK_CODE							:= BO/WK_CODE[org_rel];
+		attribute<string> Gemeente_name						:= BO/Gemeente_name[org_rel];
+		attribute<string> GM_code							:= BO/GM_code[org_rel];
+		attribute<string> PROV_NAAM							:= BO/PROV_NAAM[org_rel];
+		attribute<string> res_regio							:= BO/res_regio[org_rel];
 				//attribute<string> heeft_gas       						:= Woning/Metervraag/Aardgas[org_rel] > 0[GJ_yr] || Woning/Metervraag/Waterstof[org_rel] > 0[GJ_yr] ? 'ja' : 'nee';
 
 		attribute<m2> vloer_opp							:= BO/Bouwdelen/VL [org_rel];
@@ -114,7 +114,7 @@ template AllocatieResultatenComponent
 		attribute<Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes>  installatie_ventilatie	:= BO/InstallatiePerProduct/VT[org_rel]; 
 		attribute<Invoer/Kengetallen/OverigeInstallaties/DK/Installatietypes>  installatie_dak          := BO/InstallatiePerProduct/DK[org_rel]; 
 
-		attribute<Classifications/Energielabel> energielabel_afgemeld		:= BO/Energielabel_afgemeld[org_rel];
+		attribute<Classifications/Energielabel> energielabel_afgemeld	:= BO/Energielabel_afgemeld[org_rel];
 		attribute<Classifications/Schillabel> energielabel_default		:= BO/Default_Energielabel_rel[org_rel];
 		attribute<Classifications/Schillabel> energielabel_berekend		:= BebouwingsComponenten/Woning/BO/EnergielabelBerekening/Energielabel_rel[org_rel];		
 
