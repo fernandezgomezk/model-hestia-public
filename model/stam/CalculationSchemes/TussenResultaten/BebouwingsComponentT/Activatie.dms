@@ -36,7 +36,7 @@ container Activatie
 				, void
 				, bool)
 			{
-				attribute<bool> Voldaan (BO) := ='merge(uint8(Energielabel_rel), bool, '+AsItemList(Classifications/Schillabel/name)+')';
+				attribute<bool> Voldaan (BO) := ='merge(uint8(Schillabel_rel), bool, '+AsItemList(Classifications/Schillabel/name)+')';
 			}
 
 			attribute<bool> BoSelectie(BO) := Naleving && LabelVoorwaarde/Voldaan && InDoelgroep;
