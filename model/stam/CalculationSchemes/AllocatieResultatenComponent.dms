@@ -208,6 +208,17 @@ template AllocatieResultatenComponent
 			attribute<Eur_yr> Km_H2          (BO) := Metervraag/H2 * prijzen/overig/Pm_H2;
 			attribute<Eur_yr> Kj_H2_EH       (BO) := const(0.0[eur_yr],BO);
 		}
+		
+		container eindgebruikerskosten 
+		{
+			//Constanten
+			parameter<Eur> Inkomensgrens := 99999.00[Eur]; //Voorbeeld
+			
+			
+			//Huur...
+			
+			//Koop...
+		}
 	}
 
 	attribute<kw> CapaciteitsvraagE (PlanRegio) :=  sum(BO/AansluitCapaciteit/GTF_Enet *
