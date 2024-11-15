@@ -144,6 +144,25 @@ template AllocatieResultatenComponent
         container export_csv := Model/CalculationSchemes/Rapportage/WriteTable32ToCSV(table, AsList(variable/name, ';'), OutputFolder+rekenstapname+'_Iso_hWP_export.csv');
         }
 		
+		container EnergieverbruikRV_Iso_hWP
+	    {
+        unit<uint32> table := select_with_org_rel(isdefined(BO/code))
+		{
+			attribute<String> 	identificatie			:= BO/code[org_rel];
+			attribute<GJ_yr>	Aardgas_RVb_voor		:= BebouwingsComponenten/Woning/BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_gas_rv_basis[org_rel];
+			attribute<GJ_yr>	Aardgas_RVp_voor		:= BebouwingsComponenten/Woning/BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_gas_rv_piek[org_rel];
+			attribute<GJ_yr>	Aardgas_RVb_na			:= Woning/Metervraag/metervraag_gas_rv_basis[org_rel];
+			attribute<GJ_yr>	Aardgas_RVp_na			:= Woning/Metervraag/metervraag_gas_rv_piek[org_rel];
+			attribute<GJ_yr>	Elektriciteit_RVb_voor	:= BebouwingsComponenten/Woning/BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_elektriciteit_rv_basis[org_rel];
+			attribute<GJ_yr>	Elektriciteit_RVp_voor	:= BebouwingsComponenten/Woning/BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_elektriciteit_rv_piek[org_rel];
+			attribute<GJ_yr>	Elektriciteit_RVb_na	:= Woning/Metervraag/metervraag_elektriciteit_rv_basis[org_rel];
+			attribute<GJ_yr>	Elektriciteit_RVp_na	:= Woning/Metervraag/metervraag_elektriciteit_rv_piek[org_rel];
+		}
+		parameter<string> OutputFolder := '%localDataProjDir%/Results/CPB_Warmtepompen/Iso_hWP/';
+        unit<uint32> variable := SubItem_PropValues(table,'name');
+        container export_csv := Model/CalculationSchemes/Rapportage/WriteTable32ToCSV(table, AsList(variable/name, ';'), OutputFolder+rekenstapname+'_EnergieverbruikRV_Iso_hWP_export.csv');
+        }
+		
 		container Metervraag := BO_Base/Metervraag
 		{
 			attribute<GJ_yr> EA        (BO) := Functioneel/EA / /Invoer/Kengetallen/Constanten/Efficiency_EA;

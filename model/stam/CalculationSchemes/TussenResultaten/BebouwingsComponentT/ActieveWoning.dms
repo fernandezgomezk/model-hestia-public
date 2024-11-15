@@ -247,6 +247,10 @@ unit<uint32> ActieveWoning := select_with_org_rel(BO/Activatie/ProductActief || 
 															, BO/metervraagBerekening/eEffect/volume/Vj_elek        
 															+ BO/metervraagBerekening/eEffect/capaciteit/Vj_elek) ;
 
+			attribute<GJ_yr> metervraag_gas_rv_basis       		(BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_gas_rv_basis     [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_gas_rv_basis    );
+			attribute<GJ_yr> metervraag_gas_rv_piek        		(BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_gas_rv_piek      [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_gas_rv_piek    );
+			attribute<GJ_yr> metervraag_elektriciteit_rv_basis 	(BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_elektriciteit_rv_basis [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_elektriciteit_rv_basis);
+			attribute<GJ_yr> metervraag_elektriciteit_rv_piek 	(BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_elektriciteit_rv_piek [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_elektriciteit_rv_piek);
 		} 
 
 		container functioneel := for_each_nedv(
