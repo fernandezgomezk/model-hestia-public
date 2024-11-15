@@ -96,6 +96,14 @@ Template FunctioneelToMetervraag
 		, VraagBO
 		, GJ_yr);
 	
+	container metervraag_per_product_per_input
+	{
+		attribute<GJ_yr> metervraag_gas_rv_basis 			(VraagBO) 	:= 	BemeterdeGebouwInput_rel/RVb == Classifications/BemeterdeGebouwInput/V/gas ? metervraag_per_product/RVb : float64(0);
+		attribute<GJ_yr> metervraag_gas_rv_piek 			(VraagBO) 	:= 	BemeterdeGebouwInput_rel/RVp == Classifications/BemeterdeGebouwInput/V/gas ? metervraag_per_product/RVp : float64(0);
+		attribute<GJ_yr> metervraag_elektriciteit_rv_basis 	(VraagBO)	:= 	BemeterdeGebouwInput_rel/RVb == Classifications/BemeterdeGebouwInput/V/E ? metervraag_per_product/RVb : float64(0);
+		attribute<GJ_yr> metervraag_elektriciteit_rv_piek 	(VraagBO) 	:= 	BemeterdeGebouwInput_rel/RVp == Classifications/BemeterdeGebouwInput/V/E ? metervraag_per_product/RVp : float64(0);
+	}
+	
 	container Koken
 	{
 		attribute<Invoer/Kengetallen/OverigeInstallaties/KK/Installatietypes> Installatietype_rel (VraagBO) := VraagBO/InstallatiePerProduct/KK;
