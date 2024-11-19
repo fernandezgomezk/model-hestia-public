@@ -80,4 +80,762 @@
 				attribute<percent_yr> R_s := float64(rentepercentages/wooncorp[rentepercentages_rel])[percent_yr];
 			}
 		}
+		
+		container WP9
+		{
+			container class
+			{
+			
+				unit<uint8> WoningType5 : nrofrows = 6
+				{
+					attribute<string> label                : ['geen woonpand','vrijstaand','2 onder 1 kap'   ,'rijwoning hoek','rijwoning tussen','meergezins'] , DialogType = "LabelText";
+					attribute<string> name                 : ['geen_woonpand','vrijstaand','twee_onder_1_kap','hoekwoning'    ,'tussenwoning'    ,'meergezinspand'];
+					
+					container V := for_each_nedv(name, 'value('+string(id(.))+', ..)', void, .);
+				}
+				
+				unit<uint32> EigendomHuurKoop : nrofrows = 2
+				{
+					attribute<string> label: DialogType = "LabelText",
+						['Koop', 'Huur'];
+					attribute<string> name := label;
+					
+					container V := for_each_nedv(name, 'value('+string(id(.))+', ..)', void, .);
+				}
+			
+				unit<uint32> WE := combine(class/woningtype5, class/eigendomhuurkoop)
+				{
+					attribute<string> LabelWoningtype := Class/Woningtype5/label[nr_1];
+					attribute<string> LabelEigendom := Class/Eigendomhuurkoop/label[nr_2];
+					attribute<string> label         := LabelWoningtype + '_' + LabelEigendom;
+				}
+				
+				unit<uint32> WEG := combine(WE, Invoer/RuimtelijkeData/Studiegebied/Gemeente)
+				{
+					attribute<string> LabelG := Invoer/RuimtelijkeData/Studiegebied/Gemeente/label[nr_2];
+					attribute<string> LabelWE := WE/label[nr_1];
+					attribute<string> label         := LabelG + '_' + LabelWE;
+				}
+
+				unit<uint32> WEGYvarD := combine(WEG, y_variabelen_discreet);
+				unit<uint32> WEGYvarCatD := combine(WEGYvarD, y_categorien_discreet);
+				unit<uint32> WEGYvarC := combine(WEG, y_variabelen_continu);
+				
+				unit<uint32> WEB := combine(WE, Invoer/RuimtelijkeData/Studiegebied/Buurt)
+				{
+					attribute<string> LabelB := Invoer/RuimtelijkeData/Studiegebied/Buurt/label[nr_2];
+					attribute<string> LabelWE := WE/label[nr_1];
+					attribute<string> label         := LabelB + '_' + LabelWE;
+				}
+				
+				unit<uint32> WEBYvarD := combine(WEB, y_variabelen_discreet);
+				unit<uint32> WEBYvarCatD := combine(WEBYvarD, y_categorien_discreet);
+				unit<uint32> WEBYvarC := combine(WEB, y_variabelen_continu);
+				
+				unit<uint32> y_variabelen_discreet := unique(gemeente_discreet_src/y_variable) 
+				{
+					attribute<string> name : ['AantPersHH','LeeftijdRefPers','TypeHH'];
+					attribute<string> label      := values;
+				}
+				
+				unit<uint32> y_categorien_discreet := unique(gemeente_discreet_src/category)
+				{		
+					unit<uint8> AantPersHH: nrofrows = 6
+					{
+						attribute<string> name          : ['GeenData', 'Een', 'Twee', 'Drie', 'Vier', 'VijfOfMeer'];
+						attribute<string> label         : ['GeenData', '1', '2', '3', '4', '5+'], DialogType = "LabelText"; //moet overeenkomen met inputdata + toevoegen optie geen data
+							
+						container V := for_each_nedv(name, 'value('+string(id(.))+', ..)', void, .);
+					}
+					
+					unit<uint8> LeeftijdRefPers: nrofrows = 9
+					{
+						attribute<string> name          : ['GeenData', 'LeeftijdJongerDan17Jaar', 'Leeftijd17tot24Jaar', 'Leeftijd25tot34Jaar', 'Leeftijd35tot44Jaar', 'Leeftijd45tot54Jaar', 'Leeftijd55tot64Jaar', 'Leeftijd65tot74Jaar', 'Leeftijd75JaarOfOuder'];
+						attribute<string> label         : ['GeenData', 'JONGER DAN 17 JAAR', '17-24 JAAR', '25-34 JAAR', '35-44 JAAR', '44-54 JAAR', '55-64 JAAR', '65-74 JAAR', '75 JAAR EN OUDER'], DialogType = "LabelText"; //moet overeenkomen met input data + toevoegen optie geen data
+							
+						container V := for_each_nedv(name, 'value('+string(id(.))+', ..)', void, .);
+					}
+					
+					unit<uint8> TypeHH: nrofrows = 4
+					{
+						attribute<string> name          : ['GeenData', 'Eenpersoonshuishouden', 'MeerpersoonsZonderMinderjarigeKinderen', 'MeerpersoonsMetMinderjarigeKinderen'];
+						attribute<string> label         : ['GeenData', 'EENPERSOONSHUISHOUDEN', 'MEERPERSOONSHUISHOUDEN ZONDER MINDERJARIGE KINDEREN', 'MEERPERSOONSHUISHOUDEN MET MINDERJARIGE KINDEREN'], DialogType = "LabelText"; //moet overenkomen met inputdata + toevoegen optie geen data
+						container V := for_each_nedv(name, 'value('+string(id(.))+', ..)', void, .);
+					}
+					
+					
+				}
+				unit<uint32> y_variabelen_continu := unique(gemeente_continu_src/y_variable) // Opzetje
+				{
+					attribute<string> label      : ['BelastbaarInkomen', 'Huurpunten', 'Hypotheekrentelasten', 'KaleHuur', 'Hypotheekschuld', 'Vermogen', 'WOZwaarde'];
+					//attribute<string> alpha_naam : [ '' ,'alpha_kalehuur' , ''];
+					//attribute<string> beta_naam  : [ '' ,'beta_kalehuur' , ''];
+				}
+			}
+					
+			unit<uint32> VBO := Invoer/RuimtelijkeData/Bebouwing/Woning, IsHidden = "True"
+
+			{
+				attribute<Invoer/RuimtelijkeData/Studiegebied/Gemeente> gemeente_rel := Invoer/RuimtelijkeData/Studiegebied/Buurt/Gemeente_rel[buurt_rel];
+				attribute<Invoer/RuimtelijkeData/Studiegebied/Buurt> buurt_rel := /Invoer/RuimtelijkeData/Bebouwing/Woning/Buurt_rel;
+				attribute<Class/Eigendomhuurkoop> Eigendomhuurkoop_rel := Eigendom_rel == 0 ? 0[Invoer/Kengetallen/Eindgebruikerskosten/WP9/Class/eigendomhuurkoop] : 1[Invoer/Kengetallen/Eindgebruikerskosten/WP9/Class/eigendomhuurkoop];
+				attribute<Class/WoningType5>      Woningtype5_rel     := Woningtype_rel == 6[classifications/Woningtype]  ? 5[Invoer/Kengetallen/Eindgebruikerskosten/WP9/Class/Woningtype5] : Woningtype_rel[Invoer/Kengetallen/Eindgebruikerskosten/WP9/Class/Woningtype5];
+				attribute<nrAsl>      nrAansluitingen    := nrAansluitingen_i[nrAsl];
+				attribute<m2>      Oppervlakte     := Oppervlakte_i[m2];
+				attribute<Class/WEG>    Gemeente_ModelObjectKey     := combine_data( Invoer/Kengetallen/Eindgebruikerskosten/WP9/Class/WEG,  combine_data( Invoer/Kengetallen/Eindgebruikerskosten/WP9/Class/WE , Woningtype5_rel, Eigendomhuurkoop_rel), Gemeente_rel );
+				attribute<Class/WEB>    Buurt_ModelObjectKey     := combine_data( Invoer/Kengetallen/Eindgebruikerskosten/WP9/Class/WEB,  combine_data( Invoer/Kengetallen/Eindgebruikerskosten/WP9/Class/WE , Woningtype5_rel, Eigendomhuurkoop_rel), Buurt_rel );
+
+				//Box-Muller transform
+				
+				//Twee uniform verdeelde random getallen
+				parameter<uint32>  seed1    := Invoer/TechnischeInstellingen/RandomSeed + 199, IsHidden = "True";
+				parameter<uint32>  seed2    := Invoer/TechnischeInstellingen/RandomSeed + 200, IsHidden = "True"; 
+				attribute<float32> rndNr_1 := rnd_uniform(seed1, vbo, range(float32, 0f, 1f)), IsHidden = "True";
+				attribute<float32> rndNr_2 := rnd_uniform(seed2, vbo, range(float32, 0f, 1f)), IsHidden = "True";
+			
+				//Paren van normaal verdeelde getallen
+				attribute<float32> Z0 := sqrt(-2f * log(rndNr_1)) * cos(2f * float32(pi()) * rndNr_2);
+				attribute<float32> Z1 := sqrt(-2f * log(rndNr_1)) * sin(2f * float32(pi()) * rndNr_2);
+				
+				//Een getal per paar kiezen
+				parameter<uint32>  seed3    := Invoer/TechnischeInstellingen/RandomSeed + 201, IsHidden = "True"; 
+				attribute<float32> rndNr_3 := rnd_uniform(seed1, vbo, range(float32, 0f, 1f)), IsHidden = "True";
+				attribute<float32> Z := rndNr_3 < 0.5f ? Z0 : Z1;	
+				
+				/*unit<uint32> continu_per_vbo := for_each_ind( //Opzetje voor vermenigvuldigen van continue variabelen
+				'nedv'
+				,class/y_variabelen/label
+				,'nr_asl * ' + class/y_variabelen/alphaNaam + ' + opp * ' + class/y_variabelen/betaNaam
+				,VBO
+				,float64
+				);*/
+					
+				unit <uint32> gemeente_continu_per_vbo := vbo, IsHidden = "True"
+				{
+					unit<uint32>                          ModelObject           := Class/WEG, IsHidden = "True";
+					attribute<class/WEG>                  ModelObject_rel (VBO) := rlookup(vbo/Gemeente_ModelObjectKey, gemeente_continu/WEG_rel), IsHidden = "True";
+					
+					// alpha is vast, beta is oppervlakte afhankelijk
+					// formule vorm: ln(y) = alpha + beta * ln(opp) + u en u (residu) is N(0,variantie residu). u wordt berekend als mu + sigma * Z oftewel, 0 + sqrt(var_resid) * Z. 
+					container continu_per_vbo := for_each_ind(
+					'nedv',
+					class/y_variabelen_continu/label,
+					'exp(float64(nrAansluitingen) * gemeente_continu/Asl/' + class/y_variabelen_continu/label + ' [ModelObject_rel] + log(float64(Oppervlakte)) * gemeente_continu/Opp/'+ class/y_variabelen_continu/label + ' [ModelObject_rel] + (0d + sqrt(gemeente_continu/Var_resid/'+ class/y_variabelen_continu/label + ' [ModelObject_rel]) * float64(Z)))',
+					.,
+					float64);
+						
+					//Zonder u (dus zonder spreiding), ter vergelijking
+					container continu_per_vbo_zonder_spreiding := for_each_ind(
+					'nedv',
+					class/y_variabelen_continu/label,
+					'exp(float64(nrAansluitingen) * gemeente_continu/Asl/' + class/y_variabelen_continu/label + ' [ModelObject_rel] + log(float64(Oppervlakte)) * gemeente_continu/Opp/'+ class/y_variabelen_continu/label + ' [ModelObject_rel])',
+					.,
+					float64);
+				}
+				
+				unit <uint32> buurt_continu_per_vbo := vbo, IsHidden = "True"
+				{
+					unit<uint32>                          ModelObject           := Class/WEB, IsHidden = "True";
+					attribute<class/WEB>                  ModelObject_rel (VBO) := rlookup(vbo/Buurt_ModelObjectKey, buurt_continu/WEB_rel), IsHidden = "True";
+					
+					// alpha is vast, beta is oppervlakte afhankelijk
+					// formule vorm: ln(y) = alpha + beta * ln(opp) + u en u (residu) is N(0,variantie residu). u wordt berekend als 0 + sqrt(var_resid) * Z. 
+					container continu_per_vbo := for_each_ind(
+					'nedv',
+					class/y_variabelen_continu/label,
+					'exp(float64(nrAansluitingen) * buurt_continu/Asl/' + class/y_variabelen_continu/label + ' [ModelObject_rel] + log(float64(Oppervlakte)) * buurt_continu/Opp/'+ class/y_variabelen_continu/label + ' [ModelObject_rel] + (0d + sqrt(buurt_continu/Var_resid/'+ class/y_variabelen_continu/label + ' [ModelObject_rel]) * float64(Z)))',
+					.,
+					float64);
+						
+					//Zonder u (dus zonder spreiding), ter vergelijking
+					container continu_per_vbo_zonder_spreiding := for_each_ind(
+					'nedv',
+					class/y_variabelen_continu/label,
+					'exp(float64(nrAansluitingen) * buurt_continu/Asl/' + class/y_variabelen_continu/label + ' [ModelObject_rel] + log(float64(Oppervlakte)) * buurt_continu/Opp/'+ class/y_variabelen_continu/label + ' [ModelObject_rel])',
+					.,
+					float64);
+				}
+					
+				unit<uint32> gemeente_discreet_per_vbo := RuimtelijkeData/BAG/import/VBO
+				{
+					
+						unit<uint32>                          ModelObject           := Class/WEG, IsHidden = "True";
+						attribute<class/WEG>                  ModelObject_rel (VBO) := rlookup(vbo/Gemeente_ModelObjectKey, gemeente_discreet/WEG_rel), IsHidden = "True";
+						parameter<uint32>                     seed                  := Invoer/TechnischeInstellingen/RandomSeed + 199, IsHidden = "True";
+						attribute<float32>                    RndNr           (VBO) := rnd_uniform(seed, vbo, range(float32, 0f, 1f)), IsHidden = "True";
+
+					container AantPersHH
+					{					
+						container Probability := for_each_nedv(
+						class/y_categorien_discreet/AantPersHH/name,
+						'Invoer/Kengetallen/Eindgebruikerskosten/WP9/gemeente_discreet/AantPersHH/Frequentie/' + class/y_categorien_discreet/AantPersHH/name + '[ModelObject_rel]',
+						VBO,
+						float64);
+											
+						container CumulProb : IsHidden = "True"
+						{
+							attribute<float32> Een (VBO) := float32(Probability/Een);
+							attribute<float32> Twee (VBO) := float32(Probability/Twee) + Een;
+							attribute<float32> Drie (VBO) := float32(Probability/Drie) + Twee;
+							attribute<float32> Vier (VBO) := float32(Probability/Vier) + Drie;
+							attribute<float32> VijfOfMeer (VBO) := float32(Probability/VijfOfMeer) + Vier;
+						}
+
+						attribute<Class/y_categorien_discreet/AantPersHH> AantPersHH  (VBO) :=
+							  RndNr < CumulProb/Een ? 1[Class/y_categorien_discreet/AantPersHH]
+							: RndNr < CumulProb/Twee ? 2[Class/y_categorien_discreet/AantPersHH]
+							: RndNr < CumulProb/Drie ? 3[Class/y_categorien_discreet/AantPersHH]
+							: RndNr < CumulProb/Vier ? 4[Class/y_categorien_discreet/AantPersHH]
+							: RndNr <= CumulProb/VijfOfMeer ? 5[Class/y_categorien_discreet/AantPersHH]
+							: 0[Class/y_categorien_discreet/AantPersHH];
+					}
+						
+					container LeeftijdRefPers
+					{					
+						container Probability := for_each_nedv(
+						class/y_categorien_discreet/LeeftijdRefPers/name,
+						'Invoer/Kengetallen/Eindgebruikerskosten/WP9/gemeente_discreet/LeeftijdRefPers/Frequentie/' + class/y_categorien_discreet/LeeftijdRefPers/name + '[ModelObject_rel]',
+						VBO,
+						float64);
+											
+						container CumulProb : IsHidden = "True"
+						{
+							attribute<float32> LeeftijdJongerDan17Jaar (VBO) := float32(Probability/LeeftijdJongerDan17Jaar);
+							attribute<float32> Leeftijd17tot24Jaar (VBO) := float32(Probability/Leeftijd17tot24Jaar) + LeeftijdJongerDan17Jaar;
+							attribute<float32> Leeftijd25tot34Jaar (VBO) := float32(Probability/Leeftijd25tot34Jaar) + Leeftijd17tot24Jaar;
+							attribute<float32> Leeftijd35tot44Jaar (VBO) := float32(Probability/Leeftijd35tot44Jaar) + Leeftijd25tot34Jaar;
+							attribute<float32> Leeftijd45tot54Jaar (VBO) := float32(Probability/Leeftijd45tot54Jaar) + Leeftijd35tot44Jaar;
+							attribute<float32> Leeftijd55tot64Jaar (VBO) := float32(Probability/Leeftijd55tot64Jaar) + Leeftijd45tot54Jaar;
+							attribute<float32> Leeftijd65tot74Jaar (VBO) := float32(Probability/Leeftijd65tot74Jaar) + Leeftijd55tot64Jaar;
+							attribute<float32> Leeftijd75JaarOfOuder (VBO) := float32(Probability/Leeftijd75JaarOfOuder) + Leeftijd65tot74Jaar;
+						
+						}
+
+						attribute<Class/y_categorien_discreet/LeeftijdRefPers> LeeftijdRefPers  (VBO) :=
+							  RndNr < CumulProb/LeeftijdJongerDan17Jaar ? 1[Class/y_categorien_discreet/LeeftijdRefPers]
+							: RndNr < CumulProb/Leeftijd17tot24Jaar ? 2[Class/y_categorien_discreet/LeeftijdRefPers]
+							: RndNr < CumulProb/Leeftijd25tot34Jaar ? 3[Class/y_categorien_discreet/LeeftijdRefPers]
+							: RndNr < CumulProb/Leeftijd35tot44Jaar ? 4[Class/y_categorien_discreet/LeeftijdRefPers]
+							: RndNr < CumulProb/Leeftijd45tot54Jaar ? 5[Class/y_categorien_discreet/LeeftijdRefPers]
+							: RndNr < CumulProb/Leeftijd55tot64Jaar ? 6[Class/y_categorien_discreet/LeeftijdRefPers]
+							: RndNr < CumulProb/Leeftijd65tot74Jaar ? 7[Class/y_categorien_discreet/LeeftijdRefPers]
+							: RndNr <= CumulProb/Leeftijd75JaarOfOuder ? 8[Class/y_categorien_discreet/LeeftijdRefPers]
+							: 0[Class/y_categorien_discreet/LeeftijdRefPers];
+					}
+					
+					container TypeHH
+					{					
+						container Probability := for_each_nedv(
+						class/y_categorien_discreet/TypeHH/name,
+						'Invoer/Kengetallen/Eindgebruikerskosten/WP9/gemeente_discreet/TypeHH/Frequentie/' + class/y_categorien_discreet/TypeHH/name + '[ModelObject_rel]',
+						VBO,
+						float64);
+											
+						container CumulProb : IsHidden = "True"
+						{
+							attribute<float32> Eenpersoonshuishouden (VBO) := float32(Probability/Eenpersoonshuishouden);
+							attribute<float32> MeerpersoonsZonderMinderjarigeKinderen (VBO) := float32(Probability/MeerpersoonsZonderMinderjarigeKinderen) + Eenpersoonshuishouden;
+							attribute<float32> MeerpersoonsMetMinderjarigeKinderen (VBO) := float32(Probability/MeerpersoonsMetMinderjarigeKinderen) + MeerpersoonsZonderMinderjarigeKinderen;
+						}
+
+						attribute<Class/y_categorien_discreet/TypeHH> TypeHH  (VBO) :=
+							  RndNr < CumulProb/Eenpersoonshuishouden ? 1[Class/y_categorien_discreet/TypeHH]
+							: RndNr < CumulProb/MeerpersoonsZonderMinderjarigeKinderen ? 2[Class/y_categorien_discreet/TypeHH]
+							: RndNr <= CumulProb/MeerpersoonsMetMinderjarigeKinderen ? 3[Class/y_categorien_discreet/TypeHH]
+							: 0[Class/y_categorien_discreet/TypeHH];
+					}
+				}
+				
+				unit<uint32> buurt_discreet_per_vbo := RuimtelijkeData/BAG/import/VBO
+				{
+					
+						unit<uint32>                          ModelObject           := Class/WEB, IsHidden = "True";
+						attribute<class/WEB>                  ModelObject_rel (VBO) := rlookup(vbo/Buurt_ModelObjectKey, buurt_discreet/WEB_rel), IsHidden = "True";
+						parameter<uint32>                     seed                  := Invoer/TechnischeInstellingen/RandomSeed + 199, IsHidden = "True";
+						attribute<float32>                    RndNr           (VBO) := rnd_uniform(seed, vbo, range(float32, 0f, 1f)), IsHidden = "True";
+
+					container AantPersHH
+					{					
+						container Probability := for_each_nedv(
+						class/y_categorien_discreet/AantPersHH/name,
+						'Invoer/Kengetallen/Eindgebruikerskosten/WP9/buurt_discreet/AantPersHH/Frequentie/' + class/y_categorien_discreet/AantPersHH/name + '[ModelObject_rel]',
+						VBO,
+						float64);
+											
+						container CumulProb : IsHidden = "True"
+						{
+							attribute<float32> Een (VBO) := float32(Probability/Een);
+							attribute<float32> Twee (VBO) := float32(Probability/Twee) + Een;
+							attribute<float32> Drie (VBO) := float32(Probability/Drie) + Twee;
+							attribute<float32> Vier (VBO) := float32(Probability/Vier) + Drie;
+							attribute<float32> VijfOfMeer (VBO) := float32(Probability/VijfOfMeer) + Vier;
+						}
+
+						attribute<Class/y_categorien_discreet/AantPersHH> AantPersHH  (VBO) :=
+							  RndNr < CumulProb/Een ? 1[Class/y_categorien_discreet/AantPersHH]
+							: RndNr < CumulProb/Twee ? 2[Class/y_categorien_discreet/AantPersHH]
+							: RndNr < CumulProb/Drie ? 3[Class/y_categorien_discreet/AantPersHH]
+							: RndNr < CumulProb/Vier ? 4[Class/y_categorien_discreet/AantPersHH]
+							: RndNr <= CumulProb/VijfOfMeer ? 5[Class/y_categorien_discreet/AantPersHH]
+							: 0[Class/y_categorien_discreet/AantPersHH];
+					}
+						
+					container LeeftijdRefPers
+					{					
+						container Probability := for_each_nedv(
+						class/y_categorien_discreet/LeeftijdRefPers/name,
+						'Invoer/Kengetallen/Eindgebruikerskosten/WP9/buurt_discreet/LeeftijdRefPers/Frequentie/' + class/y_categorien_discreet/LeeftijdRefPers/name + '[ModelObject_rel]',
+						VBO,
+						float64);
+											
+						container CumulProb : IsHidden = "True"
+						{
+							attribute<float32> LeeftijdJongerDan17Jaar (VBO) := float32(Probability/LeeftijdJongerDan17Jaar);
+							attribute<float32> Leeftijd17tot24Jaar (VBO) := float32(Probability/Leeftijd17tot24Jaar) + LeeftijdJongerDan17Jaar;
+							attribute<float32> Leeftijd25tot34Jaar (VBO) := float32(Probability/Leeftijd25tot34Jaar) + Leeftijd17tot24Jaar;
+							attribute<float32> Leeftijd35tot44Jaar (VBO) := float32(Probability/Leeftijd35tot44Jaar) + Leeftijd25tot34Jaar;
+							attribute<float32> Leeftijd45tot54Jaar (VBO) := float32(Probability/Leeftijd45tot54Jaar) + Leeftijd35tot44Jaar;
+							attribute<float32> Leeftijd55tot64Jaar (VBO) := float32(Probability/Leeftijd55tot64Jaar) + Leeftijd45tot54Jaar;
+							attribute<float32> Leeftijd65tot74Jaar (VBO) := float32(Probability/Leeftijd65tot74Jaar) + Leeftijd55tot64Jaar;
+							attribute<float32> Leeftijd75JaarOfOuder (VBO) := float32(Probability/Leeftijd75JaarOfOuder) + Leeftijd65tot74Jaar;
+						
+						}
+
+						attribute<Class/y_categorien_discreet/LeeftijdRefPers> LeeftijdRefPers  (VBO) :=
+							  RndNr < CumulProb/LeeftijdJongerDan17Jaar ? 1[Class/y_categorien_discreet/LeeftijdRefPers]
+							: RndNr < CumulProb/Leeftijd17tot24Jaar ? 2[Class/y_categorien_discreet/LeeftijdRefPers]
+							: RndNr < CumulProb/Leeftijd25tot34Jaar ? 3[Class/y_categorien_discreet/LeeftijdRefPers]
+							: RndNr < CumulProb/Leeftijd35tot44Jaar ? 4[Class/y_categorien_discreet/LeeftijdRefPers]
+							: RndNr < CumulProb/Leeftijd45tot54Jaar ? 5[Class/y_categorien_discreet/LeeftijdRefPers]
+							: RndNr < CumulProb/Leeftijd55tot64Jaar ? 6[Class/y_categorien_discreet/LeeftijdRefPers]
+							: RndNr < CumulProb/Leeftijd65tot74Jaar ? 7[Class/y_categorien_discreet/LeeftijdRefPers]
+							: RndNr <= CumulProb/Leeftijd75JaarOfOuder ? 8[Class/y_categorien_discreet/LeeftijdRefPers]
+							: 0[Class/y_categorien_discreet/LeeftijdRefPers];
+					}
+					
+					container TypeHH
+					{					
+						container Probability := for_each_nedv(
+						class/y_categorien_discreet/TypeHH/name,
+						'Invoer/Kengetallen/Eindgebruikerskosten/WP9/buurt_discreet/TypeHH/Frequentie/' + class/y_categorien_discreet/TypeHH/name + '[ModelObject_rel]',
+						VBO,
+						float64);
+											
+						container CumulProb : IsHidden = "True"
+						{
+							attribute<float32> Eenpersoonshuishouden (VBO) := float32(Probability/Eenpersoonshuishouden);
+							attribute<float32> MeerpersoonsZonderMinderjarigeKinderen (VBO) := float32(Probability/MeerpersoonsZonderMinderjarigeKinderen) + Eenpersoonshuishouden;
+							attribute<float32> MeerpersoonsMetMinderjarigeKinderen (VBO) := float32(Probability/MeerpersoonsMetMinderjarigeKinderen) + MeerpersoonsZonderMinderjarigeKinderen;
+						}
+
+						attribute<Class/y_categorien_discreet/TypeHH> TypeHH  (VBO) :=
+							  RndNr < CumulProb/Eenpersoonshuishouden ? 1[Class/y_categorien_discreet/TypeHH]
+							: RndNr < CumulProb/MeerpersoonsZonderMinderjarigeKinderen ? 2[Class/y_categorien_discreet/TypeHH]
+							: RndNr <= CumulProb/MeerpersoonsMetMinderjarigeKinderen ? 3[Class/y_categorien_discreet/TypeHH]
+							: 0[Class/y_categorien_discreet/TypeHH];
+					}
+				} 			
+			
+				container huishoudkenmerken := for_each_nedv(
+				class/y_variabelen_continu/label,
+				'makedefined(buurt_continu_per_vbo/continu_per_vbo/' + class/y_variabelen_continu/label + ' , gemeente_continu_per_vbo/continu_per_vbo/'+ class/y_variabelen_continu/label + ' )',
+				.,
+				float64);
+				
+				container huishoudkenmerken_zonder_spreiding := for_each_nedv(
+				class/y_variabelen_continu/label + '_u0',
+				'makedefined(buurt_continu_per_vbo/continu_per_vbo_zonder_spreiding/' + class/y_variabelen_continu/label + ' , gemeente_continu_per_vbo/continu_per_vbo_zonder_spreiding/'+ class/y_variabelen_continu/label + ' )',
+				.,
+				float64);
+				
+				//Bij discrete variabelen geen makedefined want geen data is gedefinieerd als waarde 0 ipv null
+				attribute<Class/y_categorien_discreet/AantPersHH> 		AantPersHH 			:= buurt_discreet_per_vbo/AantPersHH/AantPersHH > 0[Class/y_categorien_discreet/AantPersHH] ? buurt_discreet_per_vbo/AantPersHH/AantPersHH : gemeente_discreet_per_vbo/AantPersHH/AantPersHH;
+				attribute<Class/y_categorien_discreet/LeeftijdRefPers> 	LeeftijdRefPers 	:= buurt_discreet_per_vbo/LeeftijdRefPers/LeeftijdRefPers > 0[Class/y_categorien_discreet/LeeftijdRefPers] ? buurt_discreet_per_vbo/LeeftijdRefPers/LeeftijdRefPers : gemeente_discreet_per_vbo/LeeftijdRefPers/LeeftijdRefPers;
+				attribute<Class/y_categorien_discreet/TypeHH> 			TypeHH 				:= buurt_discreet_per_vbo/TypeHH/TypeHH > 0[Class/y_categorien_discreet/TypeHH] ? buurt_discreet_per_vbo/TypeHH/TypeHH : gemeente_discreet_per_vbo/TypeHH/TypeHH;
+				
+				container export 
+				{
+					attribute<string> 										vbo_ID			(vbo) := Invoer/RuimtelijkeData/Bebouwing/Woning/code;
+					attribute<string> 										postcode		(vbo) := Invoer/RuimtelijkeData/Bebouwing/Woning/label;
+					attribute<string> 										Gemeentecode	(vbo) := Invoer/RuimtelijkeData/Studiegebied/Buurt/GM_code[buurt_rel];
+					attribute<string> 										Buurtcode		(vbo) := Invoer/RuimtelijkeData/Studiegebied/Buurt/BU_code[buurt_rel];
+					attribute<nrAsl>										nrAansluitingen (vbo) := vbo/nrAansluitingen;
+					attribute<Class/Woningtype5>							Woningtype		(vbo) := vbo/Woningtype5_rel;
+					attribute<Class/EigendomHuurKoop>						Eigendomstype	(vbo) := vbo/Eigendomhuurkoop_rel;
+					attribute<m2>											Oppervlakte		(vbo) := vbo/oppervlakte;
+					//attribute<float32>										Z				(vbo) := vbo/Z;
+					attribute<Class/y_categorien_discreet/AantPersHH> 		AantPersHH		(vbo) := vbo/AantPersHH;
+					attribute<Class/y_categorien_discreet/LeeftijdRefPers> 	LeeftijdRefPers	(vbo) := vbo/LeeftijdRefPers;
+					attribute<Class/y_categorien_discreet/TypeHH> 			TypeHH			(vbo) := vbo/TypeHH;
+				}	
+			}
+			
+			unit<uint32> gemeente_discreet_src : StorageName = "%HestiaDataDir%/Eindgebruikerskosten/20240711_gemeente_discreet_gesplitst.csv"
+			,	StorageType     = "gdal.vect"
+			,	StorageReadOnly = "True"
+			{
+				attribute<string> gemeentecode := 'GM' + trim(gemeente_discreet_src/Gemeente);
+				
+				// individuele relaties
+				attribute<class/eigendomhuurkoop>   Eigendom_rel   := strcount(gemeente_discreet_src/eigendom,   'koop')         > 0 ? class/EigendomHuurKoop/V/Koop : class/EigendomHuurKoop/V/Huur;
+				attribute<class/woningtype5> Woningtype_rel := strcount(gemeente_discreet_src/woningtype, '2onder1kap')   > 0 ? class/woningtype5/V/twee_onder_1_kap : 
+																	strcount(gemeente_discreet_src/woningtype, 'hoekwoning')   > 0 ? class/woningtype5/V/hoekwoning : 
+																	strcount(gemeente_discreet_src/woningtype, 'tussenwoning') > 0 ? class/woningtype5/V/tussenwoning : 
+																	strcount(gemeente_discreet_src/woningtype, 'vrijstaand')   > 0 ? class/woningtype5/V/vrijstaand : 
+																																	class/woningtype5/V/meergezinspand; 
+				attribute</Invoer/RuimtelijkeData/Studiegebied/Gemeente> gemeente_rel := rlookup(gemeente_discreet_src/gemeentecode, /Invoer/RuimtelijkeData/Studiegebied/Gemeente/GM_code);
+				attribute<class/y_variabelen_discreet> y_var_rel := rlookup(y_variable, class/y_variabelen_discreet/Values);
+				attribute<class/y_categorien_discreet> y_cat_rel := rlookup(category, class/y_categorien_discreet/Values);
+				
+				// Combinatie relaties
+				attribute<class/WE> 			WE_rel 			:= combine_data(class/WE, 			Woningtype_rel, Eigendom_rel);
+				attribute<class/WEG> 			WEG_rel 		:= combine_data(class/WEG, 			WE_rel, 		gemeente_rel);
+				attribute<class/WEGYvarD> 		WEGYvarD_rel 	:= combine_data(class/WEGyvarD, 	WEG_rel, 		y_var_rel);
+				attribute<class/WEGYvarCatD> 	WEGYvarCatD_rel := combine_data(class/WEGYvarCatD, 	WEGYvarD_rel, 	y_cat_rel);
+				
+				// variabele van string naar float64
+				attribute<float64> FractieWoningenBinnenGroep := float64(replace(gemeente_discreet_src/fractie, ',', '.'));
+			}
+			
+			unit<uint32> gemeente_discreet := class/WEG
+			{
+				attribute<class/eigendomhuurkoop>           Eigendom_rel     := class/WE/second_rel[first_rel];
+				attribute<class/Woningtype5>         Woningtype_rel   := class/WE/first_rel[first_rel];
+				attribute</Invoer/RuimtelijkeData/Studiegebied/Gemeente> Gemeente_rel := second_rel;
+				
+				attribute<class/WE> WE_rel := combine_data(class/WE, Woningtype_rel, Eigendom_rel);
+				attribute<class/WEG> WEG_rel := combine_data(class/WEG, WE_rel, Gemeente_rel);
+				attribute<string> Label := Class/WEG/label[WEG_rel];
+
+				//Nu  voor iederen mogelijke uitkomst van variabele een attribuut met de fractie
+				// Aantal personen
+				unit<uint32> AantPersHH := class/WEG
+				{
+					// leg relatie op variabele aantal personen
+					attribute<class/WEGYvarD> WEGAantPersHH_rel := combine_data(class/WEGYvarD, WEG_rel, rlookup('AantPersHH',class/y_variabelen_discreet/name)), IntegrityCheck = "isDefined(this)";
+					
+					// Leg relaties op category binnen aantal personen
+					unit<uint32> Categorie_rel := for_each_nedv(
+					class/y_categorien_discreet/AantPersHH/name,
+					'combine_data(class/WEGYvarCatD, WEGAantPersHH_rel, rlookup(' + '''' + class/y_categorien_discreet/AantPersHH/label + '''' + ', class/y_categorien_discreet/values))', 
+					.,
+					class/WEGYvarCatD);
+					
+					// Ophalen van bijbehorende waarden
+					unit<uint32> Frequentie := for_each_nedv(
+					class/y_categorien_discreet/AantPersHH/name,
+					'gemeente_discreet_src/FractieWoningenBinnenGroep[invert(gemeente_discreet_src/WEGYvarCatD_rel)][Categorie_Rel/' + class/y_categorien_discreet/AantPersHH/name + ']',
+					.,
+					float64);
+					
+					/* Uitgeschreven, i.p.v. forloops:
+					// Leg relaties op category binnen aantal personen
+					attribute<class/WEGYvarCatD> WEGAantalPersonen_1_rel := combine_data(class/WEGYvarCatD, WEGAantPersHH_rel, rlookup('1',class/y_categorien_discreet/values));
+					attribute<class/WEGYvarCatD> WEGAantalPersonen_2_rel := combine_data(class/WEGYvarCatD, WEGAantPersHH_rel, rlookup('2',class/y_categorien_discreet/values));
+					attribute<class/WEGYvarCatD> WEGAantalPersonen_3_rel := combine_data(class/WEGYvarCatD, WEGAantPersHH_rel, rlookup('3',class/y_categorien_discreet/values));
+					attribute<class/WEGYvarCatD> WEGAantalPersonen_4_rel := combine_data(class/WEGYvarCatD, WEGAantPersHH_rel, rlookup('4',class/y_categorien_discreet/values));
+					attribute<class/WEGYvarCatD> WEGAantalPersonen_5_rel := combine_data(class/WEGYvarCatD, WEGAantPersHH_rel, rlookup('5+',class/y_categorien_discreet/values));
+					
+					// Ophalen van bijbehorende waarden
+					attribute<float64> AantPersHH1 := gemeente_discreet_src/FractieWoningenBinnenGroep[invert(gemeente_discreet_src/WEGYvarCatD_rel)][WEGAantalPersonen_1_rel];
+					attribute<float64> AantPersHH2 := gemeente_discreet_src/FractieWoningenBinnenGroep[invert(gemeente_discreet_src/WEGYvarCatD_rel)][WEGAantalPersonen_2_rel];
+					attribute<float64> AantPersHH3 := gemeente_discreet_src/FractieWoningenBinnenGroep[invert(gemeente_discreet_src/WEGYvarCatD_rel)][WEGAantalPersonen_3_rel];
+					attribute<float64> AantPersHH4 := gemeente_discreet_src/FractieWoningenBinnenGroep[invert(gemeente_discreet_src/WEGYvarCatD_rel)][WEGAantalPersonen_4_rel];
+					attribute<float64> AantPersHH5 := gemeente_discreet_src/FractieWoningenBinnenGroep[invert(gemeente_discreet_src/WEGYvarCatD_rel)][WEGAantalPersonen_5_rel];
+					*/
+				}
+				
+				//Leeftijd referentiepersoon
+				unit<uint32> LeeftijdRefPers := class/WEG
+				{
+					// leg relatie op variabele leeftijd refpersoon
+					attribute<class/WEGYvarD> WEGLeeftijdRefPers_rel := combine_data(class/WEGYvarD, WEG_rel, rlookup('LeeftijdRefPers',class/y_variabelen_discreet/name)), IntegrityCheck = "isDefined(this)";
+					
+					// Leg relaties op category binnen leeftijd refpersoon
+					unit<uint32> Categorie_rel := for_each_nedv(
+					class/y_categorien_discreet/LeeftijdRefPers/name,
+					'combine_data(class/WEGYvarCatD, WEGLeeftijdRefPers_rel, rlookup(' + '''' + class/y_categorien_discreet/LeeftijdRefPers/label + '''' + ', class/y_categorien_discreet/values))',
+					.,
+					class/WEGYvarCatD);
+					
+					// Ophalen van bijbehorende waarden
+					unit<uint32> Frequentie := for_each_nedv(
+					class/y_categorien_discreet/LeeftijdRefPers/name,
+					'gemeente_discreet_src/FractieWoningenBinnenGroep[invert(gemeente_discreet_src/WEGYvarCatD_rel)][Categorie_Rel/' + class/y_categorien_discreet/LeeftijdRefPers/name + ']',
+					.,
+					float64);
+					
+				}				
+				unit<uint32> TypeHH := class/WEG
+				{
+					// leg relatie op variabele type huishouden
+					attribute<class/WEGYvarD> WEGTypeHH_rel := combine_data(class/WEGYvarD, WEG_rel, rlookup('TypeHH',class/y_variabelen_discreet/name)), IntegrityCheck = "isDefined(this)";
+					
+					// Leg relaties op category binnen type huishouden
+					unit<uint32> Categorie_rel := for_each_nedv(
+					class/y_categorien_discreet/TypeHH/name,
+					'combine_data(class/WEGYvarCatD, WEGTypeHH_rel, rlookup(' + '''' + class/y_categorien_discreet/TypeHH/label + '''' + ', class/y_categorien_discreet/values))',
+					.,
+					class/WEGYvarCatD);
+					
+					// Ophalen van bijbehorende waarden
+					unit<uint32> Frequentie := for_each_nedv(
+					class/y_categorien_discreet/TypeHH/name,
+					'gemeente_discreet_src/FractieWoningenBinnenGroep[invert(gemeente_discreet_src/WEGYvarCatD_rel)][Categorie_Rel/' + class/y_categorien_discreet/TypeHH/name + ']',
+					.,
+					float64);
+					
+				}				
+			}
+			
+			unit<uint32> gemeente_continu_src : StorageName = "%HestiaDataDir%/Eindgebruikerskosten/gemeente_continu.csv"
+			,	StorageType     = "gdal.vect"
+			,	StorageReadOnly = "True"
+			{
+				attribute<string> gemeentecode := 'GM' + trim(gemeente_continu_src/Gemeente);
+				attribute<class/eigendomhuurkoop>   Eigendom_rel   := strcount(gemeente_continu_src/eigendom,   'koop')         > 0 ? class/EigendomHuurKoop/V/Koop : class/EigendomHuurKoop/V/Huur;
+				attribute<class/woningtype5> Woningtype_rel := strcount(gemeente_continu_src/woningtype, '2onder1kap')   > 0 ? class/woningtype5/V/twee_onder_1_kap : 
+																	strcount(gemeente_continu_src/woningtype, 'hoekwoning')   > 0 ? class/woningtype5/V/hoekwoning : 
+																	strcount(gemeente_continu_src/woningtype, 'tussenwoning') > 0 ? class/woningtype5/V/tussenwoning : 
+																	strcount(gemeente_continu_src/woningtype, 'vrijstaand')   > 0 ? class/woningtype5/V/vrijstaand : 
+																																	class/woningtype5/V/meergezinspand; 
+				//attribute<Geography/RegioIndelingen/Gemeente> gemeente_rel := rlookup(gemeente_continu_src/gemeentecode, Geography/RegioIndelingen/Gemeente/Values);
+				attribute<Invoer/RuimtelijkeData/Studiegebied/Gemeente> gemeente_rel := rlookup(gemeente_continu_src/gemeentecode, Invoer/RuimtelijkeData/Studiegebied/Gemeente/GM_code);
+				//attribute<float64> BelastbaarInkomen_alpha := float64(replace(Alpha, ',', '.')); // Opzetje
+				//attribute<float64> BelastbaarInkomen_beta  := float64(replace(Beta , ',', '.')); // Opzetje
+				attribute<class/WE> 			WE_rel 			:= combine_data(class/WE, 			Woningtype_rel, Eigendom_rel);
+				attribute<class/WEG> 			WEG_rel 		:= combine_data(class/WEG, 			WE_rel, 		gemeente_rel);
+				
+				// alpha is vast, beta is oppervlakte afhankelijk
+				// formule vorm: ln(y) = alpha + beta * ln(opp) + u
+				attribute<float64> 								Opp := float64(replace(Beta, ',', '.')); 
+				attribute<float64> 								Asl := float64(replace(Alpha, ',', '.'));
+				attribute<float64>								sigma_u_2 := float64(replace(Var_resid, ',', '.'));
+				attribute<class/y_variabelen_continu> 			y_var_rel := rlookup(y_variable, class/y_variabelen_continu/Values);				
+				attribute<class/WEGYvarC> 						WEGYvarC_rel 	:= combine_data(class/WEGyvarC, 	WEG_rel, 		y_var_rel);
+
+
+			}
+			
+			unit<uint32> gemeente_continu := class/WEG
+			{
+				attribute<class/eigendomhuurkoop>           Eigendom_rel     := class/WE/second_rel[first_rel];
+				attribute<class/Woningtype5>         Woningtype_rel   := class/WE/first_rel[first_rel];
+				attribute<Invoer/RuimtelijkeData/Studiegebied/Gemeente> Gemeente_rel := second_rel;
+				
+				attribute<class/WE> WE_rel := combine_data(class/WE, Woningtype_rel, Eigendom_rel);
+				attribute<class/WEG> WEG_rel := combine_data(class/WEG, WE_rel, Gemeente_rel);
+				attribute<string> Label := Class/WEG/label[WEG_rel];
+				
+				// leg relatie op variabele
+				container Rel := for_each_nedv(
+				'WEG_' + class/y_variabelen_continu/label + '_rel',
+				'combine_data(class/WEGYvarC, WEG_rel, rlookup(' +  '''' + class/y_variabelen_continu/label +  '''' + ', class/y_variabelen_continu/label))',
+				., 
+				class/WEGyvarC);
+				
+				// Per y-variabele een aparte alpha en aparte beta attribute
+				container Opp := for_each_nedv(
+				class/y_variabelen_continu/label,
+				'gemeente_continu_src/Opp[invert(gemeente_continu_src/WEGYvarC_rel)][Rel/WEG_' + class/y_variabelen_continu/label + '_rel]',
+				., 
+				float64);
+
+				container Asl := for_each_nedv(
+				class/y_variabelen_continu/label,
+				'gemeente_continu_src/Asl[invert(gemeente_continu_src/WEGYvarC_rel)][Rel/WEG_' + class/y_variabelen_continu/label + '_rel]',
+				., 
+				float64);
+
+				container Var_resid := for_each_nedv(
+				class/y_variabelen_continu/label,
+				'gemeente_continu_src/sigma_u_2[invert(gemeente_continu_src/WEGYvarC_rel)][Rel/WEG_' + class/y_variabelen_continu/label + '_rel]',
+				., 
+				float64);					
+			}
+			
+			unit<uint32> buurt_discreet_src : StorageName = "%HestiaDataDir%/Eindgebruikerskosten/buurt_discreet.csv"
+			,	StorageType     = "gdal.vect"
+			,	StorageReadOnly = "True"
+			{
+				attribute<string> buurtcode := 'BU' + trim(buurt_discreet_src/Buurt);
+
+				// individuele relaties
+				attribute<class/eigendomhuurkoop>   Eigendom_rel   := strcount(buurt_discreet_src/eigendom,   'koop')         > 0 ? class/EigendomHuurKoop/V/Koop : class/EigendomHuurKoop/V/Huur;
+				attribute<class/woningtype5> 		Woningtype_rel := strcount(buurt_discreet_src/woningtype, '2onder1kap')   > 0 ? class/woningtype5/V/twee_onder_1_kap : 
+																	strcount(buurt_discreet_src/woningtype, 'hoekwoning')   > 0 ? class/woningtype5/V/hoekwoning : 
+																	strcount(buurt_discreet_src/woningtype, 'tussenwoning') > 0 ? class/woningtype5/V/tussenwoning : 
+																	strcount(buurt_discreet_src/woningtype, 'vrijstaand')   > 0 ? class/woningtype5/V/vrijstaand : 
+																																	class/woningtype5/V/meergezinspand; 
+				attribute</Invoer/RuimtelijkeData/Studiegebied/Buurt> buurt_rel := rlookup(buurt_discreet_src/buurtcode, Invoer/RuimtelijkeData/Studiegebied/Buurt/BU_code);
+				attribute<class/y_variabelen_discreet> y_var_rel := rlookup(y_variable, class/y_variabelen_discreet/Values);
+				attribute<class/y_categorien_discreet> y_cat_rel := rlookup(category, class/y_categorien_discreet/Values);
+				
+				// Combinatie relaties
+				attribute<class/WE> 			WE_rel 			:= combine_data(class/WE, 			Woningtype_rel, Eigendom_rel);
+				attribute<class/WEB> 			WEB_rel 		:= combine_data(class/WEB, 			WE_rel, 		buurt_rel);
+				attribute<class/WEBYvarD> 		WEBYvarD_rel 	:= combine_data(class/WEByvarD, 	WEB_rel, 		y_var_rel);
+				attribute<class/WEBYvarCatD> 	WEBYvarCatD_rel := combine_data(class/WEBYvarCatD, 	WEBYvarD_rel, 	y_cat_rel);
+				
+				// variabele van string naar float64
+				attribute<float64> FractieWoningenBinnenGroep := float64(replace(buurt_discreet_src/fractie, ',', '.'));
+			}
+			
+			unit<uint32> buurt_discreet := class/WEB // Moet om combine van Woningtype, eigendom buurt, en dan alle variabelen een attribute
+			{
+				attribute<class/eigendomhuurkoop>           Eigendom_rel     := class/WE/second_rel[first_rel];
+				attribute<class/Woningtype5>         Woningtype_rel   := class/WE/first_rel[first_rel];
+				attribute</Invoer/RuimtelijkeData/Studiegebied/Buurt> Buurt_rel := second_rel;
+				
+				attribute<class/WE> WE_rel := combine_data(class/WE, Woningtype_rel, Eigendom_rel);
+				attribute<class/WEB> WEB_rel := combine_data(class/WEB, WE_rel, Buurt_rel);
+				attribute<string> Label := Class/WEB/label[WEB_rel];
+
+				//Nu  voor iederen mogelijke uitkomst van variabele een attribuut met de fractie
+				// Aantal personen
+				unit<uint32> AantPersHH := class/WEB
+				{
+					// leg relatie op variabele aantal personen
+					attribute<class/WEBYvarD> WEBAantPersHH_rel := combine_data(class/WEBYvarD, WEB_rel, rlookup('AantPersHH',class/y_variabelen_discreet/name)), IntegrityCheck = "isDefined(this)";
+					
+					// Leg relaties op category binnen aantal personen
+					unit<uint32> Categorie_rel := for_each_nedv(
+					class/y_categorien_discreet/AantPersHH/name,
+					'combine_data(class/WEBYvarCatD, WEBAantPersHH_rel, rlookup(' + '''' + class/y_categorien_discreet/AantPersHH/label + '''' + ', class/y_categorien_discreet/values))', 
+					.,
+					class/WEBYvarCatD);
+					
+					// Ophalen van bijbehorende waarden
+					unit<uint32> Frequentie := for_each_nedv(
+					class/y_categorien_discreet/AantPersHH/name,
+					'buurt_discreet_src/FractieWoningenBinnenGroep[invert(buurt_discreet_src/WEBYvarCatD_rel)][Categorie_Rel/' + class/y_categorien_discreet/AantPersHH/name + ']',
+					.,
+					float64);
+					
+					/* Uitgeschreven, i.p.v. forloops:
+					// Leg relaties op category binnen aantal personen
+					attribute<class/WEBYvarCatD> WEBAantalPersonen_1_rel := combine_data(class/WEBYvarCatD, WEBAantPersHH_rel, rlookup('1',class/y_categorien_discreet/values));
+					attribute<class/WEBYvarCatD> WEBAantalPersonen_2_rel := combine_data(class/WEBYvarCatD, WEBAantPersHH_rel, rlookup('2',class/y_categorien_discreet/values));
+					attribute<class/WEBYvarCatD> WEBAantalPersonen_3_rel := combine_data(class/WEBYvarCatD, WEBAantPersHH_rel, rlookup('3',class/y_categorien_discreet/values));
+					attribute<class/WEBYvarCatD> WEBAantalPersonen_4_rel := combine_data(class/WEBYvarCatD, WEBAantPersHH_rel, rlookup('4',class/y_categorien_discreet/values));
+					attribute<class/WEBYvarCatD> WEBAantalPersonen_5_rel := combine_data(class/WEBYvarCatD, WEBAantPersHH_rel, rlookup('5+',class/y_categorien_discreet/values));
+					
+					// Ophalen van bijbehorende waarden
+					attribute<float64> AantPersHH1 := buurt_discreet_src/FractieWoningenBinnenGroep[invert(buurt_discreet_src/WEBYvarCatD_rel)][WEBAantalPersonen_1_rel];
+					attribute<float64> AantPersHH2 := buurt_discreet_src/FractieWoningenBinnenGroep[invert(buurt_discreet_src/WEBYvarCatD_rel)][WEBAantalPersonen_2_rel];
+					attribute<float64> AantPersHH3 := buurt_discreet_src/FractieWoningenBinnenGroep[invert(buurt_discreet_src/WEBYvarCatD_rel)][WEBAantalPersonen_3_rel];
+					attribute<float64> AantPersHH4 := buurt_discreet_src/FractieWoningenBinnenGroep[invert(buurt_discreet_src/WEBYvarCatD_rel)][WEBAantalPersonen_4_rel];
+					attribute<float64> AantPersHH5 := buurt_discreet_src/FractieWoningenBinnenGroep[invert(buurt_discreet_src/WEBYvarCatD_rel)][WEBAantalPersonen_5_rel];
+					*/
+				}
+				
+				//Leeftijd referentiepersoon
+				unit<uint32> LeeftijdRefPers := class/WEB
+				{
+					// leg relatie op variabele leeftijd refpersoon
+					attribute<class/WEBYvarD> WEBLeeftijdRefPers_rel := combine_data(class/WEBYvarD, WEB_rel, rlookup('LeeftijdRefPers',class/y_variabelen_discreet/name)), IntegrityCheck = "isDefined(this)";
+					
+					// Leg relaties op category binnen leeftijd refpersoon
+					unit<uint32> Categorie_rel := for_each_nedv(
+					class/y_categorien_discreet/LeeftijdRefPers/name,
+					'combine_data(class/WEBYvarCatD, WEBLeeftijdRefPers_rel, rlookup(' + '''' + class/y_categorien_discreet/LeeftijdRefPers/label + '''' + ', class/y_categorien_discreet/values))',
+					.,
+					class/WEBYvarCatD);
+					
+					// Ophalen van bijbehorende waarden
+					unit<uint32> Frequentie := for_each_nedv(
+					class/y_categorien_discreet/LeeftijdRefPers/name,
+					'buurt_discreet_src/FractieWoningenBinnenGroep[invert(buurt_discreet_src/WEBYvarCatD_rel)][Categorie_Rel/' + class/y_categorien_discreet/LeeftijdRefPers/name + ']',
+					.,
+					float64);
+					
+				}				
+				unit<uint32> TypeHH := class/WEB
+				{
+					// leg relatie op variabele type huishouden
+					attribute<class/WEBYvarD> WEBTypeHH_rel := combine_data(class/WEBYvarD, WEB_rel, rlookup('TypeHH',class/y_variabelen_discreet/name)), IntegrityCheck = "isDefined(this)";
+					
+					// Leg relaties op category binnen type huishouden
+					unit<uint32> Categorie_rel := for_each_nedv(
+					class/y_categorien_discreet/TypeHH/name,
+					'combine_data(class/WEBYvarCatD, WEBTypeHH_rel, rlookup(' + '''' + class/y_categorien_discreet/TypeHH/label + '''' + ', class/y_categorien_discreet/values))',
+					.,
+					class/WEBYvarCatD);
+					
+					// Ophalen van bijbehorende waarden
+					unit<uint32> Frequentie := for_each_nedv(
+					class/y_categorien_discreet/TypeHH/name,
+					'buurt_discreet_src/FractieWoningenBinnenGroep[invert(buurt_discreet_src/WEBYvarCatD_rel)][Categorie_Rel/' + class/y_categorien_discreet/TypeHH/name + ']',
+					.,
+					float64);
+					
+				}
+			}
+			unit<uint32> buurt_continu_src : StorageName = "%HestiaDataDir%/Eindgebruikerskosten/buurt_continu.csv"
+			,	StorageType     = "gdal.vect"
+			,	StorageReadOnly = "True"
+			{
+				attribute<string> buurtcode := 'BU' + trim(buurt_continu_src/Buurt);
+				attribute<class/eigendomhuurkoop>   Eigendom_rel   := strcount(buurt_continu_src/eigendom,   'koop')         > 0 ? class/EigendomHuurKoop/V/Koop : class/EigendomHuurKoop/V/Huur;
+				attribute<class/woningtype5> Woningtype_rel := strcount(buurt_continu_src/woningtype, '2onder1kap')   > 0 ? class/woningtype5/V/twee_onder_1_kap : 
+																	strcount(buurt_continu_src/woningtype, 'hoekwoning')   > 0 ? class/woningtype5/V/hoekwoning : 
+																	strcount(buurt_continu_src/woningtype, 'tussenwoning') > 0 ? class/woningtype5/V/tussenwoning : 
+																	strcount(buurt_continu_src/woningtype, 'vrijstaand')   > 0 ? class/woningtype5/V/vrijstaand : 
+																																	class/woningtype5/V/meergezinspand; 
+				//attribute<Geography/RegioIndelingen/Buurt> buurt_rel := rlookup(buurt_continu_src/buurtcode, Geography/RegioIndelingen/Buurt/Values);
+				attribute<Invoer/RuimtelijkeData/Studiegebied/Buurt> buurt_rel := rlookup(buurt_continu_src/buurtcode, Invoer/RuimtelijkeData/Studiegebied/Buurt/BU_code);
+				//attribute<float64> BelastbaarInkomen_alpha := float64(replace(Alpha, ',', '.')); // Opzetje
+				//attribute<float64> BelastbaarInkomen_beta  := float64(replace(Beta , ',', '.')); // Opzetje
+				attribute<class/WE> 			WE_rel 			:= combine_data(class/WE, 			Woningtype_rel, Eigendom_rel);
+				attribute<class/WEB> 			WEB_rel 		:= combine_data(class/WEB, 			WE_rel, 		buurt_rel);
+				
+				// alpha is vast, beta is oppervlakte afhankelijk
+				// formule vorm: ln(y) = alpha + beta * ln(opp) + u
+				attribute<float64> 								Opp := float64(replace(Beta, ',', '.')); 
+				attribute<float64> 								Asl := float64(replace(Alpha, ',', '.'));
+				attribute<float64>								sigma_u_2 := float64(replace(Var_resid, ',', '.'));
+				attribute<class/y_variabelen_continu> 			y_var_rel := rlookup(y_variable, class/y_variabelen_continu/Values);				
+				attribute<class/WEBYvarC> 						WEBYvarC_rel 	:= combine_data(class/WEByvarC, 	WEB_rel, 		y_var_rel);
+
+
+			}
+			
+			unit<uint32> buurt_continu := class/WEB
+			{
+				attribute<class/eigendomhuurkoop>           Eigendom_rel     := class/WE/second_rel[first_rel];
+				attribute<class/Woningtype5>         Woningtype_rel   := class/WE/first_rel[first_rel];
+				attribute<Invoer/RuimtelijkeData/Studiegebied/Buurt> Buurt_rel := second_rel;
+				
+				attribute<class/WE> WE_rel := combine_data(class/WE, Woningtype_rel, Eigendom_rel);
+				attribute<class/WEB> WEB_rel := combine_data(class/WEB, WE_rel, Buurt_rel);
+				attribute<string> Label := Class/WEB/label[WEB_rel];
+				
+				// leg relatie op variabele
+				container Rel := for_each_nedv(
+				'WEB_' + class/y_variabelen_continu/label + '_rel',
+				'combine_data(class/WEBYvarC, WEB_rel, rlookup(' +  '''' + class/y_variabelen_continu/label +  '''' + ', class/y_variabelen_continu/label))',
+				., 
+				class/WEByvarC);
+				
+				// Per y-variabele een aparte alpha en aparte beta attribute
+				container Opp := for_each_nedv(
+				class/y_variabelen_continu/label,
+				'buurt_continu_src/Opp[invert(buurt_continu_src/WEBYvarC_rel)][Rel/WEB_' + class/y_variabelen_continu/label + '_rel]',
+				., 
+				float64);
+
+				container Asl := for_each_nedv(
+				class/y_variabelen_continu/label,
+				'buurt_continu_src/Asl[invert(buurt_continu_src/WEBYvarC_rel)][Rel/WEB_' + class/y_variabelen_continu/label + '_rel]',
+				., 
+				float64);
+
+				container Var_resid := for_each_nedv(
+				class/y_variabelen_continu/label,
+				'buurt_continu_src/sigma_u_2[invert(buurt_continu_src/WEBYvarC_rel)][Rel/WEB_' + class/y_variabelen_continu/label + '_rel]',
+				., 
+				float64);
+			}
+		
+		}
 	}
