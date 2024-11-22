@@ -78,6 +78,9 @@
 				attribute<percent_yr> R_k := float64(rentepercentages/koop[rentepercentages_rel])[percent_yr];
 				attribute<percent_yr> R_h := float64(rentepercentages/parthuur[rentepercentages_rel])[percent_yr];
 				attribute<percent_yr> R_s := float64(rentepercentages/wooncorp[rentepercentages_rel])[percent_yr];
+				attribute<percent_yr> R_wf := float64(rentepercentages/warmtefonds[rentepercentages_rel])[percent_yr];
+				attribute<percent_yr> R_hc := float64(rentepercentages/huurcommissie[rentepercentages_rel])[percent_yr];
+
 			}
 		}
 		

@@ -56,40 +56,36 @@ template StateNaAllocatieComponent
 			attribute<eur_yr> adm_KD     (BO) := BO_base/jaarlijks/adm_KD;
 			
 			container Eindgebruikerskosten
-			{
-				//====== Placeholder Huurverhoging
-
-				attribute<Invoer/Kengetallen/Eindgebruikerskosten/SSOKWT> HV_rel (BO) := rlookup((
-					Classifications/Schillabel/name[BO/Energielabel_rel] + '_' + Classifications/Schillabel/name[BebouwingsComponenten/Woning/BO/Energielabel_rel] //Schilsprong
-					+ '_' + Invoer/Kengetallen/Eindgebruikerskosten/OK/Label[classify(BO/oppervlakte, Invoer/Kengetallen/Eindgebruikerskosten/OK/ClassBreaks)]
-					+ '_' + (BO/isMeergezins ? 'MGW' : 'EGW')
-					),Invoer/Kengetallen/Eindgebruikerskosten/SSOKWT/Label)
-					;
-				attribute<eur_yr> Oj_hv  (BO) :=
-					  BO/Eigendom_rel == Classifications/Eigendom/V/PartHuur ? Invoer/Kengetallen/Eindgebruikerskosten/SSOKWT/Oj_hv_Punten[HV_rel]
-					: BO/Eigendom_rel == Classifications/Eigendom/V/WoonCorp ? Invoer/Kengetallen/Eindgebruikerskosten/SSOKWT/Oj_hv_WoonCo[HV_rel]
-					: 0.0[eur_yr];
-
-				container Huurcommissiemethode
+			{	
+				attribute<Classifications/Eigendom>	Eigendom_rel	(BO) := BO/Eigendom_rel;				
+				attribute<Eur> Ki_installatie 	(BO) := eenmalig/Ki15_LO + eenmalig/Ki_VT + eenmalig/Ki20_LO + eenmalig/Ki30_LO + eenmalig/Ki_LTAS - eenmalig/Oi15_LO - eenmalig/Oi_VT - eenmalig/Oi20_LO - eenmalig/Oi30_LO; //check of LTAS hier ook bijhoort
+				attribute<Eur> Ki_isolatie 		(BO) := eenmalig/Ki_gv - eenmalig/Oi_gv;
+					
+				container Financierlingslasten  		// Hypothecaire lening voor eigenaar-bewoner, vastgoedhypotheek voor particuliere verhuurder, WSW voor sociale verhuurder
 				{
-					parameter<ratio> Mr   := 0.0469 / 12.0 , Descr = "Maandrente";
-
-					parameter<_yr> r15 := 12.0[_yr] * ( Mr / (1.0-((1.0 + Mr)^-180.0)) );
-					parameter<_yr> r20 := 12.0[_yr] * ( Mr / (1.0-((1.0 + Mr)^-240.0)) );
-					parameter<_yr> r25 := 12.0[_yr] * ( Mr / (1.0-((1.0 + Mr)^-300.0)) );
-					parameter<_yr> r30 := 12.0[_yr] * ( Mr / (1.0-((1.0 + Mr)^-360.0)) );
-
-					attribute<Eur> Ki_15 (BO) := eenmalig/Ki15_LO + eenmalig/Ki_VT - eenmalig/Oi15_LO - eenmalig/Oi_VT;
-					attribute<Eur> Ki_20 (BO) := eenmalig/Ki20_LO - eenmalig/Oi20_LO;
-					attribute<Eur> Ki_25 (BO) := eenmalig/Ki_gv - eenmalig/Oi_gv;
-					attribute<Eur> Ki_30 (BO) := eenmalig/Ki30_LO + eenmalig/Ki_LTAS - eenmalig/Oi30_LO;
-
-					attribute<Eur_yr> Oj_hv_15 (BO) := r15 * Ki_15;
-					attribute<Eur_yr> Oj_hv_20 (BO) := r20 * Ki_20;
-					attribute<Eur_yr> Oj_hv_25 (BO) := r25 * Ki_25;
-					attribute<Eur_yr> Oj_hv_30 (BO) := r30 * Ki_30;
-
-					attribute<Eur_yr> Oj_hv (BO) := add(Oj_hv_15,Oj_hv_20,Oj_hv_25,Oj_hv_30);
+					attribute<percent_yr> rentepercentage 	(BO) := ='merge(uint8(BO/Eigendom_rel), percent_yr,'+ AsItemList('Invoer/Kengetallen/Eindgebruikerskosten/rentepercentages/PerJaar/R_' + Classifications/Eigendom/c + '[Classifications/Zichtjaar/Rekenjaar_rel[Zichtjaar_rel]]')+')';
+					attribute<_yr> maandrente				(BO) := (rentepercentage[percent_yr] / 10000d)[_yr] / 12d;
+					attribute<Eur_yr> Kj_installatie 		(BO) := 12.0 * ( maandrente / (1.0-((1.0 + maandrente)^-180.0)) ) * Ki_installatie;
+					attribute<Eur_yr> Kj_isolatie			(BO) := Eigendom_rel == 0 ? 12.0 * ( maandrente / (1.0-((1.0 + maandrente)^-360.0)) ) * Ki_isolatie : 12.0 * ( maandrente / (1.0-((1.0 + maandrente)^-300.0)) ) * Ki_isolatie;					
+					attribute<Eur_yr> Kj_totaal				(BO) := Kj_installatie + Kj_isolatie;
+					
+					container Warmtefondslening		// Warmtefondslening voor eigenaar-bewoner, null voor huurwoningen
+					{
+						attribute<percent_yr> rentepercentage	(BO) := Eigendom_rel == 0 ? const(Invoer/Kengetallen/Eindgebruikerskosten/rentepercentages/PerJaar/R_wf[Classifications/Zichtjaar/Rekenjaar_rel[Zichtjaar_rel]],BO) : float64(0/0);
+						attribute<_yr> maandrente				(BO) := (rentepercentage[percent_yr] / 10000d)[_yr] / 12d;
+						attribute<Eur_yr> Kj_installatie		(BO) := 12.0 * ( maandrente / (1.0-((1.0 + maandrente)^-180.0)) ) * Ki_installatie;
+						attribute<Eur_yr> Kj_isolatie			(BO) := 12.0 * ( maandrente / (1.0-((1.0 + maandrente)^-240.0)) ) * Ki_isolatie; 
+						attribute<Eur_yr> Kj_totaal				(BO) := Kj_installatie + Kj_isolatie;
+					}
+				}
+				
+				container Huurverhoging_huurcommissiemethode 
+				{
+					attribute<percent_yr> rentepercentage	(BO) := Eigendom_rel != 0 ? const(Invoer/Kengetallen/Eindgebruikerskosten/rentepercentages/PerJaar/R_hc[Classifications/Zichtjaar/Rekenjaar_rel[Zichtjaar_rel]],BO) : float64(0/0);
+					attribute<_yr> maandrente				(BO) := rentepercentage[_yr] / 10000d / 12d;
+					attribute<Eur_yr> Kj_installatie 		(BO) := 12.0 * ( maandrente / (1.0-((1.0 + maandrente)^-180.0)) ) * Ki_installatie;
+					attribute<Eur_yr> Kj_isolatie			(BO) :=	Eigendom_rel == 1 ? 12.0 * ( maandrente / (1.0-((1.0 + maandrente)^-300.0)) ) * Ki_isolatie : 0d;
+					attribute<Eur_yr> Huurverhoging         (BO) := Kj_installatie + Kj_isolatie;
 				}
 
 				//====== Placeholder Hypotheekrenteaftrek
