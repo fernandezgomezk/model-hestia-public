@@ -439,38 +439,24 @@
 					}
 				} 			
 			
-				container huishoudkenmerken := for_each_nedv(
+				container huishoudenskenmerken := for_each_nedv(
 				class/y_variabelen_continu/label,
 				'makedefined(buurt_continu_per_vbo/continu_per_vbo/' + class/y_variabelen_continu/label + ' , gemeente_continu_per_vbo/continu_per_vbo/'+ class/y_variabelen_continu/label + ' )',
 				.,
-				float64);
+				float64)
+				{
+					//Bij discrete variabelen geen makedefined want geen data is gedefinieerd als waarde 0 ipv null
+					attribute<Class/y_categorien_discreet/AantPersHH> 		AantPersHH 	(..)		:= buurt_discreet_per_vbo/AantPersHH/AantPersHH > 0[Class/y_categorien_discreet/AantPersHH] ? buurt_discreet_per_vbo/AantPersHH/AantPersHH : gemeente_discreet_per_vbo/AantPersHH/AantPersHH;
+					attribute<Class/y_categorien_discreet/LeeftijdRefPers> 	LeeftijdRefPers (..)	:= buurt_discreet_per_vbo/LeeftijdRefPers/LeeftijdRefPers > 0[Class/y_categorien_discreet/LeeftijdRefPers] ? buurt_discreet_per_vbo/LeeftijdRefPers/LeeftijdRefPers : gemeente_discreet_per_vbo/LeeftijdRefPers/LeeftijdRefPers;
+					attribute<Class/y_categorien_discreet/TypeHH> 			TypeHH 		(..)		:= buurt_discreet_per_vbo/TypeHH/TypeHH > 0[Class/y_categorien_discreet/TypeHH] ? buurt_discreet_per_vbo/TypeHH/TypeHH : gemeente_discreet_per_vbo/TypeHH/TypeHH;
+				}
 				
-				container huishoudkenmerken_zonder_spreiding := for_each_nedv(
+				/*container huishoudenskenmerken_zonder_spreiding := for_each_nedv(
 				class/y_variabelen_continu/label + '_u0',
 				'makedefined(buurt_continu_per_vbo/continu_per_vbo_zonder_spreiding/' + class/y_variabelen_continu/label + ' , gemeente_continu_per_vbo/continu_per_vbo_zonder_spreiding/'+ class/y_variabelen_continu/label + ' )',
 				.,
 				float64);
-				
-				//Bij discrete variabelen geen makedefined want geen data is gedefinieerd als waarde 0 ipv null
-				attribute<Class/y_categorien_discreet/AantPersHH> 		AantPersHH 			:= buurt_discreet_per_vbo/AantPersHH/AantPersHH > 0[Class/y_categorien_discreet/AantPersHH] ? buurt_discreet_per_vbo/AantPersHH/AantPersHH : gemeente_discreet_per_vbo/AantPersHH/AantPersHH;
-				attribute<Class/y_categorien_discreet/LeeftijdRefPers> 	LeeftijdRefPers 	:= buurt_discreet_per_vbo/LeeftijdRefPers/LeeftijdRefPers > 0[Class/y_categorien_discreet/LeeftijdRefPers] ? buurt_discreet_per_vbo/LeeftijdRefPers/LeeftijdRefPers : gemeente_discreet_per_vbo/LeeftijdRefPers/LeeftijdRefPers;
-				attribute<Class/y_categorien_discreet/TypeHH> 			TypeHH 				:= buurt_discreet_per_vbo/TypeHH/TypeHH > 0[Class/y_categorien_discreet/TypeHH] ? buurt_discreet_per_vbo/TypeHH/TypeHH : gemeente_discreet_per_vbo/TypeHH/TypeHH;
-				
-				container export 
-				{
-					attribute<string> 										vbo_ID			(vbo) := Invoer/RuimtelijkeData/Bebouwing/Woning/code;
-					attribute<string> 										postcode		(vbo) := Invoer/RuimtelijkeData/Bebouwing/Woning/label;
-					attribute<string> 										Gemeentecode	(vbo) := Invoer/RuimtelijkeData/Studiegebied/Buurt/GM_code[buurt_rel];
-					attribute<string> 										Buurtcode		(vbo) := Invoer/RuimtelijkeData/Studiegebied/Buurt/BU_code[buurt_rel];
-					attribute<nrAsl>										nrAansluitingen (vbo) := vbo/nrAansluitingen;
-					attribute<Class/Woningtype5>							Woningtype		(vbo) := vbo/Woningtype5_rel;
-					attribute<Class/EigendomHuurKoop>						Eigendomstype	(vbo) := vbo/Eigendomhuurkoop_rel;
-					attribute<m2>											Oppervlakte		(vbo) := vbo/oppervlakte;
-					//attribute<float32>										Z				(vbo) := vbo/Z;
-					attribute<Class/y_categorien_discreet/AantPersHH> 		AantPersHH		(vbo) := vbo/AantPersHH;
-					attribute<Class/y_categorien_discreet/LeeftijdRefPers> 	LeeftijdRefPers	(vbo) := vbo/LeeftijdRefPers;
-					attribute<Class/y_categorien_discreet/TypeHH> 			TypeHH			(vbo) := vbo/TypeHH;
-				}	
+				*/
 			}
 			
 			unit<uint32> gemeente_discreet_src : StorageName = "%HestiaDataDir%/Eindgebruikerskosten/20240711_gemeente_discreet_gesplitst.csv"
