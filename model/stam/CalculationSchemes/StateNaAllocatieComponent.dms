@@ -61,7 +61,7 @@ template StateNaAllocatieComponent
 				attribute<Eur> Ki_installatie 	(BO) := eenmalig/Ki15_LO + eenmalig/Ki_VT + eenmalig/Ki20_LO + eenmalig/Ki30_LO + eenmalig/Ki_LTAS - eenmalig/Oi15_LO - eenmalig/Oi_VT - eenmalig/Oi20_LO - eenmalig/Oi30_LO; //check of LTAS hier ook bijhoort
 				attribute<Eur> Ki_isolatie 		(BO) := eenmalig/Ki_gv - eenmalig/Oi_gv;
 					
-				container Financierlingslasten  		// Hypothecaire lening voor eigenaar-bewoner, vastgoedhypotheek voor particuliere verhuurder, WSW voor sociale verhuurder
+				container Financieringslasten  		// Hypothecaire lening voor eigenaar-bewoner, vastgoedhypotheek voor particuliere verhuurder, WSW voor sociale verhuurder
 				{
 					attribute<percent_yr> rentepercentage 	(BO) := ='merge(uint8(BO/Eigendom_rel), percent_yr,'+ AsItemList('Invoer/Kengetallen/Eindgebruikerskosten/rentepercentages/PerJaar/R_' + Classifications/Eigendom/c + '[Classifications/Zichtjaar/Rekenjaar_rel[Zichtjaar_rel]]')+')';
 					attribute<_yr> maandrente				(BO) := (rentepercentage[percent_yr] / 10000d)[_yr] / 12d;
@@ -91,12 +91,113 @@ template StateNaAllocatieComponent
 				//====== Placeholder Hypotheekrenteaftrek
 				container Hypotheekrenteaftrek
 				{
+					parameter<ratio> aandeel_investering_WOZ := 0.60[ratio], source = "https://www.eigenhuis.nl/verduurzamen/maatregelen/zonne-energie/5-vragen-over-zonnepanelen-en-de-woz-waarde"; 
+					parameter<ratio> BelastingSchijf_laag := 0.3697[ratio], source = "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/inkomstenbelasting/heffingskortingen_boxen_tarieven/boxen_en_tarieven/overzicht_tarieven_en_schijven/"; //  (2024)
+					parameter<ratio> BelastingSchijf_hoog := 0.4950[ratio], source = "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/inkomstenbelasting/heffingskortingen_boxen_tarieven/boxen_en_tarieven/overzicht_tarieven_en_schijven/"; // (2024)
+					parameter<Eur_yr> Inkomensgrens_belastingschijf :=  75518[Eur_yr], source = "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/inkomstenbelasting/heffingskortingen_boxen_tarieven/boxen_en_tarieven/overzicht_tarieven_en_schijven/"; // (2024) 
+					parameter<Eur> WOZ_grens_eigenwoningforfait := 1310000[Eur],		source = "https://www.belastingdienst.nl/wps/wcm/connect/nl/koopwoning/content/hoe-werkt-eigenwoningforfait"; // (2024)
+					parameter<_yr> eigenwoningforfait_laag := 0.0035[_yr], 				source = "https://www.belastingdienst.nl/wps/wcm/connect/nl/koopwoning/content/hoe-werkt-eigenwoningforfait"; // (2024)
+					parameter<_yr> eigenwoningforfait_hoog_variabel := 0.0235[_yr], 	source = "https://www.belastingdienst.nl/wps/wcm/connect/nl/koopwoning/content/hoe-werkt-eigenwoningforfait"; // (2024)
+					parameter<Eur_yr> eigenwoningforfait_hoog_vast := 4585[Eur_yr], 	source = "https://www.belastingdienst.nl/wps/wcm/connect/nl/koopwoning/content/hoe-werkt-eigenwoningforfait"; // (2024)
+					
+					container Huidig
+					{
+						attribute<ratio> BelastingSchijf	(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BelastbaarInkomen[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_laag[ratio]
+						: Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BelastbaarInkomen[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_hoog 
+						: (0/0)[ratio];
+						
+						attribute<Eur_yr> Rentelasten_per_jaar 		(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/Hypotheekrentelasten * 12d [Eur_yr];
+						attribute<_yr> vermoedelijk_rentepercentage_hypotheek 					(BO) := Rentelasten_per_jaar[Eur_yr] / Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/Hypotheekschuld[Eur];
+						
+						attribute<Eur_yr> eigenwoningforfait 									(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/WOZwaarde[Eur] < WOZ_grens_eigenwoningforfait[Eur] ? Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/WOZwaarde[Eur] * eigenwoningforfait_laag[_yr]
+						: Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/WOZwaarde[Eur] >= WOZ_grens_eigenwoningforfait[Eur] ? eigenwoningforfait_hoog_vast[Eur_yr] + (Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/WOZwaarde[Eur] - WOZ_grens_eigenwoningforfait[Eur]) * eigenwoningforfait_hoog_variabel[_yr] :
+						(0/0)[Eur_yr];
+						
+						attribute<Eur_yr> Bruto_inkomen_na_rentelasten 							(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BelastbaarInkomen[Eur_yr] - Rentelasten_per_jaar[Eur_yr] + Eigenwoningforfait[Eur_yr];
+						
+						attribute<ratio> BelastingSchijf_na_rentelasten						(BO) := Bruto_inkomen_na_rentelasten[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_laag[ratio]
+						: Bruto_inkomen_na_rentelasten[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_hoog 
+						: (0/0)[ratio];
+												
+						attribute<Eur_yr> Deel_inkomen_onder									(BO) := Bruto_inkomen_na_rentelasten[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? Bruto_inkomen_na_rentelasten[Eur_yr]
+						: Bruto_inkomen_na_rentelasten[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? Inkomensgrens_belastingschijf[Eur_yr]
+						: (0/0)[Eur_yr];
+						
+						attribute<Eur_yr> Deel_inkomen_boven									(BO) := Bruto_inkomen_na_rentelasten[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? 0[Eur_yr]
+						: Bruto_inkomen_na_rentelasten[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? Bruto_inkomen_na_rentelasten[Eur_yr] - Inkomensgrens_belastingschijf[Eur_yr]
+						: (0/0)[Eur_yr];			
+					
+						attribute<Eur_yr> inkomstenbelasting					(BO) := BelastingSchijf_laag * Deel_inkomen_onder + BelastingSchijf_hoog * Deel_inkomen_boven;
+					}
+					
+					container Na_investering
+					{
+						attribute<ratio> BelastingSchijf	(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BelastbaarInkomen[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_laag[ratio]
+						: Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BelastbaarInkomen[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_hoog 
+						: (0/0)[ratio];
+						attribute<Eur> WOZwaarde									(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/WOZwaarde[Eur] + aandeel_investering_WOZ * (Ki_isolatie + Ki_installatie); 
+						attribute<Eur_yr> eigenwoningforfait						(BO) :=  WOZwaarde < WOZ_grens_eigenwoningforfait[Eur] ? WOZwaarde[Eur] * eigenwoningforfait_laag[_yr]
+						: WOZwaarde[Eur] >= WOZ_grens_eigenwoningforfait[Eur] ? eigenwoningforfait_hoog_vast[Eur_yr] + (WOZwaarde[Eur] - WOZ_grens_eigenwoningforfait[Eur]) * eigenwoningforfait_hoog_variabel[_yr]
+						: (0/0)[Eur_yr];					
+							
+						container Hypothecaire_lening
+						{
+							attribute<Eur_yr> Bruto_rentelasten 				(BO) := Huidig/Rentelasten_per_jaar[Eur_yr] + (financieringslasten/rentepercentage[percent_yr]/100[percent])[_yr] * (Ki_isolatie + Ki_installatie);
+							attribute<Eur_yr> Bruto_inkomen_na_rentelasten 		(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BelastbaarInkomen[Eur_yr] - Bruto_rentelasten[Eur_yr] + Eigenwoningforfait[Eur_yr];
+							
+							attribute<ratio> BelastingSchijf_na_rentelasten		(BO) := Bruto_inkomen_na_rentelasten[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_laag[ratio]
+							: Bruto_inkomen_na_rentelasten[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_hoog 
+							: (0/0)[ratio];
+							
+							
+							attribute<Eur_yr> Deel_inkomen_onder									(BO) := Bruto_inkomen_na_rentelasten[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? Bruto_inkomen_na_rentelasten[Eur_yr]
+							: Bruto_inkomen_na_rentelasten[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? Inkomensgrens_belastingschijf[Eur_yr]
+							: (0/0)[Eur_yr];
+							
+							attribute<Eur_yr> Deel_inkomen_boven									(BO) := Bruto_inkomen_na_rentelasten[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? 0[Eur_yr]
+							: Bruto_inkomen_na_rentelasten[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? Bruto_inkomen_na_rentelasten[Eur_yr] - Inkomensgrens_belastingschijf[Eur_yr]
+							: (0/0)[Eur_yr];			
+						
+							attribute<Eur_yr> inkomstenbelasting					(BO) := BelastingSchijf_laag * Deel_inkomen_onder + BelastingSchijf_hoog * Deel_inkomen_boven;
+							
+							attribute<bool> Belastingschijfverschuivingen (BO) := Belastingschijf == Belastingschijf_na_rentelasten ? FALSE : TRUE;
+						}
+						container Warmtefondslening
+						{
+							attribute<Eur_yr> Bruto_rentelasten 				(BO) := Huidig/Rentelasten_per_jaar[Eur_yr] + (financieringslasten/Warmtefondslening/rentepercentage[percent_yr]/100[percent])[_yr] * (Ki_isolatie + Ki_installatie);
+							attribute<Eur_yr> Bruto_inkomen_na_rentelasten 		(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BelastbaarInkomen[Eur_yr] - Bruto_rentelasten[Eur_yr] + Eigenwoningforfait[Eur_yr];
+							
+							attribute<ratio> BelastingSchijf_na_rentelasten		(BO) := Bruto_inkomen_na_rentelasten[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_laag[ratio]
+							: Bruto_inkomen_na_rentelasten[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_hoog 
+							: (0/0)[ratio];
+							
+							
+							attribute<Eur_yr> Deel_inkomen_onder									(BO) := Bruto_inkomen_na_rentelasten[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? Bruto_inkomen_na_rentelasten[Eur_yr]
+							: Bruto_inkomen_na_rentelasten[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? Inkomensgrens_belastingschijf[Eur_yr]
+							: (0/0)[Eur_yr];
+							
+							attribute<Eur_yr> Deel_inkomen_boven									(BO) := Bruto_inkomen_na_rentelasten[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? 0[Eur_yr]
+							: Bruto_inkomen_na_rentelasten[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? Bruto_inkomen_na_rentelasten[Eur_yr] - Inkomensgrens_belastingschijf[Eur_yr]
+							: (0/0)[Eur_yr];			
+						
+							attribute<Eur_yr> inkomstenbelasting					(BO) := BelastingSchijf_laag * Deel_inkomen_onder + BelastingSchijf_hoog * Deel_inkomen_boven;
+							
+							attribute<bool> Belastingschijfverschuivingen (BO) := Belastingschijf == Belastingschijf_na_rentelasten ? FALSE : TRUE;
+						}
+					}	
+					
+				
+					attribute<Eur_yr> Belastingteruggave 						(BO) := (huidig/inkomstenbelasting - na_investering/Hypothecaire_lening/inkomstenbelasting);
+					attribute<Eur_yr> Belastingteruggave_warmtefondslening 		(BO) := (huidig/inkomstenbelasting - na_investering/Warmtefondslening/inkomstenbelasting);
+					
+					/*
 					parameter<ratio> BelastingSchijf := 0.37[ratio]; // 0.371 of 0.495 (2022)
 
 					attribute<Eur_yr> KL_totaal    (BO) := = 'add('+AsItemlist('float64('+string(Classifications/Gebouw_Kapitaallasten/isEindgebruikerskosten)+ ') * Kapitaallasten/'+ Classifications/Gebouw_Kapitaallasten/name)+')';
 					attribute<Eur_yr> wv_Aflossing (BO) := = 'add('+AsItemlist('eenmalig/'+ Classifications/Gebouwoptie_eenmalig/name + ' / float64(' + string(Classifications/GebouwOptie_eenmalig/AT) +')[yr]' ) +')' ;
 					attribute<Eur_yr> RenteBedrag  (BO) := KL_totaal - wv_Aflossing;
 					attribute<Eur_yr> Aftrek       (BO) := RenteBedrag * BelastingSchijf;
+					*/
 				}
 			}
 		}
