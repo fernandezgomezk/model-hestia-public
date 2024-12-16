@@ -45,7 +45,7 @@ template ResultatenT
 			')'
 		), IsHidden = "true"
 	{
-		container Totaal := =(SpecifiekeInstellingen/Rapportage/RapportageSchaal/name != 'NL')
+		container Totaal := =(first(SpecifiekeInstellingen/Rapportage/RapportageSchaal/name) != 'NL')
 			? 'Rapportage/Flow(geography/RegioIndelingen/NL, ''NL'', value(0, geography/RegioIndelingen/NL) )'
 			: '.', IsHidden = "True";
 	}
@@ -206,8 +206,8 @@ template ResultatenT
 				attribute<.> per_BO(BO) := rlookup(InstallatieGetalOV_rel, values); 
 				attribute<AS> AS_rel := InstallatieGetalOV/first_rel[values];
 				attribute<VT> VT_rel := InstallatieGetalOV/second_rel[values];
-				attribute<DK> DK_rel := InstallatieGetalOV/nr_3[values];
-				attribute<KK> KK_rel := InstallatieGetalOV/nr_4[values];
+				attribute<DK> DK_rel := InstallatieGetalOV/third_rel[values];
+				attribute<KK> KK_rel := InstallatieGetalOV/fourth_rel[values];
 				
 				attribute<string> Label := AS/name[AS_rel]+';'+VT/name[VT_rel]+';'+DK/name[DK_rel]+';'+KK/name[KK_rel];
 			}

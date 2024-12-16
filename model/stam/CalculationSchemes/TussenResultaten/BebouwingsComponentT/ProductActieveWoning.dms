@@ -43,9 +43,9 @@ unit<uint32> ProductActieveWoning := select_with_org_rel(BO/Activatie/ProductAct
 		//===== voor woningen met ook actieve bouwdelen worden de gebouwopties per uniek ambitieniveau (max 5) berekend =====
 		unit<uint32> xIsolatieAmbitie := select(IsDefined(rlookup(BouwdeelActieveWoning/UniekAmbitie/BO_rel, sub_Bouwdeelactief/BO_rel)))
 		{
-			attribute<sub_BouwdeelActief> sub_BouwdeelActief_rel := select_data(xIsolatieAmbitie, rlookup(BouwdeelActieveWoning/UniekAmbitie/BO_rel, sub_Bouwdeelactief/BO_rel)), ishidden = "True";
-			attribute<classifications/IsolatieAmbitie> MinIsolatieAmbitie_rel := select_data(xIsolatieAmbitie, BouwdeelActieveWoning/UniekAmbitie/MinIsolatieAmbitie_rel), ishidden = "True";
-			attribute<classifications/IsolatieAmbitie> MaxIsolatieAmbitie_rel := select_data(xIsolatieAmbitie, BouwdeelActieveWoning/UniekAmbitie/MaxIsolatieAmbitie_rel), ishidden = "True";
+			attribute<sub_BouwdeelActief> sub_BouwdeelActief_rel := collect_by_cond(xIsolatieAmbitie, rlookup(BouwdeelActieveWoning/UniekAmbitie/BO_rel, sub_Bouwdeelactief/BO_rel)), ishidden = "True";
+			attribute<classifications/IsolatieAmbitie> MinIsolatieAmbitie_rel := collect_by_cond(xIsolatieAmbitie, BouwdeelActieveWoning/UniekAmbitie/MinIsolatieAmbitie_rel), ishidden = "True";
+			attribute<classifications/IsolatieAmbitie> MaxIsolatieAmbitie_rel := collect_by_cond(xIsolatieAmbitie, BouwdeelActieveWoning/UniekAmbitie/MaxIsolatieAmbitie_rel), ishidden = "True";
 			
 			attribute<BO> BO_rel := sub_BouwdeelActief_rel->BO_rel, ishidden = "True";
 			

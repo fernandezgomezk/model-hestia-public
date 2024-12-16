@@ -108,15 +108,15 @@
 			
 				unit<uint32> WE := combine(class/woningtype5, class/eigendomhuurkoop)
 				{
-					attribute<string> LabelWoningtype := Class/Woningtype5/label[nr_1];
-					attribute<string> LabelEigendom := Class/Eigendomhuurkoop/label[nr_2];
+					attribute<string> LabelWoningtype := Class/Woningtype5/label[first_rel];
+					attribute<string> LabelEigendom := Class/Eigendomhuurkoop/label[second_rel];
 					attribute<string> label         := LabelWoningtype + '_' + LabelEigendom;
 				}
 				
 				unit<uint32> WEG := combine(WE, Invoer/RuimtelijkeData/Studiegebied/Gemeente)
 				{
-					attribute<string> LabelG := Invoer/RuimtelijkeData/Studiegebied/Gemeente/label[nr_2];
-					attribute<string> LabelWE := WE/label[nr_1];
+					attribute<string> LabelG := Invoer/RuimtelijkeData/Studiegebied/Gemeente/label[second_rel];
+					attribute<string> LabelWE := WE/label[first_rel];
 					attribute<string> label         := LabelG + '_' + LabelWE;
 				}
 
@@ -126,8 +126,8 @@
 				
 				unit<uint32> WEB := combine(WE, Invoer/RuimtelijkeData/Studiegebied/Buurt)
 				{
-					attribute<string> LabelB := Invoer/RuimtelijkeData/Studiegebied/Buurt/label[nr_2];
-					attribute<string> LabelWE := WE/label[nr_1];
+					attribute<string> LabelB := Invoer/RuimtelijkeData/Studiegebied/Buurt/label[second_rel];
+					attribute<string> LabelWE := WE/label[first_rel];
 					attribute<string> label         := LabelB + '_' + LabelWE;
 				}
 				

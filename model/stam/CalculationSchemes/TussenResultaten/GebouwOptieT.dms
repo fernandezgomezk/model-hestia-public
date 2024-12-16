@@ -35,10 +35,10 @@ template select_with_org_relGebouwOptieT
 	//===== Selectie van woningen die voldoen aan de minimale isolatiegraad voor de gebouwoptie in kwestie =====
 	unit<uint32> GeschiktObject := select(LabelGeschikt && KoudeGeschikt && Criterium), ishidden = "True"
 	{
-		attribute<BO>                              BO_rel                 := select_data(GeschiktObject, ActiefObject/BO_rel);
-		attribute<Classifications/SchilLabel>      SchilLabel_rel         := select_data(GeschiktObject, ActiefObject/SchilLabel_rel);
+		attribute<BO>                              BO_rel                 := collect_by_cond(GeschiktObject, ActiefObject/BO_rel);
+		attribute<Classifications/SchilLabel>      SchilLabel_rel         := collect_by_cond(GeschiktObject, ActiefObject/SchilLabel_rel);
 		attribute<Classifications/SchilLabel>      Energielabel_rel       := ../Energielabel_rel;
-		attribute<Classifications/GebouwOptie>     GebouwOptie_rel        := select_data(GeschiktObject, ../GebouwOptie_rel);
+		attribute<Classifications/GebouwOptie>     GebouwOptie_rel        := collect_by_cond(GeschiktObject, ../GebouwOptie_rel);
 		attribute<Classifications/IsolatieAmbitie> MinIsolatieAmbitie_rel := collect_by_cond(GeschiktObject, ../MinIsolatieAmbitie_rel);
 		attribute<Classifications/IsolatieAmbitie> MaxIsolatieAmbitie_rel := collect_by_cond(GeschiktObject, ../MaxIsolatieAmbitie_rel);
 		attribute<m2>                              Oppervlakte_i          := BO/Oppervlakte[BO_Rel];
