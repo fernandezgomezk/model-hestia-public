@@ -479,7 +479,7 @@ template select_with_org_relGebouwOptieT
 		attribute<Classifications/SchilLabel> Norm (GeschiktObject) := ='makedefined(min_elem('+AsItemList('Normen/'+BBN/name+'/LabelNorm')+'), Classifications/Schillabel/V/N)';
 	}
 	
-	attribute<bool> LabelNormOK (GeschiktObject) := =LabelNormen/GeenNormen ? 'const(true,GeschiktObject)' : 'Schillabel_rel <= LabelNormen/Norm';
+	attribute<bool> LabelNormOK (GeschiktObject) := =LabelNormen/GeenNormen ? 'const(true,GeschiktObject)' : 'Energielabel_rel <= LabelNormen/Norm';
 	//======
 
 	attribute<Eur_yr> kosten_or_undefined (GeschiktObject) := collect_by_cond(GeschiktObject, Criterium) && LabelNormOK && not(Verboden) ? kosten : (0/0)[Eur_yr];
