@@ -38,6 +38,7 @@ template select_with_org_relGebouwOptieT
 		attribute<BO>                              BO_rel                 := select_data(GeschiktObject, ActiefObject/BO_rel);
 		attribute<Classifications/SchilLabel>      SchilLabel_rel         := select_data(GeschiktObject, ActiefObject/SchilLabel_rel);
 		attribute<Classifications/SchilLabel>      Energielabel_rel       := ../Energielabel_rel;
+		attribute<Classifications/energielabel>    EL_rel       		  := ../EL_rel;
 		attribute<Classifications/GebouwOptie>     GebouwOptie_rel        := select_data(GeschiktObject, ../GebouwOptie_rel);
 		attribute<Classifications/IsolatieAmbitie> MinIsolatieAmbitie_rel := select_data(GeschiktObject, ../MinIsolatieAmbitie_rel);
 		attribute<Classifications/IsolatieAmbitie> MaxIsolatieAmbitie_rel := select_data(GeschiktObject, ../MaxIsolatieAmbitie_rel);
@@ -486,6 +487,7 @@ template select_with_org_relGebouwOptieT
 
 	container energielabelberekening := CalculationSchemes/NTA8800(GeschiktObject);
 	attribute<Classifications/Schillabel> Energielabel_rel     (GeschiktObject) := energielabelberekening/Energielabel_rel;
+	attribute<Classifications/Energielabel> EL_rel 			   (GeschiktObject) := energielabelberekening/EL_rel;
 	attribute<Classifications/Schillabel> SchilLabel_rel       (GeschiktObject) := GeschiktObject/Schillabel_rel;
 
 

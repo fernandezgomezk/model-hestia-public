@@ -63,4 +63,6 @@
 			attribute<kwh_yr_m2> Kwh_m2 (ObjectDomain) := MakeDefined(Total / BO/Oppervlakte[ObjectDomain/BO_rel], 0.0[kwh_yr_m2]);
 		}
 		attribute<Classifications/Schillabel> Energielabel_rel (ObjectDomain) := MakeDefined(Primair_kWh/Kwh_m2, 1.0[kwh_yr_m2]) <= 0.0[kwh_yr_m2] ? Classifications/Schillabel/V/A : classify(Primair_kWh/Kwh_m2, classifications/Schillabel/classbreak);
+		attribute<Classifications/Energielabel> EL_rel 	       (ObjectDomain) := MakeDefined(Primair_kWh/Kwh_m2, 1.0[kwh_yr_m2]) <= 0.0[kwh_yr_m2] ? Classifications/Energielabel/V/A : classify(Primair_kWh/Kwh_m2, classifications/Energielabel/classbreak);
+
 	}
