@@ -787,6 +787,7 @@ container Classifications: Using = "Units", KeepData = "True", IsHidden = "True"
 			,rgb(251,182,001)
 			,rgb(249,097,014)
 			,rgb(249,026,031)
+			,rgb(128,128,128)
 		];
 		attribute<uint32> SymbColor := Color, DialogType = "SymbolColor";
 
