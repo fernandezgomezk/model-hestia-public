@@ -30,6 +30,8 @@ unit<uint32> ActieveWoning := select_with_org_rel(BO/Activatie/ProductActief || 
 
 		attribute<ActieveWoning> ActieveWoning_rel := rlookup(BO_rel, ActieveWoning/BO_rel);
 		
+		attribute<uint32> Count_per_ActieveWoning(ActieveWoning) := pcount(ActieveWoning_rel);
+		
 		container Bouwdelen {
 			container Isolatie := for_each_nedv(Classifications/Bouwdeel/name
 			,	replace(constr_expr2, '@A', 'Bouwdelen/Isolatie/@BN', '@BN', Classifications/Bouwdeel/name)
