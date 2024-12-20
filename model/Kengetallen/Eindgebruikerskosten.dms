@@ -223,7 +223,7 @@
 					container continu_per_vbo := for_each_ind(
 					'nedv',
 					class/y_variabelen_continu/label,
-					'exp(float64(nrAansluitingen) * gemeente_continu/Asl/' + class/y_variabelen_continu/label + ' [ModelObject_rel] + log(float64(Oppervlakte)) * gemeente_continu/Opp/'+ class/y_variabelen_continu/label + ' [ModelObject_rel] + (0d + sqrt(gemeente_continu/Var_resid/'+ class/y_variabelen_continu/label + ' [ModelObject_rel]) * float64(Z)))',
+					'exp(gemeente_continu/Asl/' + class/y_variabelen_continu/label + ' [ModelObject_rel] + log(Oppervlakte/1[m2]) * gemeente_continu/Opp/'+ class/y_variabelen_continu/label + ' [ModelObject_rel] + (0d + sqrt(gemeente_continu/Var_resid/'+ class/y_variabelen_continu/label + ' [ModelObject_rel]) * float64(Z)))',
 					.,
 					float64);
 						
@@ -231,7 +231,7 @@
 					container continu_per_vbo_zonder_spreiding := for_each_ind(
 					'nedv',
 					class/y_variabelen_continu/label,
-					'exp(float64(nrAansluitingen) * gemeente_continu/Asl/' + class/y_variabelen_continu/label + ' [ModelObject_rel] + log(float64(Oppervlakte)) * gemeente_continu/Opp/'+ class/y_variabelen_continu/label + ' [ModelObject_rel])',
+					'exp(gemeente_continu/Asl/' + class/y_variabelen_continu/label + ' [ModelObject_rel] + log(Oppervlakte/1[m2]) * gemeente_continu/Opp/'+ class/y_variabelen_continu/label + ' [ModelObject_rel])',
 					.,
 					float64);
 				}
@@ -246,7 +246,7 @@
 					container continu_per_vbo := for_each_ind(
 					'nedv',
 					class/y_variabelen_continu/label,
-					'exp(float64(nrAansluitingen) * buurt_continu/Asl/' + class/y_variabelen_continu/label + ' [ModelObject_rel] + log(float64(Oppervlakte)) * buurt_continu/Opp/'+ class/y_variabelen_continu/label + ' [ModelObject_rel] + (0d + sqrt(buurt_continu/Var_resid/'+ class/y_variabelen_continu/label + ' [ModelObject_rel]) * float64(Z)))',
+					'exp(buurt_continu/Asl/' + class/y_variabelen_continu/label + ' [ModelObject_rel] + log(Oppervlakte/1[m2]) * buurt_continu/Opp/'+ class/y_variabelen_continu/label + ' [ModelObject_rel] + (0d + sqrt(buurt_continu/Var_resid/'+ class/y_variabelen_continu/label + ' [ModelObject_rel]) * float64(Z)))',
 					.,
 					float64);
 						
@@ -254,7 +254,7 @@
 					container continu_per_vbo_zonder_spreiding := for_each_ind(
 					'nedv',
 					class/y_variabelen_continu/label,
-					'exp(float64(nrAansluitingen) * buurt_continu/Asl/' + class/y_variabelen_continu/label + ' [ModelObject_rel] + log(float64(Oppervlakte)) * buurt_continu/Opp/'+ class/y_variabelen_continu/label + ' [ModelObject_rel])',
+					'exp(buurt_continu/Asl/' + class/y_variabelen_continu/label + ' [ModelObject_rel] + log(float64(Oppervlakte)/1[m2]) * buurt_continu/Opp/'+ class/y_variabelen_continu/label + ' [ModelObject_rel])',
 					.,
 					float64);
 				}
@@ -445,6 +445,16 @@
 				.,
 				float64)
 				{
+					/*attribute<string> vbo_ID (VBO) := RuimtelijkeData/Bebouwing/Woning/code;
+					attribute<string> postcode (VBO) := RuimtelijkeData/Bebouwing/Woning/label;
+					attribute<string> Gemeentecode (VBO) := RuimtelijkeData/Studiegebied/Buurt/GM_code[vbo/buurt_rel];
+					attribute<string> Buurtcode (VBO) := RuimtelijkeData/Studiegebied/Buurt/BU_CODE[vbo/buurt_rel];
+					attribute<nrAsl> nrAansluitingen (VBO) := vbo/nrAansluitingen;
+					attribute<Invoer/Kengetallen/Eindgebruikerskosten/WP9/Class/WoningType5> WoningType (VBO) := vbo/Woningtype5_rel;
+					attribute<Invoer/Kengetallen/Eindgebruikerskosten/WP9/Class/EigendomHuurKoop> Eigendomstype (VBO) := vbo/Eigendomhuurkoop_rel;
+					attribute<m2> Oppervlakte (VBO) := vbo/Oppervlakte;
+					attribute<float32> Z (VBO) := vbo/Z;
+					*/
 					//Bij discrete variabelen geen makedefined want geen data is gedefinieerd als waarde 0 ipv null
 					attribute<Class/y_categorien_discreet/AantPersHH> 		AantPersHH 	(..)		:= buurt_discreet_per_vbo/AantPersHH/AantPersHH > 0[Class/y_categorien_discreet/AantPersHH] ? buurt_discreet_per_vbo/AantPersHH/AantPersHH : gemeente_discreet_per_vbo/AantPersHH/AantPersHH;
 					attribute<Class/y_categorien_discreet/LeeftijdRefPers> 	LeeftijdRefPers (..)	:= buurt_discreet_per_vbo/LeeftijdRefPers/LeeftijdRefPers > 0[Class/y_categorien_discreet/LeeftijdRefPers] ? buurt_discreet_per_vbo/LeeftijdRefPers/LeeftijdRefPers : gemeente_discreet_per_vbo/LeeftijdRefPers/LeeftijdRefPers;
