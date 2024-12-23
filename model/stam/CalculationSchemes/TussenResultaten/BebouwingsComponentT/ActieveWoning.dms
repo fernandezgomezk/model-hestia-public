@@ -16,6 +16,7 @@ unit<uint32> ActieveWoning := select_with_org_rel(BO/Activatie/ProductActief || 
 	attribute<BO> BO_rel := org_rel, ishidden = "False";
 	attribute<rdc_meter> Geometry := lookup(BO_rel, BO/Geometry), ishidden = "True";
 	attribute<ActieveWoning> per_BO(BO) := invert(BO_rel), ishidden = "True";
+	attribute<Classifications/SchilLabel> org_schillabel_rel := BO/SchilLabel_rel[BO_rel];
 	
 	unit<uint32> xInvesteringsOptie := union_unit(ProductActieveWoning/xIsolatieAmbitie/PAW_xInvesteringsOptie, BouwdeelActieveWoning/ProductInactieveAmbitie)
 	{
