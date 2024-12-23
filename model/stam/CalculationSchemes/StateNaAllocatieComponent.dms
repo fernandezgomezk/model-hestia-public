@@ -91,7 +91,7 @@ template StateNaAllocatieComponent
 				//====== Placeholder Hypotheekrenteaftrek
 				container Hypotheekrenteaftrek
 				{
-					parameter<ratio> aandeel_investering_WOZ := 0.60[ratio], source = "https://www.eigenhuis.nl/verduurzamen/maatregelen/zonne-energie/5-vragen-over-zonnepanelen-en-de-woz-waarde"; 
+					parameter<ratio> aandeel_investering_WOZ := 0.00[ratio]; //0.60[ratio], source = "https://www.eigenhuis.nl/verduurzamen/maatregelen/zonne-energie/5-vragen-over-zonnepanelen-en-de-woz-waarde"; 
 					parameter<ratio> BelastingSchijf_laag := 0.3697[ratio], source = "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/inkomstenbelasting/heffingskortingen_boxen_tarieven/boxen_en_tarieven/overzicht_tarieven_en_schijven/"; //  (2024)
 					parameter<ratio> BelastingSchijf_hoog := 0.4950[ratio], source = "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/inkomstenbelasting/heffingskortingen_boxen_tarieven/boxen_en_tarieven/overzicht_tarieven_en_schijven/"; // (2024)
 					parameter<Eur_yr> Inkomensgrens_belastingschijf :=  75518[Eur_yr], source = "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/inkomstenbelasting/heffingskortingen_boxen_tarieven/boxen_en_tarieven/overzicht_tarieven_en_schijven/"; // (2024) 
