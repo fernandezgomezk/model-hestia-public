@@ -36,6 +36,7 @@ template select_with_org_relGebouwOptieT
 	unit<uint32> GeschiktObject := select(LabelGeschikt && KoudeGeschikt && Criterium), ishidden = "True"
 	{
 		attribute<BO>                              BO_rel                 := collect_by_cond(GeschiktObject, ActiefObject/BO_rel);
+		attribute<Classifications/SchilLabel>      org_SchilLabel_rel     := BO/SchilLabel_rel[BO_rel];
 		attribute<Classifications/SchilLabel>      SchilLabel_rel         := collect_by_cond(GeschiktObject, ActiefObject/SchilLabel_rel);
 		attribute<Classifications/SchilLabel>      Energielabel_rel       := ../Energielabel_rel;
 		attribute<Classifications/GebouwOptie>     GebouwOptie_rel        := collect_by_cond(GeschiktObject, ../GebouwOptie_rel);
