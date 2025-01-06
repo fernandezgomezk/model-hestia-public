@@ -152,7 +152,7 @@ container Activatie
 	attribute<bool> BouwdeelVervanging (..) := ='add('+AsItemList('uint8(Bouwdelen/'+Classifications/bouwdeel/name+')')+') > 0b';
 	attribute<bool> ProductVervanging  (..) := ='add('+AsItemList('uint8(Producten/'+Classifications/product/name+')')+') > 0b';
 
-	attribute<bool> KanNietActiveren   (..) := const(false,..);/*=Invoer/DefaultInstellingen/Basis/RuimtelijkeOntwikkelingAan ? 
+	attribute<bool> KanNietActiveren   (..) := AansluitFactor <= 0.0;/*=Invoer/DefaultInstellingen/Basis/RuimtelijkeOntwikkelingAan ? Woningen die nog niet gebouwd zijn, of al gesloopt, mogen zeker niet geactiveerd worden.
 		'MakeDefined(sub_or_null(Sloopjaar, Zichtjaar_jaar), 9999w) < 10[yr_uint16] || MakeDefined(sub_or_null(Zichtjaar_jaar, Bouwjaar), 9999w) < 10[yr_uint16] || Afbouw || Aanbouw || not(nrAansluitingen > 0.0[nrAsl])' :
 		'const(false,..)'; */
 	attribute<bool> BouwdeelActief     (..) := =RekenStapName == 'StartJaar' ? 'const(false,..)' : 'BouwdeelVervanging && not(KanNietActiveren)';
