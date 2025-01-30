@@ -25,6 +25,7 @@ container Units: isHidden = "True"
 	unit<float64> s             := baseunit('s', float64), label = "seconde" , descr = "seconde, eenheid voor duratie";
 	unit<float64> hr            := 60 * 60 * s           , label = "uur"     , descr = "uur, eenheid voor duratie";
 	unit<float64> yr            := BaseUnit('yr',float64), label = "jaar"    , descr = "jaar, eenheid voor duratie";
+	unit<float64> mo            := BaseUnit('mo',float64), label = "maand"   , descr = "maand, eenheid voor duratie";	
 	unit<float64> _yr           := 1 / yr                , label = "per jaar", descr = "per jaar, eenheid voor frequentie";
 	
 	// eenheden voor moment
@@ -119,6 +120,7 @@ container Units: isHidden = "True"
 	unit<float64> Eur_ton       := Eur / ton                , label = "euro per ton"                     , descr = "euro per ton";
 	unit<float64> Eur_kWh       := Eur / kWh                , label = "euro per kilowattuur"             , descr = "euro per kilowattuur";
 	unit<float64> Eur_yr        := Eur / yr                 , label = "euro per jaar"                    , descr = "euro per jaar";
+	unit<float64> Eur_mo        := Eur / mo                 , label = "euro per maand"                   , descr = "euro per maand";	
 	unit<float64> mEur_yr       := mEur / yr                , label = "miljoen euro per jaar"            , descr = "miljoen euro per jaar";
 	unit<float64> Eur_yr_m      := Eur_yr / m               , label = "euro per jaar per meter"          , descr = "euro per jaar per meter, eenheid voor jaarlijkse kosten van infrastructuur";
 	unit<float64> Eur_yr_m2     := Eur / yr / m2            , label = "euro per jaar per vierkante meter", descr = "euro per jaar per vierkante meter, eenheid voor jaarlijkse kosten relatief naar oppervlak";
