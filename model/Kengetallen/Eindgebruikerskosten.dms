@@ -262,10 +262,12 @@
 				unit<uint32> gemeente_discreet_per_vbo := RuimtelijkeData/BAG/import/VBO
 				{
 					
-						unit<uint32>                          ModelObject           := Class/WEG, IsHidden = "True";
-						attribute<class/WEG>                  ModelObject_rel (VBO) := rlookup(vbo/Gemeente_ModelObjectKey, gemeente_discreet/WEG_rel), IsHidden = "True";
-						parameter<uint32>                     seed                  := Invoer/TechnischeInstellingen/RandomSeed + 199, IsHidden = "True";
-						attribute<float32>                    RndNr           (VBO) := rnd_uniform(seed, vbo, range(float32, 0f, 1f)), IsHidden = "True";
+						unit<uint32>                          ModelObject           	:= Class/WEG, IsHidden = "True";
+						attribute<class/WEG>                  ModelObject_rel 	(VBO) 	:= rlookup(vbo/Gemeente_ModelObjectKey, gemeente_discreet/WEG_rel), IsHidden = "True";
+						parameter<uint32>                     seed_hh                  	:= Invoer/TechnischeInstellingen/RandomSeed + 199, IsHidden = "True";
+						parameter<uint32>                     seed_lfd                  := Invoer/TechnischeInstellingen/RandomSeed + 198, IsHidden = "True";
+						attribute<float32>                    RndNr_hh          (VBO) 	:= rnd_uniform(seed_hh, vbo, range(float32, 0f, 1f)), IsHidden = "True";
+						attribute<float32>                    RndNr_lfd         (VBO) 	:= rnd_uniform(seed_lfd, vbo, range(float32, 0f, 1f)), IsHidden = "True";
 
 					container AantPersHH
 					{					
@@ -285,11 +287,11 @@
 						}
 
 						attribute<Class/y_categorien_discreet/AantPersHH> AantPersHH  (VBO) :=
-							  RndNr < CumulProb/Een ? 1[Class/y_categorien_discreet/AantPersHH]
-							: RndNr < CumulProb/Twee ? 2[Class/y_categorien_discreet/AantPersHH]
-							: RndNr < CumulProb/Drie ? 3[Class/y_categorien_discreet/AantPersHH]
-							: RndNr < CumulProb/Vier ? 4[Class/y_categorien_discreet/AantPersHH]
-							: RndNr <= CumulProb/VijfOfMeer ? 5[Class/y_categorien_discreet/AantPersHH]
+							  RndNr_hh < CumulProb/Een ? 1[Class/y_categorien_discreet/AantPersHH]
+							: RndNr_hh < CumulProb/Twee ? 2[Class/y_categorien_discreet/AantPersHH]
+							: RndNr_hh < CumulProb/Drie ? 3[Class/y_categorien_discreet/AantPersHH]
+							: RndNr_hh < CumulProb/Vier ? 4[Class/y_categorien_discreet/AantPersHH]
+							: RndNr_hh <= CumulProb/VijfOfMeer ? 5[Class/y_categorien_discreet/AantPersHH]
 							: 0[Class/y_categorien_discreet/AantPersHH];
 					}
 						
@@ -315,14 +317,14 @@
 						}
 
 						attribute<Class/y_categorien_discreet/LeeftijdRefPers> LeeftijdRefPers  (VBO) :=
-							  RndNr < CumulProb/LeeftijdJongerDan17Jaar ? 1[Class/y_categorien_discreet/LeeftijdRefPers]
-							: RndNr < CumulProb/Leeftijd17tot24Jaar ? 2[Class/y_categorien_discreet/LeeftijdRefPers]
-							: RndNr < CumulProb/Leeftijd25tot34Jaar ? 3[Class/y_categorien_discreet/LeeftijdRefPers]
-							: RndNr < CumulProb/Leeftijd35tot44Jaar ? 4[Class/y_categorien_discreet/LeeftijdRefPers]
-							: RndNr < CumulProb/Leeftijd45tot54Jaar ? 5[Class/y_categorien_discreet/LeeftijdRefPers]
-							: RndNr < CumulProb/Leeftijd55tot64Jaar ? 6[Class/y_categorien_discreet/LeeftijdRefPers]
-							: RndNr < CumulProb/Leeftijd65tot74Jaar ? 7[Class/y_categorien_discreet/LeeftijdRefPers]
-							: RndNr <= CumulProb/Leeftijd75JaarOfOuder ? 8[Class/y_categorien_discreet/LeeftijdRefPers]
+							  RndNr_lfd < CumulProb/LeeftijdJongerDan17Jaar ? 1[Class/y_categorien_discreet/LeeftijdRefPers]
+							: RndNr_lfd < CumulProb/Leeftijd17tot24Jaar ? 2[Class/y_categorien_discreet/LeeftijdRefPers]
+							: RndNr_lfd < CumulProb/Leeftijd25tot34Jaar ? 3[Class/y_categorien_discreet/LeeftijdRefPers]
+							: RndNr_lfd < CumulProb/Leeftijd35tot44Jaar ? 4[Class/y_categorien_discreet/LeeftijdRefPers]
+							: RndNr_lfd < CumulProb/Leeftijd45tot54Jaar ? 5[Class/y_categorien_discreet/LeeftijdRefPers]
+							: RndNr_lfd < CumulProb/Leeftijd55tot64Jaar ? 6[Class/y_categorien_discreet/LeeftijdRefPers]
+							: RndNr_lfd < CumulProb/Leeftijd65tot74Jaar ? 7[Class/y_categorien_discreet/LeeftijdRefPers]
+							: RndNr_lfd <= CumulProb/Leeftijd75JaarOfOuder ? 8[Class/y_categorien_discreet/LeeftijdRefPers]
 							: 0[Class/y_categorien_discreet/LeeftijdRefPers];
 					}
 					
@@ -342,9 +344,9 @@
 						}
 
 						attribute<Class/y_categorien_discreet/TypeHH> TypeHH  (VBO) :=
-							  RndNr < CumulProb/Eenpersoonshuishouden ? 1[Class/y_categorien_discreet/TypeHH]
-							: RndNr < CumulProb/MeerpersoonsZonderMinderjarigeKinderen ? 2[Class/y_categorien_discreet/TypeHH]
-							: RndNr <= CumulProb/MeerpersoonsMetMinderjarigeKinderen ? 3[Class/y_categorien_discreet/TypeHH]
+							  RndNr_hh < CumulProb/Eenpersoonshuishouden ? 1[Class/y_categorien_discreet/TypeHH]
+							: RndNr_hh < CumulProb/MeerpersoonsZonderMinderjarigeKinderen ? 2[Class/y_categorien_discreet/TypeHH]
+							: RndNr_hh <= CumulProb/MeerpersoonsMetMinderjarigeKinderen ? 3[Class/y_categorien_discreet/TypeHH]
 							: 0[Class/y_categorien_discreet/TypeHH];
 					}
 				}
@@ -352,10 +354,12 @@
 				unit<uint32> buurt_discreet_per_vbo := RuimtelijkeData/BAG/import/VBO
 				{
 					
-						unit<uint32>                          ModelObject           := Class/WEB, IsHidden = "True";
-						attribute<class/WEB>                  ModelObject_rel (VBO) := rlookup(vbo/Buurt_ModelObjectKey, buurt_discreet/WEB_rel), IsHidden = "True";
-						parameter<uint32>                     seed                  := Invoer/TechnischeInstellingen/RandomSeed + 199, IsHidden = "True";
-						attribute<float32>                    RndNr           (VBO) := rnd_uniform(seed, vbo, range(float32, 0f, 1f)), IsHidden = "True";
+						unit<uint32>                          ModelObject           	:= Class/WEB, IsHidden = "True";
+						attribute<class/WEB>                  ModelObject_rel 	(VBO) 	:= rlookup(vbo/Buurt_ModelObjectKey, buurt_discreet/WEB_rel), IsHidden = "True";
+						parameter<uint32>                     seed_hh                  	:= Invoer/TechnischeInstellingen/RandomSeed + 199, IsHidden = "True";
+						parameter<uint32>                     seed_lfd                  := Invoer/TechnischeInstellingen/RandomSeed + 198, IsHidden = "True";
+						attribute<float32>                    RndNr_hh          (VBO) 	:= rnd_uniform(seed_hh, vbo, range(float32, 0f, 1f)), IsHidden = "True";
+						attribute<float32>                    RndNr_lfd         (VBO) 	:= rnd_uniform(seed_lfd, vbo, range(float32, 0f, 1f)), IsHidden = "True";
 
 					container AantPersHH
 					{					
@@ -375,11 +379,11 @@
 						}
 
 						attribute<Class/y_categorien_discreet/AantPersHH> AantPersHH  (VBO) :=
-							  RndNr < CumulProb/Een ? 1[Class/y_categorien_discreet/AantPersHH]
-							: RndNr < CumulProb/Twee ? 2[Class/y_categorien_discreet/AantPersHH]
-							: RndNr < CumulProb/Drie ? 3[Class/y_categorien_discreet/AantPersHH]
-							: RndNr < CumulProb/Vier ? 4[Class/y_categorien_discreet/AantPersHH]
-							: RndNr <= CumulProb/VijfOfMeer ? 5[Class/y_categorien_discreet/AantPersHH]
+							  RndNr_hh < CumulProb/Een ? 1[Class/y_categorien_discreet/AantPersHH]
+							: RndNr_hh < CumulProb/Twee ? 2[Class/y_categorien_discreet/AantPersHH]
+							: RndNr_hh < CumulProb/Drie ? 3[Class/y_categorien_discreet/AantPersHH]
+							: RndNr_hh < CumulProb/Vier ? 4[Class/y_categorien_discreet/AantPersHH]
+							: RndNr_hh <= CumulProb/VijfOfMeer ? 5[Class/y_categorien_discreet/AantPersHH]
 							: 0[Class/y_categorien_discreet/AantPersHH];
 					}
 						
@@ -405,14 +409,14 @@
 						}
 
 						attribute<Class/y_categorien_discreet/LeeftijdRefPers> LeeftijdRefPers  (VBO) :=
-							  RndNr < CumulProb/LeeftijdJongerDan17Jaar ? 1[Class/y_categorien_discreet/LeeftijdRefPers]
-							: RndNr < CumulProb/Leeftijd17tot24Jaar ? 2[Class/y_categorien_discreet/LeeftijdRefPers]
-							: RndNr < CumulProb/Leeftijd25tot34Jaar ? 3[Class/y_categorien_discreet/LeeftijdRefPers]
-							: RndNr < CumulProb/Leeftijd35tot44Jaar ? 4[Class/y_categorien_discreet/LeeftijdRefPers]
-							: RndNr < CumulProb/Leeftijd45tot54Jaar ? 5[Class/y_categorien_discreet/LeeftijdRefPers]
-							: RndNr < CumulProb/Leeftijd55tot64Jaar ? 6[Class/y_categorien_discreet/LeeftijdRefPers]
-							: RndNr < CumulProb/Leeftijd65tot74Jaar ? 7[Class/y_categorien_discreet/LeeftijdRefPers]
-							: RndNr <= CumulProb/Leeftijd75JaarOfOuder ? 8[Class/y_categorien_discreet/LeeftijdRefPers]
+							  RndNr_lfd < CumulProb/LeeftijdJongerDan17Jaar ? 1[Class/y_categorien_discreet/LeeftijdRefPers]
+							: RndNr_lfd < CumulProb/Leeftijd17tot24Jaar ? 2[Class/y_categorien_discreet/LeeftijdRefPers]
+							: RndNr_lfd < CumulProb/Leeftijd25tot34Jaar ? 3[Class/y_categorien_discreet/LeeftijdRefPers]
+							: RndNr_lfd < CumulProb/Leeftijd35tot44Jaar ? 4[Class/y_categorien_discreet/LeeftijdRefPers]
+							: RndNr_lfd < CumulProb/Leeftijd45tot54Jaar ? 5[Class/y_categorien_discreet/LeeftijdRefPers]
+							: RndNr_lfd < CumulProb/Leeftijd55tot64Jaar ? 6[Class/y_categorien_discreet/LeeftijdRefPers]
+							: RndNr_lfd < CumulProb/Leeftijd65tot74Jaar ? 7[Class/y_categorien_discreet/LeeftijdRefPers]
+							: RndNr_lfd <= CumulProb/Leeftijd75JaarOfOuder ? 8[Class/y_categorien_discreet/LeeftijdRefPers]
 							: 0[Class/y_categorien_discreet/LeeftijdRefPers];
 					}
 					
@@ -432,9 +436,9 @@
 						}
 
 						attribute<Class/y_categorien_discreet/TypeHH> TypeHH  (VBO) :=
-							  RndNr < CumulProb/Eenpersoonshuishouden ? 1[Class/y_categorien_discreet/TypeHH]
-							: RndNr < CumulProb/MeerpersoonsZonderMinderjarigeKinderen ? 2[Class/y_categorien_discreet/TypeHH]
-							: RndNr <= CumulProb/MeerpersoonsMetMinderjarigeKinderen ? 3[Class/y_categorien_discreet/TypeHH]
+							  RndNr_hh < CumulProb/Eenpersoonshuishouden ? 1[Class/y_categorien_discreet/TypeHH]
+							: RndNr_hh < CumulProb/MeerpersoonsZonderMinderjarigeKinderen ? 2[Class/y_categorien_discreet/TypeHH]
+							: RndNr_hh <= CumulProb/MeerpersoonsMetMinderjarigeKinderen ? 3[Class/y_categorien_discreet/TypeHH]
 							: 0[Class/y_categorien_discreet/TypeHH];
 					}
 				} 			

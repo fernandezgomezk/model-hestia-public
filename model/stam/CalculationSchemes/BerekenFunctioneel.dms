@@ -19,7 +19,7 @@ Template BerekenFunctioneel
 	attribute<GJ_yr> EA (BOdomain) := PrevState/Functioneel_base/EA[PrevState_rel];
 	attribute<GJ_yr> TW (BOdomain) := PrevState/Functioneel_base/TW[PrevState_rel];
 	attribute<GJ_yr> KD (BOdomain) := PrevState/Functioneel_base/KD[PrevState_rel];
-	attribute<GJ_yr> RV (BOdomain) := (RV_per_Bouwdeel_now/Totaal  + Vrv_VT) * Correction_RV - warmtewinst/totaal;
+	attribute<GJ_yr> RV (BOdomain) := (RV_per_Bouwdeel_now/Totaal  + Vrv_VT) * Correction_RV; // - warmtewinst/totaal;
 	
 	attribute<GJ_yr> Vrv_VT (BOdomain) :=
 		  Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes/V_RV_asl[PrevState/InstallatiePerProduct/VT[PrevState_rel]]
