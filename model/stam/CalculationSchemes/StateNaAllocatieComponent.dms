@@ -80,9 +80,8 @@ template StateNaAllocatieComponent
 					
 					container nulprocentlening 
 					{
-						attribute<float64> maandrente			(BO) := Eigendom_rel == 0 ? 0d : float64(0/0);
-						attribute<Eur_yr> Kj_installatie		(BO) := 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-180.0d)) ) * Ki_installatie;
-						attribute<Eur_yr> Kj_isolatie			(BO) := 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-240.0d)) ) * Ki_isolatie; 
+						attribute<Eur_yr> Kj_installatie		(BO) := 12.0[_yr] * Ki_installatie / 180d;
+						attribute<Eur_yr> Kj_isolatie			(BO) := 12.0[_yr] * Ki_isolatie / 240.0d ; 
 						attribute<Eur_yr> Kj_totaal				(BO) := Kj_installatie + Kj_isolatie;
 					}
 				}
@@ -117,7 +116,7 @@ template StateNaAllocatieComponent
 					// het model worden geupdate maar ik weet nog niet waar. Als we alleen naar 1 jaar kijken maakt het op zich niet uit maar het is niet heel netjes.
 				}
 				
-				container Huurtoeslag
+				container Huurtoeslag //test
 				{
 					attribute<string> leeftijdsgroep 			(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/LeeftijdRefPers > 2b ? "boven21" : "onder21";  
 					attribute<string> huishoudgrootte			(BO) := switch(
