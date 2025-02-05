@@ -62,6 +62,8 @@ template BebouwingsComponentT
 			container Func2Meter := MetervraagBerekening;
 		}
 		attribute<Classifications/Schillabel> Energielabel_rel := EnergielabelBerekening/Energielabel_rel, IntegrityCheck = "Isdefined(Energielabel_rel)";
+		attribute<Classifications/Energielabel> EL_rel := EnergielabelBerekening/EL_rel, IntegrityCheck = "Isdefined(EL_rel)";
+
 
 		attribute<bool> LabelGelijk := Energielabel_rel == PrevObject/Energielabel_rel || RekenstapName == 'StartJaar';
 

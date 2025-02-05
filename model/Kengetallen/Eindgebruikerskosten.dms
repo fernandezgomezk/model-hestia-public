@@ -15,7 +15,7 @@
 		unit<uint32> OK : nrofrows = 3 //oppervlakteklasse
 		{
 			attribute<string> label       : ['K','M','G'];
-			attribute<m2>     ClassBreaks : [ 0 ,70 ,90 ];
+			attribute<m2>     ClassBreaks : [ 0 , 25 , 40 ];
 		}
 		unit<uint32> WT : nrofrows = 2 //woningtype
 		{
@@ -52,21 +52,21 @@
 
 		unit<uint32> huurpunten_labelsprong : StorageName = "%projDir%/Eindgebruikerskosten/huurpunten_labelsprong.csv", StorageType = "gdal.vect", StorageReadOnly = "True"
 		{
-			attribute<string> label := huidig_label + '_' + doel_label + woningtype;
+			attribute<string> label := huidig_label + '_' + doel_label + '_' + oppervlak + '_' + woningtype;
 
 			//====== jaarlijkse huurverhoging conform huurpuntensystematiek
-			attribute<eur_yr> Oj_hv := float64(huurpunten) * huurpunten_maxhuur/Huurverhoging_perpunt * PuntenVerhogingGebruikSchuif;
+			//attribute<eur_yr> Oj_hv := float64(huurpunten) * huurpunten_maxhuur/Huurverhoging_perpunt * PuntenVerhogingGebruikSchuif;
 		}
 
 		unit<uint32> huurpunten_maxhuur : StorageName = "%projDir%/Eindgebruikerskosten/huurpunten_maxhuur.csv", StorageType = "gdal.vect", StorageReadOnly = "True"
 		{
 			//====== jaarlijkse maximum huur conform huurpuntenstelsel
-			attribute<eur_yr> Oj_huur := 12d * float64(huur_per_maand) * 1.0[eur_yr];
+			//attribute<eur_yr> Oj_huur := 12d * float64(huur_per_maand) * 1.0[eur_yr];
 
 			//====== marginale verhoging
-			attribute<eur_yr> marginal := Oj_huur - Oj_huur[id(.)-1u];
+			//attribute<eur_yr> marginal := Oj_huur - Oj_huur[id(.)-1u];
 
-			parameter<eur_yr> Huurverhoging_perpunt := mean(marginal);
+			//parameter<eur_yr> Huurverhoging_perpunt := mean(marginal);
 		}
 
 		unit<uint32> rentepercentages : StorageName = "%projDir%/Eindgebruikerskosten/rentepercentages.csv", StorageType = "gdal.vect", StorageReadOnly = "True"
