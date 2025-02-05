@@ -44,7 +44,7 @@ unit<uint32> BouwdeelActieveWoning := select_with_org_rel(BO/Activatie/BouwdeelA
 	attribute<bool>  NooitOKE  := MaximumVraagWaarde <= BestKaasWaarde;
 	attribute<bool>  DynamicProgramForMinimumIsolatieNiveauEis := not(AltijdOKE) && not(NooitOKE);
 	
-	unit<uint8> VraagBucket := range(0b, 50b);
+	unit<uint8> VraagBucket := range(0b, 20b);
 	
 	
 	unit<uint32> DP_Woning := select(DynamicProgramForMinimumIsolatieNiveauEis)
@@ -79,6 +79,7 @@ unit<uint32> BouwdeelActieveWoning := select_with_org_rel(BO/Activatie/BouwdeelA
 			attribute<uint16> CountWaysB := sum_uint16(CountWays3[DP_BucketIter/first_rel] * CountWays4[DP_BucketIter/DP_bucket_rel], DP_BucketIter/DP_bucket_dest_rel); // max 25^2 == 625
 			attribute<uint32> CountWaysC := sum_uint32(CountWaysA[DP_BucketIter/first_rel] * CountWaysB[DP_BucketIter/DP_bucket_rel], DP_BucketIter/DP_bucket_dest_rel); // max 625^2 == 390625
 			attribute<uint32> CountWaysX := sum_uint32(CountWaysC[DP_BucketIter/first_rel] * uint32(CountWays5[DP_BucketIter/DP_bucket_rel]), DP_BucketIter/DP_bucket_dest_rel); // max 5^10 == 9765625
+			attribute<uint32> CumulCountWaysX := cumulate(CountWaysX, first_rel); 
 			
 			attribute<uint32> CountTest(DP_Woning) := sum(CountWaysX, first_rel);
 			
@@ -192,9 +193,33 @@ unit<uint32> BouwdeelActieveWoning := select_with_org_rel(BO/Activatie/BouwdeelA
 		// ================ BEGIN Berekening t.b.v. minimum score Ambitie specifiek deel
 		
 		//DynamicProgramForMinimumIsolatieNiveauEis[BouwdeelActieveWoning_rel]
-		unit<uint32> DP_Woning := select(DynamicProgramForMinimumIsolatieNiveauEis[BouwdeelActieveWoning_rel])
-		{
+		
+		
 			
+		unit<uint32> DP_WoningAmbitie := select(DynamicProgramForMinimumIsolatieNiveauEis[BouwdeelActieveWoning_rel])
+		{
+			unit<uint32> DP_Bucket := combine(DP_WoningAmbitie, VraagBucket)
+			{
+				container BucketMeasure := for_each_nedv(classifications/Bouwdeel/name,
+					replace(
+						AsList(replace('second_rel == (collect_by_cond(DP_Woning, VerbruiksBijdrage/@BD_@IN)[first_rel] / VraagBucketSize[first_rel])[VraagBucket]', '@IN', classifications/IsolatieNiveau/name), '||')
+					,	'@BD', classifications/Bouwdeel/name
+					)
+				,	DP_Bucket, float64);
+			}
+		
+			unit<uint32> BucketIter := DP_Woning/DP_Bucket/DP_BucketIter;
+			attribute<float64> MeasureWays0 := const(1.0, DP_WoningAmbitie);
+			attribute<float64> MeasureWays1 := sum_uint16(MeasureWays0[BucketIter/first_rel[BouwdeelActieveWoning_rel]] * P/RB[BucketIter/DP_bucket_rel[BouwdeelActieveWoning_rel]], BucketIter/DP_bucket_dest_rel[BouwdeelActieveWoning_rel]);
+			attribute<float64> MeasureWays2 := sum_uint16(MeasureWays1[BucketIter/first_rel[BouwdeelActieveWoning_rel]] * P/RO[BucketIter/DP_bucket_rel[BouwdeelActieveWoning_rel]], BucketIter/DP_bucket_dest_rel[BouwdeelActieveWoning_rel]);
+			attribute<float64> MeasureWays3 := sum_uint16(MeasureWays2[BucketIter/first_rel[BouwdeelActieveWoning_rel]] * P/DR[BucketIter/DP_bucket_rel[BouwdeelActieveWoning_rel]], BucketIter/DP_bucket_dest_rel[BouwdeelActieveWoning_rel]);
+			attribute<float64> MeasureWays4 := sum_uint16(MeasureWays3[BucketIter/first_rel[BouwdeelActieveWoning_rel]] * P/PL[BucketIter/DP_bucket_rel[BouwdeelActieveWoning_rel]], BucketIter/DP_bucket_dest_rel[BouwdeelActieveWoning_rel]);
+			attribute<float64> MeasureWays5 := sum_uint16(MeasureWays4[BucketIter/first_rel[BouwdeelActieveWoning_rel]] * P/VL[BucketIter/DP_bucket_rel[BouwdeelActieveWoning_rel]], BucketIter/DP_bucket_dest_rel[BouwdeelActieveWoning_rel]);
+			attribute<float64> MeasureWays6 := sum_uint16(MeasureWays5[BucketIter/first_rel[BouwdeelActieveWoning_rel]] * P/MG[BucketIter/DP_bucket_rel[BouwdeelActieveWoning_rel]], BucketIter/DP_bucket_dest_rel[BouwdeelActieveWoning_rel]);
+			attribute<float64> MeasureWays7 := sum_uint16(MeasureWays6[BucketIter/first_rel[BouwdeelActieveWoning_rel]] * P/MS[BucketIter/DP_bucket_rel[BouwdeelActieveWoning_rel]], BucketIter/DP_bucket_dest_rel[BouwdeelActieveWoning_rel]);
+			attribute<float64> MeasureWays8 := sum_uint16(MeasureWays7[BucketIter/first_rel[BouwdeelActieveWoning_rel]] * P/DP[BucketIter/DP_bucket_rel[BouwdeelActieveWoning_rel]], BucketIter/DP_bucket_dest_rel[BouwdeelActieveWoning_rel]);
+			attribute<float64> MeasureWays9 := sum_uint16(MeasureWays8[BucketIter/first_rel[BouwdeelActieveWoning_rel]] * P/DS[BucketIter/DP_bucket_rel[BouwdeelActieveWoning_rel]], BucketIter/DP_bucket_dest_rel[BouwdeelActieveWoning_rel]);
+			attribute<float64> MeasureWaysX := sum_uint16(MeasureWays9[BucketIter/first_rel[BouwdeelActieveWoning_rel]] * P/KR[BucketIter/DP_bucket_rel[BouwdeelActieveWoning_rel]], BucketIter/DP_bucket_dest_rel[BouwdeelActieveWoning_rel]);
 		}
 		// ================ END   Berekening t.b.v. minimum score Ambitie specifiek deel
 			

@@ -1,0 +1,7 @@
+LeeftijdRefPers;AantalPersHH;Label;Vermogensgrens;Inkomensgrens;Minimum_normhuur;Verhoging_normhuur;Minimum_basishuur;Aftoppingsgrens;Kwaliteitskortinggrens;Factor_a;Factor_b;Percentage_basishuur_kwaliteit;Percentage_kwaliteit_aftopping;Percentage_aftopping
+onder 21;1;onder21_1persoon;37395;22700;236.19;-37.14;199.05;682.96;477.2;4.38698E-007;0.0004463927;100;0;0
+onder 21;2;onder21_2persoon;74790;30450;234.38;-37.14;197.24;682.96;477.2;0.000000298184	;-0.0013824971;100;0;0
+onder 21;3 of meer;onder21_3plus;74790;30450;234.38;-37.14;197.24;731.93;477.2;0.000000298184	;-0.0013824971;100;0;0
+21 of hoger;1;boven21_1persoon;37395;22700;236.19;-37.14;199.05;682.96;477.2; 0.000000438698 ;0.0004463927;100;0.65;0.4
+21 of hoger;2;boven21_2persoon;74790;30450;234.38;-37.14;197.24;682.96;477.2;0.000000298184	;-0.0013824971;100;0.65;0.4
+21 of hoger;3 of meer;boven21_3plus;74790;30450;234.38;-37.14;197.24;731.93;477.2;0.000000298184	;-0.0013824971;100;0.65;0.4

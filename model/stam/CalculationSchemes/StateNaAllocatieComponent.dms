@@ -64,17 +64,24 @@ template StateNaAllocatieComponent
 				container Financieringslasten  		// Hypothecaire lening voor eigenaar-bewoner, vastgoedhypotheek voor particuliere verhuurder, WSW voor sociale verhuurder
 				{
 					attribute<percent_yr> rentepercentage 	(BO) := ='merge(uint8(BO/Eigendom_rel), percent_yr,'+ AsItemList('Invoer/Kengetallen/Eindgebruikerskosten/rentepercentages/PerJaar/R_' + Classifications/Eigendom/c + '[Classifications/Zichtjaar/Rekenjaar_rel[Zichtjaar_rel]]')+')';
-					attribute<_yr> maandrente				(BO) := (rentepercentage[percent_yr] / 10000d)[_yr] / 12d;
-					attribute<Eur_yr> Kj_installatie 		(BO) := 12.0 * ( maandrente / (1.0-((1.0 + maandrente)^-180.0)) ) * Ki_installatie;
-					attribute<Eur_yr> Kj_isolatie			(BO) := Eigendom_rel == 0 ? 12.0 * ( maandrente / (1.0-((1.0 + maandrente)^-360.0)) ) * Ki_isolatie : 12.0 * ( maandrente / (1.0-((1.0 + maandrente)^-300.0)) ) * Ki_isolatie;					
+					attribute<float64> maandrente			(BO) := rentepercentage  / 12[percent_yr];
+					attribute<Eur_yr> Kj_installatie 		(BO) := 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-180d)) ) * Ki_installatie;
+					attribute<Eur_yr> Kj_isolatie			(BO) := Eigendom_rel == 0 ? 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-360.0d)) ) * Ki_isolatie : 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-300.0d)) ) * Ki_isolatie;					
 					attribute<Eur_yr> Kj_totaal				(BO) := Kj_installatie + Kj_isolatie;
 					
-					container Warmtefondslening		// Warmtefondslening voor eigenaar-bewoner, null voor huurwoningen
+					container Warmtefondslening			// Warmtefondslening voor eigenaar-bewoner, null voor huurwoningen
 					{
 						attribute<percent_yr> rentepercentage	(BO) := Eigendom_rel == 0 ? const(Invoer/Kengetallen/Eindgebruikerskosten/rentepercentages/PerJaar/R_wf[Classifications/Zichtjaar/Rekenjaar_rel[Zichtjaar_rel]],BO) : float64(0/0);
-						attribute<_yr> maandrente				(BO) := (rentepercentage[percent_yr] / 10000d)[_yr] / 12d;
-						attribute<Eur_yr> Kj_installatie		(BO) := 12.0 * ( maandrente / (1.0-((1.0 + maandrente)^-180.0)) ) * Ki_installatie;
-						attribute<Eur_yr> Kj_isolatie			(BO) := 12.0 * ( maandrente / (1.0-((1.0 + maandrente)^-240.0)) ) * Ki_isolatie; 
+						attribute<float64> maandrente			(BO) := rentepercentage  / 12[percent_yr];
+						attribute<Eur_yr> Kj_installatie		(BO) := 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-180.0d)) ) * Ki_installatie;
+						attribute<Eur_yr> Kj_isolatie			(BO) := 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-240.0d)) ) * Ki_isolatie; 
+						attribute<Eur_yr> Kj_totaal				(BO) := Kj_installatie + Kj_isolatie;	
+					}
+					
+					container nulprocentlening 
+					{
+						attribute<Eur_yr> Kj_installatie		(BO) := 12.0[_yr] * Ki_installatie / 180d;
+						attribute<Eur_yr> Kj_isolatie			(BO) := 12.0[_yr] * Ki_isolatie / 240.0d ; 
 						attribute<Eur_yr> Kj_totaal				(BO) := Kj_installatie + Kj_isolatie;
 					}
 				}
@@ -82,23 +89,102 @@ template StateNaAllocatieComponent
 				container Huurverhoging_huurcommissiemethode 
 				{
 					attribute<percent_yr> rentepercentage	(BO) := Eigendom_rel != 0 ? const(Invoer/Kengetallen/Eindgebruikerskosten/rentepercentages/PerJaar/R_hc[Classifications/Zichtjaar/Rekenjaar_rel[Zichtjaar_rel]],BO) : float64(0/0);
-					attribute<_yr> maandrente				(BO) := rentepercentage[_yr] / 10000d / 12d;
-					attribute<Eur_yr> Kj_installatie 		(BO) := 12.0 * ( maandrente / (1.0-((1.0 + maandrente)^-180.0)) ) * Ki_installatie;
-					attribute<Eur_yr> Kj_isolatie			(BO) :=	Eigendom_rel == 1 ? 12.0 * ( maandrente / (1.0-((1.0 + maandrente)^-300.0)) ) * Ki_isolatie : 0d;
+					attribute<float64> maandrente			(BO) := rentepercentage  / 12[percent_yr];
+					attribute<Eur_yr> Kj_installatie 		(BO) := 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-180.0d)) ) * Ki_installatie;
+					attribute<Eur_yr> Kj_isolatie			(BO) :=	Eigendom_rel == 1 ? 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-300.0d)) ) * Ki_isolatie : 0d;
 					attribute<Eur_yr> Huurverhoging         (BO) := Kj_installatie + Kj_isolatie;
 				}
-
+				
+				container Huurpuntgrens
+				{
+					attribute<string> oppervlakteklasse	(BO) := BO/oppervlakte < 25d ? "K" : BO/oppervlakte < 40d ? "M" : "G";
+					attribute<string> woningtype		(BO) := BO/bebouwingstype == 5b ? "MGW" : BO/bebouwingstype == 6b ? "MGW" : "EGW"; 
+					attribute<string> EL_voor			(BO) := lookup(BO/EnergielabelBerekening/EL_rel, Classifications/EnergieLabel/Label);
+					attribute<string> EL_na 			(BO) := lookup(BO/EL_rel, Classifications/EnergieLabel/Label);
+					attribute<string> label				(BO) := EL_voor + '_' + EL_na + '_' + oppervlakteklasse + '_' + woningtype;
+					
+					attribute<int32> huurpunten_voor	(BO) := round(Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/Huurpunten); // Hier afgerond naar hele huurpunten, leek me de bedoeling
+					attribute<int32> huurpunten_sprong  (BO) := makedefined(int32(rjoin(label, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_sprong/Label, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_sprong/Huurpunten)),0i);
+					attribute<int32> huurpunten_na	    (BO) := huurpunten_voor + huurpunten_sprong;
+					attribute<eur_mo>  huurgrens		(BO) := switch(
+																		case(huurpunten_na < 40i, rjoin(40i, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurpunten, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurgrens)), 
+																		case(huurpunten_na >= 40i && huurpunten_na <= 250i, rjoin(huurpunten_na, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurpunten, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurgrens)),
+																		case(huurpunten_na > 250i, rjoin(250i, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurpunten, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurgrens) + 
+																		((rjoin(250i, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurpunten, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurgrens) - rjoin(249i, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurpunten, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurgrens)) * float64(huurpunten_na -250i))),
+																		float64(0/0));
+					// op deze manier wordt het aantal huurpunten niet geupdate, het verhoogde aantal huurpunten wordt niet opgeslagen voor een later jaar. Eigenlijk moet huurpunten ergens in 
+					// het model worden geupdate maar ik weet nog niet waar. Als we alleen naar 1 jaar kijken maakt het op zich niet uit maar het is niet heel netjes.
+				}
+				
+				container Huurtoeslag //test
+				{
+					attribute<string> leeftijdsgroep 			(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/LeeftijdRefPers > 2b ? "boven21" : "onder21";  
+					attribute<string> huishoudgrootte			(BO) := switch(
+																				case(Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/AantPersHH == 1b, "1persoon"),
+																				case(Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/AantPersHH == 2b, "2persoon"),
+																				case(Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/AantPersHH > 2b, "3plus"),
+																				"NULL"); 
+					attribute<string> label						(BO) := leeftijdsgroep + "_" + huishoudgrootte;
+					attribute<Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input> huurtoeslag_rel	(BO) := rlookup(label, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/Label);
+				
+					attribute<Eur> 	   vermogensgrens			(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/Vermogensgrens);
+					attribute<Eur_yr>  inkomensgrens			(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/Inkomensgrens);	
+					attribute<eur_mo>  minimum_normhuur			(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/Minimum_normhuur);
+					attribute<eur_mo>  verhoging_normhuur		(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/verhoging_normhuur);
+					attribute<eur_mo>  minimum_basishuur		(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/Minimum_basishuur);
+					attribute<eur_mo>  aftoppingsgrens			(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/Aftoppingsgrens);
+					attribute<eur_mo>  kwaliteitskortinggrens	(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/Kwaliteitskortinggrens);
+					attribute<float64> factor_a					(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/factor_a);
+					attribute<float64> factor_b					(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/factor_b);
+					attribute<ratio>   ratio_kkg_aftopping		(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/ratio_kkg_aftopping);
+					attribute<ratio>   ratio_aftopping			(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/ratio_aftopping);
+					
+					attribute<eur_yr>  reken_inkomen 			(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BelastbaarInkomen[Eur_yr]; //weet niet zeker of dit het goede inkomen is
+					
+					container Huidig
+					{
+						attribute<eur_mo>  rekenhuur				(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/KaleHuur[eur_mo];
+						attribute<eur_mo>  normhuur					(BO) := reken_inkomen < inkomensgrens ? minimum_normhuur : factor_a * (reken_inkomen / 1[eur_yr]) ^ 2d + factor_b * reken_inkomen * 1[yr] / 1[mo]; //updaten met nieuwe CBS inkomens (primair + secundair inkomen)
+						attribute<eur_mo>  basishuur				(BO) := normhuur + verhoging_normhuur;
+						attribute<eur_mo>  onder_kkg				(BO) := basishuur < kwaliteitskortinggrens ? kwaliteitskortinggrens - basishuur : 0[eur_mo];
+						attribute<eur_mo>  tussen_kkg_aftopping		(BO) := switch(
+																				case(rekenhuur < aftoppingsgrens && rekenhuur > kwaliteitskortinggrens, rekenhuur - kwaliteitskortinggrens),
+																				case(rekenhuur > aftoppingsgrens, aftoppingsgrens - kwaliteitskortinggrens),
+																				case(rekenhuur < kwaliteitskortinggrens, 0[eur_mo]),
+																				(0/0)[eur_mo]);
+						attribute<eur_mo>  boven_aftopping			(BO) := rekenhuur > aftoppingsgrens ? rekenhuur - aftoppingsgrens : 0[eur_mo];
+						attribute<eur_mo>  huurtoeslag				(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/Vermogen[eur] > vermogensgrens ? 0[eur_mo] : 
+																			onder_kkg  + tussen_kkg_aftopping * ratio_kkg_aftopping + boven_aftopping + ratio_aftopping;	
+					}
+					
+					container Na_investering
+					{				
+						attribute<eur_mo>  rekenhuur				(BO) := Huurverhoging_huurcommissiemethode/Huurverhoging * 1[yr] / 12[mo] + Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/KaleHuur[eur_mo];
+						attribute<eur_mo>  normhuur					(BO) := reken_inkomen < inkomensgrens ? minimum_normhuur : factor_a * (reken_inkomen / 1[eur_yr]) ^ 2d + factor_b * reken_inkomen * 1[yr] / 1[mo]; //updaten met nieuwe CBS inkomens (primair + secundair inkomen)
+						attribute<eur_mo>  basishuur				(BO) := normhuur + verhoging_normhuur;
+						attribute<eur_mo>  onder_kkg				(BO) := basishuur < kwaliteitskortinggrens ? kwaliteitskortinggrens - basishuur : 0[eur_mo];
+						attribute<eur_mo>  tussen_kkg_aftopping		(BO) := switch(
+																				case(rekenhuur < aftoppingsgrens && rekenhuur > kwaliteitskortinggrens, rekenhuur - kwaliteitskortinggrens),
+																				case(rekenhuur > aftoppingsgrens, aftoppingsgrens - kwaliteitskortinggrens),
+																				case(rekenhuur < kwaliteitskortinggrens, 0[eur_mo]),
+																				(0)[eur_mo]);
+						attribute<eur_mo>  boven_aftopping			(BO) := rekenhuur > aftoppingsgrens ? rekenhuur - aftoppingsgrens : 0[eur_mo];
+						attribute<eur_mo>  huurtoeslag				(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/Vermogen[eur] > vermogensgrens ? 0[eur_mo] : 
+																			onder_kkg  + tussen_kkg_aftopping * ratio_kkg_aftopping + boven_aftopping + ratio_aftopping;	
+					}
+					
+				}
 				//====== Placeholder Hypotheekrenteaftrek
 				container Hypotheekrenteaftrek
 				{
-					parameter<ratio> aandeel_investering_WOZ := 0.00[ratio]; //0.60[ratio], source = "https://www.eigenhuis.nl/verduurzamen/maatregelen/zonne-energie/5-vragen-over-zonnepanelen-en-de-woz-waarde"; 
-					parameter<ratio> BelastingSchijf_laag := 0.3697[ratio], source = "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/inkomstenbelasting/heffingskortingen_boxen_tarieven/boxen_en_tarieven/overzicht_tarieven_en_schijven/"; //  (2024)
-					parameter<ratio> BelastingSchijf_hoog := 0.4950[ratio], source = "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/inkomstenbelasting/heffingskortingen_boxen_tarieven/boxen_en_tarieven/overzicht_tarieven_en_schijven/"; // (2024)
-					parameter<Eur_yr> Inkomensgrens_belastingschijf :=  75518[Eur_yr], source = "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/inkomstenbelasting/heffingskortingen_boxen_tarieven/boxen_en_tarieven/overzicht_tarieven_en_schijven/"; // (2024) 
-					parameter<Eur> WOZ_grens_eigenwoningforfait := 1310000[Eur],		source = "https://www.belastingdienst.nl/wps/wcm/connect/nl/koopwoning/content/hoe-werkt-eigenwoningforfait"; // (2024)
-					parameter<_yr> eigenwoningforfait_laag := 0.0035[_yr], 				source = "https://www.belastingdienst.nl/wps/wcm/connect/nl/koopwoning/content/hoe-werkt-eigenwoningforfait"; // (2024)
+					parameter<ratio> aandeel_investering_WOZ 		:= 0.00[ratio]; //0.60[ratio], source = "https://www.eigenhuis.nl/verduurzamen/maatregelen/zonne-energie/5-vragen-over-zonnepanelen-en-de-woz-waarde"; 
+					parameter<ratio> BelastingSchijf_laag 			:= 0.3697[ratio], 	source = "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/inkomstenbelasting/heffingskortingen_boxen_tarieven/boxen_en_tarieven/overzicht_tarieven_en_schijven/"; //  (2024)
+					parameter<ratio> BelastingSchijf_hoog 			:= 0.4950[ratio],	source = "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/inkomstenbelasting/heffingskortingen_boxen_tarieven/boxen_en_tarieven/overzicht_tarieven_en_schijven/"; // (2024)
+					parameter<Eur_yr> Inkomensgrens_belastingschijf	:= 75518[Eur_yr], 	source = "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/inkomstenbelasting/heffingskortingen_boxen_tarieven/boxen_en_tarieven/overzicht_tarieven_en_schijven/"; // (2024) 
+					parameter<Eur> WOZ_grens_eigenwoningforfait 	:= 1310000[Eur],	source = "https://www.belastingdienst.nl/wps/wcm/connect/nl/koopwoning/content/hoe-werkt-eigenwoningforfait"; // (2024)
+					parameter<_yr> eigenwoningforfait_laag 			:= 0.0035[_yr], 	source = "https://www.belastingdienst.nl/wps/wcm/connect/nl/koopwoning/content/hoe-werkt-eigenwoningforfait"; // (2024)
 					parameter<_yr> eigenwoningforfait_hoog_variabel := 0.0235[_yr], 	source = "https://www.belastingdienst.nl/wps/wcm/connect/nl/koopwoning/content/hoe-werkt-eigenwoningforfait"; // (2024)
-					parameter<Eur_yr> eigenwoningforfait_hoog_vast := 4585[Eur_yr], 	source = "https://www.belastingdienst.nl/wps/wcm/connect/nl/koopwoning/content/hoe-werkt-eigenwoningforfait"; // (2024)
+					parameter<Eur_yr> eigenwoningforfait_hoog_vast 	:= 4585[Eur_yr], 	source = "https://www.belastingdienst.nl/wps/wcm/connect/nl/koopwoning/content/hoe-werkt-eigenwoningforfait"; // (2024)
 					
 					container Huidig
 					{
@@ -198,6 +284,84 @@ template StateNaAllocatieComponent
 					attribute<Eur_yr> RenteBedrag  (BO) := KL_totaal - wv_Aflossing;
 					attribute<Eur_yr> Aftrek       (BO) := RenteBedrag * BelastingSchijf;
 					*/
+				}
+				
+				container export_strategie
+				{
+					unit<uint32> table := select_with_org_rel(BO/bouwjaar <= 2023[uint16])
+					{
+						attribute<string> vbo_BAG_ID		 := BO/code[org_rel];
+						attribute<string> strategie			 := const(warmtestrategie, BO)[org_rel];
+						attribute<string> provincie			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/PROV_NAAM[buurt_rel][org_rel];
+						attribute<string> gemeente			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/GM_NAAM[buurt_rel][org_rel];
+						attribute<string> gemeentecode		 := Invoer/RuimtelijkeData/Studiegebied/Buurt/GM_code[buurt_rel][org_rel];
+						attribute<string> wijkcode			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/WK_CODE[buurt_rel][org_rel];
+						attribute<string> buurt				 := Invoer/RuimtelijkeData/Studiegebied/Buurt/BU_NAAM[buurt_rel][org_rel];
+						attribute<string> buurtcode			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/BU_CODE[buurt_rel][org_rel];
+						attribute<string> RDcoordinaten	 	 := string(geometry[org_rel]);
+						attribute<uint16> bouwjaar			 := BO/bouwjaar[org_rel];
+						attribute<string> woningtype 		 := classifications/woningtype/label[BO/woningtype_rel][org_rel];
+						attribute<string> eigendomstype		 := classifications/eigendom/label[BO/eigendom_rel][org_rel];
+						attribute<GJ_yr> gas_gj_jr 			 := AllocatieResultaten/Woning/metervraag/Gas[org_rel];
+						attribute<GJ_yr> elek_gj_jr 		 := AllocatieResultaten/Woning/metervraag/E[org_rel];
+						attribute<GJ_yr> Functioneel_RVb 	 := AllocatieResultaten/Woning/BO/MetervraagBerekening/Functioneel_per_product/RVb[org_rel];
+						attribute<GJ_yr> Functioneel_RVp 	 := AllocatieResultaten/Woning/BO/MetervraagBerekening/Functioneel_per_product/RVp[org_rel];
+						attribute<GJ_yr> Functioneel_TWb 	 := AllocatieResultaten/Woning/BO/MetervraagBerekening/Functioneel_per_product/TWb[org_rel];
+						attribute<GJ_yr> Functioneel_TWp 	 := AllocatieResultaten/Woning/BO/MetervraagBerekening/Functioneel_per_product/TWp[org_rel];
+						attribute<eur_yr> gas_var_eur_jr	 := Kj_gas[org_rel];
+						attribute<eur_yr> gas_vast_eur_jr 	 := Kj_vastrecht_G[org_rel];
+						attribute<eur_yr> elek_var_eur_jr	 := Kj_elek[org_rel];
+						attribute<eur_yr> elek_vast_eur_jr 	 := BO/nrAansluitingen[org_rel] * float64(metervraag/e[org_rel] != 0[GJ_yr]) * (prijzen/elektriciteit/VastRecht -  prijzen/Elektriciteit/bron/Heffingskorting [prijzen/Elektriciteit/JaarIndex]);
+						attribute<eur> Ki_isolatie_zst_eur	 := eenmalig/Ki_gv[org_rel];
+						attribute<eur> Ki_isolatie_nat_eur 	 := eenmalig/Ki_gv[org_rel];
+						attribute<eur> Ki_warmtepomp_HR_eur	 := eenmalig/Ki15_LO[org_rel];
+						attribute<eur> Ki_LTAS_eur 			 := eenmalig/Ki_LTAS[org_rel];
+						attribute<eur> Ki_ventilatie_zst_eur 	 := eenmalig/Ki_VT[org_rel];
+						attribute<eur> Ki_ventilatie_nat_eur 	 := eenmalig/Ki_VT[org_rel];
+						attribute<eur> Ki_koken_eur 			 := (eenmalig/Ki_KK[org_rel])/2d;
+						attribute<eur> Ki_inductie_eur 			 := (eenmalig/Ki_KK[org_rel])/2d;
+						attribute<eur> subsidie_isolatie_eur 	 := eenmalig/Oi_gv[org_rel];
+						attribute<eur> subsidie_warmtepomp_eur 	 := eenmalig/Oi15_LO[org_rel];
+						
+						//financieringslasten zelfstandig moment
+						//eigenaarbewoner
+						attribute<eur_yr> fin_tot_eb_zst_hy_eur_jr 		 := eigendomstype == 'Koop' ? financieringslasten/Kj_totaal[org_rel] : (0/0)[eur_yr];
+						attribute<eur_yr> fin_tot_eb_zst_wf_eur_jr 		 := eigendomstype == 'Koop' ? financieringslasten/Warmtefondslening/Kj_totaal[org_rel] : (0/0)[eur_yr];
+						attribute<eur_yr> fin_tot_eb_zst_wf0_eur_jr 	 := eigendomstype == 'Koop' ? financieringslasten/nulprocentlening/Kj_totaal[org_rel] : (0/0)[eur_yr];
+						
+						//verhuurder
+						attribute<eur_yr> fin_tot_vh_zst_eur_jr 		 := eigendomstype == 'PartHuur' ? financieringslasten/Kj_totaal[org_rel] : (0/0)[eur_yr];
+						
+						//financieringslasten natuurlijk moment
+						//eigenaarbewoner
+						attribute<eur_yr> fin_tot_eb_nat_hy_eur_jr 		 := eigendomstype == 'Koop' ? financieringslasten/Kj_totaal[org_rel] : (0/0)[eur_yr];
+						attribute<eur_yr> fin_tot_eb_nat_wf_eur_jr 		 := eigendomstype == 'Koop' ? financieringslasten/Warmtefondslening/Kj_totaal[org_rel] : (0/0)[eur_yr];
+						attribute<eur_yr> fin_tot_eb_nat_wf0_eur_jr 	 := eigendomstype == 'Koop' ? financieringslasten/nulprocentlening/Kj_totaal[org_rel] : (0/0)[eur_yr];
+						
+						//verhuurder
+						attribute<eur_yr> fin_tot_vh_nat_eur_jr 		 := eigendomstype == 'PartHuur' ? financieringslasten/Kj_totaal[org_rel] : (0/0)[eur_yr];
+						
+						//jaarlijkse onderhoudskosten installaties en kosten koken
+						attribute<eur_yr> Kj_oh_installatie_eur_jr		 := Kj_oh_LO[org_rel];
+						attribute<eur_yr> Kj_koken_eur_jr				 := Ki_koken_eur / 15[yr];
+						attribute<eur_yr> Kj_inductie_eur_jr			 := Ki_inductie_eur / 15[yr];
+
+						
+						//Huurverhoging, huurtoeslag, hypotheekrenteaftrek
+						attribute<eur_yr> Extra_huur_zst_eur_jr					 := eigendomstype == 'PartHuur' || eigendomstype == 'WoonCorp' ? Huurverhoging_huurcommissiemethode/huurverhoging[org_rel] : (0/0)[eur_yr];
+						attribute<eur_yr> Extra_huurtoeslag_zst_eur_jr			 := eigendomstype == 'PartHuur' || eigendomstype == 'WoonCorp' ? Huurtoeslag/Na_investering/Huurtoeslag[org_rel] - Huurtoeslag/Huidig/Huurtoeslag[org_rel] : (0/0)[eur_yr];
+						attribute<eur_yr> Extra_teruggave_HRA_hy_zst_eur_jr		 := eigendomstype == 'Koop' ? Hypotheekrenteaftrek/Belastingteruggave[org_rel] : (0/0)[eur_yr];
+						attribute<eur_yr> Extra_teruggave_HRA_wf_zst_eur_jr		 := eigendomstype == 'Koop' ? Hypotheekrenteaftrek/Belastingteruggave_warmtefondslening[org_rel] : (0/0)[eur_yr];
+						
+						attribute<eur_yr> Extra_huur_nat_eur_jr					 := eigendomstype == 'PartHuur' || eigendomstype == 'WoonCorp' ? Huurverhoging_huurcommissiemethode/huurverhoging[org_rel] : (0/0)[eur_yr];
+						attribute<eur_yr> Extra_huurtoeslag_nat_eur_jr			 := eigendomstype == 'PartHuur' || eigendomstype == 'WoonCorp' ? Huurtoeslag/Na_investering/Huurtoeslag[org_rel] - Huurtoeslag/Huidig/Huurtoeslag[org_rel] : (0/0)[eur_yr];
+						attribute<eur_yr> Extra_teruggave_HRA_hy_nat_eur_jr		 := eigendomstype == 'Koop' ? Hypotheekrenteaftrek/Belastingteruggave[org_rel] : (0/0)[eur_yr];
+						attribute<eur_yr> Extra_teruggave_HRA_wf_nat_eur_jr		 := eigendomstype == 'Koop' ? Hypotheekrenteaftrek/Belastingteruggave_warmtefondslening[org_rel] : (0/0)[eur_yr];
+					
+					}
+					parameter<string> OutputFolder := '%localDataProjDir%/Results';
+					unit<uint32> variable := SubItem_PropValues(table,'name');
+					container export_csv := Model/CalculationSchemes/Rapportage/WriteTable32ToCSV(table, AsList(variable/name, ';'), OutputFolder+'strategie_'+warmtestrategie+'_export.csv'); 
 				}
 			}
 		}
