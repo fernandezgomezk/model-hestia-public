@@ -449,8 +449,9 @@ container Classifications: Using = "Units", KeepData = "True", IsHidden = "True"
 		attribute<IsolatieMaatregel> IsolatieMaatregel_rel := rlookup(name, IsolatieMaatregel/name);
 //		attribute<bool>              isActieveMaatregel    := second_rel > 0[uint32] && Maatregel_label != ''; TODO: optimize, alleen maatregelen doorrekenen die daadwerkelijk gebruikt worden
 		attribute<string>            Maatregel_label       := Isolatie_imp/maatregel[Isolatiemaatregel/imp[IsolatieMaatregel_rel]];
-		attribute<percent>           R_RV                  := rjoin(name, Isolatie_imp/name, Isolatie_imp/R_RV)[percent];
-		
+		attribute<percent>           P100_RV               := rjoin(name, Isolatie_imp/name, Isolatie_imp/R_RV)[percent];
+		attribute<ratio>             R_RV (Classifications/BouwdeelIsolatie):= Classifications/BouwdeelIsolatie/P100_RV / 100[percent];
+
 		container V := for_each_nedv(name, 'value('+string(id(.))+', ..)', void, .);
 	}
 	unit<uint32> IsolatieMaatregel := select_with_org_rel(BouwdeelIsolatie/second_rel > 0b)
@@ -472,7 +473,8 @@ container Classifications: Using = "Units", KeepData = "True", IsHidden = "True"
 		}
 		
 //		container R_RV    := for_each_nedv(Vraagprofiel/name, 'Isolatie_imp/besparing_' + Vraagprofiel/name+'[imp][percent]', ., percent);
-		attribute<percent> R_RV := Isolatie_imp/R_RV[imp][percent];
+		attribute<percent> P100_RV := Isolatie_imp/R_RV[imp][percent];
+		attribute<Ratio>   R_RV    := P100_RV / 100[percent];
 		
 		container V := for_each_nedv(name, 'value('+string(id(.))+', ..)', void, .);
 	}
@@ -751,7 +753,7 @@ container Classifications: Using = "Units", KeepData = "True", IsHidden = "True"
 		];
 		attribute<uint32> SymbColor := Color, DialogType = "SymbolColor";
 
-		attribute<Kwh_yr_m2>  ClassBreak :
+		attribute<kWh_yr_m2>  ClassBreak :
 			[     
 				   -9999 // A+++++ <= 0
 				,  -9998 // A++++  <= 0
@@ -791,7 +793,7 @@ container Classifications: Using = "Units", KeepData = "True", IsHidden = "True"
 		];
 		attribute<uint32> SymbColor := Color, DialogType = "SymbolColor";
 
-		attribute<Kwh_yr_m2>  ClassBreak :
+		attribute<kWh_yr_m2>  ClassBreak :
 			[     
 				   0   // A 0   - 160
 				,  161 // B 161 - 190

@@ -8,7 +8,7 @@
 	container WarmteVraag := for_each_nedv(
 		  'Vrv_opp_' + Classifications/IsolatieNiveau/name
 		, Classifications/IsolatieNiveau/name == 'N0' ? 'Baselevel'
-			: 'Vrv_opp_N0 * (100[Percent] - Classifications/Isolatiemaatregel/R_RV[rlookup(Classifications/Bouwdeel/name +' + quote('_' +Classifications/IsolatieNiveau/name)+', Classifications/Isolatiemaatregel/Name)]) / 100[percent]'
+			: 'Vrv_opp_N0 * (1.0 - Classifications/Isolatiemaatregel/R_RV[rlookup(Classifications/Bouwdeel/name +' + quote('_' +Classifications/IsolatieNiveau/name)+', Classifications/Isolatiemaatregel/Name)])'
 		, Classifications/Bouwdeel
 		, GJ_yr_m2
 		)

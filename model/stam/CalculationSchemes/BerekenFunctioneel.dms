@@ -28,10 +28,10 @@ Template BerekenFunctioneel
 		* PrevState/Functioneel_base/Gedragfactor/VT
 		* PrevState/Functioneel_base/Fitfactor_VT[PrevState_rel], ishidden = "True";
 
-	attribute<Kwh_yr_m2>                  Kwh_m2_RV      (BOdomain) := makedefined(((RV_per_Bouwdeel_now/Totaal + Vrv_VT) / 3.6[MJ / kWh] * 1000 [ MJ / GJ]) / PrevState/Oppervlakte[PrevState_rel],0.0[Kwh_yr_m2]), ishidden = "True";
-	attribute<Kwh_yr_m2>                  Kwh_m2_tot     (BOdomain) := makedefined(((PrevState/Functioneel_base/VT[PrevState_rel]+KK+ EA / Invoer/Kengetallen/Constanten/Efficiency_EA + TW/0.72+KD*0.0+RV/1.04) / 3.6[MJ / kWh] * 1000 [ MJ / GJ]) / PrevState/Oppervlakte[PrevState_rel],0.0[Kwh_yr_m2]), ishidden = "True";//, IntegrityCheck = "Kwh_m2_tot < 1000[Kwh_yr_m2]";
+	attribute<kWh_yr_m2>                  kWh_m2_RV      (BOdomain) := makedefined(((RV_per_Bouwdeel_now/Totaal + Vrv_VT) / 3.6[MJ / kWh] * 1000 [ MJ / GJ]) / PrevState/Oppervlakte[PrevState_rel],0.0[kWh_yr_m2]), ishidden = "True";
+	attribute<kWh_yr_m2>                  kWh_m2_tot     (BOdomain) := makedefined(((PrevState/Functioneel_base/VT[PrevState_rel]+KK+ EA / Invoer/Kengetallen/Constanten/Efficiency_EA + TW/0.72+KD*0.0+RV/1.04) / 3.6[MJ / kWh] * 1000 [ MJ / GJ]) / PrevState/Oppervlakte[PrevState_rel],0.0[Kwh_yr_m2]), ishidden = "True";//, IntegrityCheck = "Kwh_m2_tot < 1000[Kwh_yr_m2]";
 	attribute<Classifications/Schillabel> Schillabel_rel (BOdomain) := classify(Kwh_m2_tot, classifications/Schillabel/classbreak), ishidden = "True";
-	attribute<ratio>                      Correction_RV  (BOdomain) := 1.0[ratio] + Invoer/Kengetallen/Constanten/BinnenTemp_A * Invoer/Kengetallen/Constanten/BinnenTemp_B ^ (Kwh_m2_RV / 1[Kwh_yr_m2]), ishidden = "True";
+	attribute<ratio>                      Correction_RV  (BOdomain) := 1.0[ratio] + Invoer/Kengetallen/Constanten/BinnenTemp_A * Invoer/Kengetallen/Constanten/BinnenTemp_B ^ (kWh_m2_RV / 1[kWh_yr_m2]), ishidden = "True";
 	attribute<GJ_yr>                      Verlies_RV     (BOdomain) := RV_per_Bouwdeel_now/Totaal + Vrv_VT;
 	attribute<GJ_yr>                      Winst_RV       (BOdomain) := warmtewinst/Totaal;
 
@@ -53,12 +53,10 @@ Template BerekenFunctioneel
 		BOdomain,
 		Classifications/BouwdeelIsolatie), ishidden = "True";
 
-	attribute<ratio> R_RV (Classifications/BouwdeelIsolatie):= Classifications/BouwdeelIsolatie/R_RV / 100[percent], ishidden = "True";
-	
 	container RV_per_Bouwdeel_now := for_each_nedv(
 		classifications/Bouwdeel/name,
 		replace(
-			'PrevState/Functioneel_base/RV_N0_per_Bouwdeel_now/@BN@[PrevState_rel] * makedefined(1.0[ratio] - R_RV[BouwdeelIsolatie_rel/@BN@], 1.0[ratio])'
+			'PrevState/Functioneel_base/RV_N0_per_Bouwdeel_now/@BN@[PrevState_rel] * makedefined(1.0[ratio] - Classifications/BouwdeelIsolatie/R_RV[BouwdeelIsolatie_rel/@BN@], 1.0[ratio])'
 		,	'@BN@', classifications/Bouwdeel/name),
 		BOdomain,
 		GJ_yr)
