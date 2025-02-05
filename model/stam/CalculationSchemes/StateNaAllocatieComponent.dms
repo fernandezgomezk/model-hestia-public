@@ -289,75 +289,75 @@ template StateNaAllocatieComponent
 				
 				container export_strategie
 				{
-					unit<uint32> table := select_with_attr_by_cond(BO, BO/bouwjaar <= 2023[uint16])
+					unit<uint32> table := select_with_org_rel(BO/bouwjaar <= 2023[uint16])
 					{
-						attribute<string> vbo_BAG_ID		(BO) := BO/code;
-						attribute<string> strategie			(BO) := const(warmtestrategie, BO);
-						attribute<string> provincie			(BO) := Invoer/RuimtelijkeData/Studiegebied/Buurt/PROV_NAAM[buurt_rel];
-						attribute<string> gemeente			(BO) := Invoer/RuimtelijkeData/Studiegebied/Buurt/GM_NAAM[buurt_rel];
-						attribute<string> gemeentecode		(BO) := Invoer/RuimtelijkeData/Studiegebied/Buurt/GM_code[buurt_rel];
-						attribute<string> wijkcode			(BO) := Invoer/RuimtelijkeData/Studiegebied/Buurt/WK_CODE[buurt_rel];
-						attribute<string> buurt				(BO) := Invoer/RuimtelijkeData/Studiegebied/Buurt/BU_NAAM[buurt_rel];
-						attribute<string> buurtcode			(BO) := Invoer/RuimtelijkeData/Studiegebied/Buurt/BU_CODE[buurt_rel];
-						attribute<rdc_meter> RDcoordinaten	(BO) := geometry;
-						attribute<uint16> bouwjaar			(BO) := BO/bouwjaar;
-						attribute<string> woningtype 		(BO) := classifications/woningtype/label[BO/woningtype_rel];
-						attribute<string> eigendomstype		(BO) := classifications/eigendom/label[BO/eigendom_rel];
-						attribute<GJ_yr> gas_gj_jr 			(BO) := AllocatieResultaten/Woning/metervraag/Gas;
-						attribute<GJ_yr> elek_gj_jr 		(BO) := AllocatieResultaten/Woning/metervraag/E;
-						attribute<GJ_yr> Functioneel_RVb 	(BO) := AllocatieResultaten/Woning/BO/MetervraagBerekening/Functioneel_per_product/RVb;
-						attribute<GJ_yr> Functioneel_RVp 	(BO) := AllocatieResultaten/Woning/BO/MetervraagBerekening/Functioneel_per_product/RVp;
-						attribute<GJ_yr> Functioneel_TWb 	(BO) := AllocatieResultaten/Woning/BO/MetervraagBerekening/Functioneel_per_product/TWb;
-						attribute<GJ_yr> Functioneel_TWp 	(BO) := AllocatieResultaten/Woning/BO/MetervraagBerekening/Functioneel_per_product/TWp;
-						attribute<eur_yr> gas_var_eur_jr	(BO) := Kj_gas;
-						attribute<eur_yr> gas_vast_eur_jr 	(BO) := Kj_vastrecht_G;
-						attribute<eur_yr> elek_var_eur_jr	(BO) := Kj_elek;
-						attribute<eur_yr> elek_vast_eur_jr 	(BO) := BO/nrAansluitingen * float64(metervraag/e != 0[GJ_yr]) * (prijzen/elektriciteit/VastRecht -  prijzen/Elektriciteit/bron/Heffingskorting [prijzen/Elektriciteit/JaarIndex]);
-						attribute<eur> Ki_isolatie_zst_eur	(BO) := eenmalig/Ki_gv;
-						attribute<eur> Ki_isolatie_nat_eur 	(BO) := eenmalig/Ki_gv;
-						attribute<eur> Ki_warmtepomp_HR_eur	(BO) := eenmalig/Ki15_LO;
-						attribute<eur> Ki_LTAS_eur 			(BO) := eenmalig/Ki_LTAS;
-						attribute<eur> Ki_ventilatie_zst_eur 	(BO) := eenmalig/Ki_VT;
-						attribute<eur> Ki_ventilatie_nat_eur 	(BO) := eenmalig/Ki_VT;
-						attribute<eur> Ki_koken_eur 			(BO) := (eenmalig/Ki_KK)/2d;
-						attribute<eur> Ki_inductie_eur 			(BO) := (eenmalig/Ki_KK)/2d;
-						attribute<eur> subsidie_isolatie_eur 	(BO) := eenmalig/Oi_gv;
-						attribute<eur> subsidie_warmtepomp_eur 	(BO) := eenmalig/Oi15_LO;
+						attribute<string> vbo_BAG_ID		 := BO/code[org_rel];
+						attribute<string> strategie			 := const(warmtestrategie, BO)[org_rel];
+						attribute<string> provincie			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/PROV_NAAM[buurt_rel][org_rel];
+						attribute<string> gemeente			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/GM_NAAM[buurt_rel][org_rel];
+						attribute<string> gemeentecode		 := Invoer/RuimtelijkeData/Studiegebied/Buurt/GM_code[buurt_rel][org_rel];
+						attribute<string> wijkcode			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/WK_CODE[buurt_rel][org_rel];
+						attribute<string> buurt				 := Invoer/RuimtelijkeData/Studiegebied/Buurt/BU_NAAM[buurt_rel][org_rel];
+						attribute<string> buurtcode			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/BU_CODE[buurt_rel][org_rel];
+						attribute<string> RDcoordinaten	 	 := string(geometry[org_rel]);
+						attribute<uint16> bouwjaar			 := BO/bouwjaar[org_rel];
+						attribute<string> woningtype 		 := classifications/woningtype/label[BO/woningtype_rel][org_rel];
+						attribute<string> eigendomstype		 := classifications/eigendom/label[BO/eigendom_rel][org_rel];
+						attribute<GJ_yr> gas_gj_jr 			 := AllocatieResultaten/Woning/metervraag/Gas[org_rel];
+						attribute<GJ_yr> elek_gj_jr 		 := AllocatieResultaten/Woning/metervraag/E[org_rel];
+						attribute<GJ_yr> Functioneel_RVb 	 := AllocatieResultaten/Woning/BO/MetervraagBerekening/Functioneel_per_product/RVb[org_rel];
+						attribute<GJ_yr> Functioneel_RVp 	 := AllocatieResultaten/Woning/BO/MetervraagBerekening/Functioneel_per_product/RVp[org_rel];
+						attribute<GJ_yr> Functioneel_TWb 	 := AllocatieResultaten/Woning/BO/MetervraagBerekening/Functioneel_per_product/TWb[org_rel];
+						attribute<GJ_yr> Functioneel_TWp 	 := AllocatieResultaten/Woning/BO/MetervraagBerekening/Functioneel_per_product/TWp[org_rel];
+						attribute<eur_yr> gas_var_eur_jr	 := Kj_gas[org_rel];
+						attribute<eur_yr> gas_vast_eur_jr 	 := Kj_vastrecht_G[org_rel];
+						attribute<eur_yr> elek_var_eur_jr	 := Kj_elek[org_rel];
+						attribute<eur_yr> elek_vast_eur_jr 	 := BO/nrAansluitingen[org_rel] * float64(metervraag/e[org_rel] != 0[GJ_yr]) * (prijzen/elektriciteit/VastRecht -  prijzen/Elektriciteit/bron/Heffingskorting [prijzen/Elektriciteit/JaarIndex]);
+						attribute<eur> Ki_isolatie_zst_eur	 := eenmalig/Ki_gv[org_rel];
+						attribute<eur> Ki_isolatie_nat_eur 	 := eenmalig/Ki_gv[org_rel];
+						attribute<eur> Ki_warmtepomp_HR_eur	 := eenmalig/Ki15_LO[org_rel];
+						attribute<eur> Ki_LTAS_eur 			 := eenmalig/Ki_LTAS[org_rel];
+						attribute<eur> Ki_ventilatie_zst_eur 	 := eenmalig/Ki_VT[org_rel];
+						attribute<eur> Ki_ventilatie_nat_eur 	 := eenmalig/Ki_VT[org_rel];
+						attribute<eur> Ki_koken_eur 			 := (eenmalig/Ki_KK[org_rel])/2d;
+						attribute<eur> Ki_inductie_eur 			 := (eenmalig/Ki_KK[org_rel])/2d;
+						attribute<eur> subsidie_isolatie_eur 	 := eenmalig/Oi_gv[org_rel];
+						attribute<eur> subsidie_warmtepomp_eur 	 := eenmalig/Oi15_LO[org_rel];
 						
 						//financieringslasten zelfstandig moment
 						//eigenaarbewoner
-						attribute<eur_yr> fin_tot_eb_zst_hy_eur_jr 		(BO) := eigendomstype == 'Koop' ? financieringslasten/Kj_totaal : (0/0)[eur_yr];
-						attribute<eur_yr> fin_tot_eb_zst_wf_eur_jr 		(BO) := eigendomstype == 'Koop' ? financieringslasten/Warmtefondslening/Kj_totaal : (0/0)[eur_yr];
-						attribute<eur_yr> fin_tot_eb_zst_wf0_eur_jr 	(BO) := eigendomstype == 'Koop' ? financieringslasten/nulprocentlening/Kj_totaal : (0/0)[eur_yr];
+						attribute<eur_yr> fin_tot_eb_zst_hy_eur_jr 		 := eigendomstype == 'Koop' ? financieringslasten/Kj_totaal[org_rel] : (0/0)[eur_yr];
+						attribute<eur_yr> fin_tot_eb_zst_wf_eur_jr 		 := eigendomstype == 'Koop' ? financieringslasten/Warmtefondslening/Kj_totaal[org_rel] : (0/0)[eur_yr];
+						attribute<eur_yr> fin_tot_eb_zst_wf0_eur_jr 	 := eigendomstype == 'Koop' ? financieringslasten/nulprocentlening/Kj_totaal[org_rel] : (0/0)[eur_yr];
 						
 						//verhuurder
-						attribute<eur_yr> fin_tot_vh_zst_eur_jr 		(BO) := eigendomstype == 'PartHuur' ? financieringslasten/Kj_totaal : (0/0)[eur_yr];
+						attribute<eur_yr> fin_tot_vh_zst_eur_jr 		 := eigendomstype == 'PartHuur' ? financieringslasten/Kj_totaal[org_rel] : (0/0)[eur_yr];
 						
 						//financieringslasten natuurlijk moment
 						//eigenaarbewoner
-						attribute<eur_yr> fin_tot_eb_nat_hy_eur_jr 		(BO) := eigendomstype == 'Koop' ? financieringslasten/Kj_totaal : (0/0)[eur_yr];
-						attribute<eur_yr> fin_tot_eb_nat_wf_eur_jr 		(BO) := eigendomstype == 'Koop' ? financieringslasten/Warmtefondslening/Kj_totaal : (0/0)[eur_yr];
-						attribute<eur_yr> fin_tot_eb_nat_wf0_eur_jr 	(BO) := eigendomstype == 'Koop' ? financieringslasten/nulprocentlening/Kj_totaal : (0/0)[eur_yr];
+						attribute<eur_yr> fin_tot_eb_nat_hy_eur_jr 		 := eigendomstype == 'Koop' ? financieringslasten/Kj_totaal[org_rel] : (0/0)[eur_yr];
+						attribute<eur_yr> fin_tot_eb_nat_wf_eur_jr 		 := eigendomstype == 'Koop' ? financieringslasten/Warmtefondslening/Kj_totaal[org_rel] : (0/0)[eur_yr];
+						attribute<eur_yr> fin_tot_eb_nat_wf0_eur_jr 	 := eigendomstype == 'Koop' ? financieringslasten/nulprocentlening/Kj_totaal[org_rel] : (0/0)[eur_yr];
 						
 						//verhuurder
-						attribute<eur_yr> fin_tot_vh_nat_eur_jr 		(BO) := eigendomstype == 'PartHuur' ? financieringslasten/Kj_totaal : (0/0)[eur_yr];
+						attribute<eur_yr> fin_tot_vh_nat_eur_jr 		 := eigendomstype == 'PartHuur' ? financieringslasten/Kj_totaal[org_rel] : (0/0)[eur_yr];
 						
 						//jaarlijkse onderhoudskosten installaties en kosten koken
-						attribute<eur_yr> Kj_oh_installatie_eur_jr		(BO) := Kj_oh_LO;
-						attribute<eur_yr> Kj_koken_eur_jr				(BO) := Ki_koken_eur / 15[yr];
-						attribute<eur_yr> Kj_inductie_eur_jr			(BO) := Ki_inductie_eur / 15[yr];
+						attribute<eur_yr> Kj_oh_installatie_eur_jr		 := Kj_oh_LO[org_rel];
+						attribute<eur_yr> Kj_koken_eur_jr				 := Ki_koken_eur / 15[yr];
+						attribute<eur_yr> Kj_inductie_eur_jr			 := Ki_inductie_eur / 15[yr];
 
 						
 						//Huurverhoging, huurtoeslag, hypotheekrenteaftrek
-						attribute<eur_yr> Extra_huur_zst_eur_jr					(BO) := eigendomstype == 'PartHuur' || eigendomstype == 'WoonCorp' ? Huurverhoging_huurcommissiemethode/huurverhoging : (0/0)[eur_yr];
-						attribute<eur_yr> Extra_huurtoeslag_zst_eur_jr			(BO) := eigendomstype == 'PartHuur' || eigendomstype == 'WoonCorp' ? Huurtoeslag/Na_investering/Huurtoeslag - Huurtoeslag/Huidig/Huurtoeslag : (0/0)[eur_yr];
-						attribute<eur_yr> Extra_teruggave_HRA_hy_zst_eur_jr		(BO) := eigendomstype == 'Koop' ? Hypotheekrenteaftrek/Belastingteruggave : (0/0)[eur_yr];
-						attribute<eur_yr> Extra_teruggave_HRA_wf_zst_eur_jr		(BO) := eigendomstype == 'Koop' ? Hypotheekrenteaftrek/Belastingteruggave_warmtefondslening : (0/0)[eur_yr];
+						attribute<eur_yr> Extra_huur_zst_eur_jr					 := eigendomstype == 'PartHuur' || eigendomstype == 'WoonCorp' ? Huurverhoging_huurcommissiemethode/huurverhoging[org_rel] : (0/0)[eur_yr];
+						attribute<eur_yr> Extra_huurtoeslag_zst_eur_jr			 := eigendomstype == 'PartHuur' || eigendomstype == 'WoonCorp' ? Huurtoeslag/Na_investering/Huurtoeslag[org_rel] - Huurtoeslag/Huidig/Huurtoeslag[org_rel] : (0/0)[eur_yr];
+						attribute<eur_yr> Extra_teruggave_HRA_hy_zst_eur_jr		 := eigendomstype == 'Koop' ? Hypotheekrenteaftrek/Belastingteruggave[org_rel] : (0/0)[eur_yr];
+						attribute<eur_yr> Extra_teruggave_HRA_wf_zst_eur_jr		 := eigendomstype == 'Koop' ? Hypotheekrenteaftrek/Belastingteruggave_warmtefondslening[org_rel] : (0/0)[eur_yr];
 						
-						attribute<eur_yr> Extra_huur_nat_eur_jr					(BO) := eigendomstype == 'PartHuur' || eigendomstype == 'WoonCorp' ? Huurverhoging_huurcommissiemethode/huurverhoging : (0/0)[eur_yr];
-						attribute<eur_yr> Extra_huurtoeslag_nat_eur_jr			(BO) := eigendomstype == 'PartHuur' || eigendomstype == 'WoonCorp' ? Huurtoeslag/Na_investering/Huurtoeslag - Huurtoeslag/Huidig/Huurtoeslag : (0/0)[eur_yr];
-						attribute<eur_yr> Extra_teruggave_HRA_hy_nat_eur_jr		(BO) := eigendomstype == 'Koop' ? Hypotheekrenteaftrek/Belastingteruggave : (0/0)[eur_yr];
-						attribute<eur_yr> Extra_teruggave_HRA_wf_nat_eur_jr		(BO) := eigendomstype == 'Koop' ? Hypotheekrenteaftrek/Belastingteruggave_warmtefondslening : (0/0)[eur_yr];
+						attribute<eur_yr> Extra_huur_nat_eur_jr					 := eigendomstype == 'PartHuur' || eigendomstype == 'WoonCorp' ? Huurverhoging_huurcommissiemethode/huurverhoging[org_rel] : (0/0)[eur_yr];
+						attribute<eur_yr> Extra_huurtoeslag_nat_eur_jr			 := eigendomstype == 'PartHuur' || eigendomstype == 'WoonCorp' ? Huurtoeslag/Na_investering/Huurtoeslag[org_rel] - Huurtoeslag/Huidig/Huurtoeslag[org_rel] : (0/0)[eur_yr];
+						attribute<eur_yr> Extra_teruggave_HRA_hy_nat_eur_jr		 := eigendomstype == 'Koop' ? Hypotheekrenteaftrek/Belastingteruggave[org_rel] : (0/0)[eur_yr];
+						attribute<eur_yr> Extra_teruggave_HRA_wf_nat_eur_jr		 := eigendomstype == 'Koop' ? Hypotheekrenteaftrek/Belastingteruggave_warmtefondslening[org_rel] : (0/0)[eur_yr];
 					
 					}
 					parameter<string> OutputFolder := '%localDataProjDir%/Results';
