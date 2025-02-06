@@ -71,7 +71,7 @@ unit<uint32> BouwdeelActieveWoning := select_with_org_rel(BO/Activatie/BouwdeelA
 				attribute<DP_Bucket> DP_bucket_dest_rel := combine_data(DP_Bucket, DP_Bucket/first_rel[first_rel], third_rel);
 			}
 			
-			// max 25
+			// max 16
 			attribute<uint8> CountWays1 := sum_uint8(has/RB[DP_BucketIter/first_rel] && has/RO[DP_BucketIter/DP_bucket_rel], DP_BucketIter/DP_bucket_dest_rel); 
 			attribute<uint8> CountWays2 := sum_uint8(has/DR[DP_BucketIter/first_rel] && has/PL[DP_BucketIter/DP_bucket_rel], DP_BucketIter/DP_bucket_dest_rel);
 			attribute<uint8> CountWays3 := sum_uint8(has/VL[DP_BucketIter/first_rel] && has/MG[DP_BucketIter/DP_bucket_rel], DP_BucketIter/DP_bucket_dest_rel);
