@@ -78,8 +78,8 @@ template StartingStateComponent
 			
 			//========= theoretische verlies ruimteverwarming (excl warmtewinsten)
 			attribute<GJ_yr>     Theoretisch_RV (..) := VL + DP + DS + MG + MS + DR + PL + RO + RB + KR + Vrv_VT_asl;
-			attribute<kWh_yr_m2> Kwh_m2_RV      (..) := makedefined((Theoretisch_RV / 3.6[MJ / kWh] * 1000 [ MJ / GJ]) / Oppervlakte_i,0.0[kWh_yr_m2]);
-			attribute<ratio>     Correction_RV  (..) := 1.0[ratio] + Invoer/Kengetallen/Constanten/BinnenTemp_A * Invoer/Kengetallen/Constanten/BinnenTemp_B ^ (Kwh_m2_RV / 1[kWh_yr_m2]);
+			attribute<kWh_yr_m2> kWh_m2_RV      (..) := makedefined((Theoretisch_RV / 3.6[MJ / kWh] * 1000 [ MJ / GJ]) / Oppervlakte_i,0.0[kWh_yr_m2]);
+			attribute<ratio>     Correction_RV  (..) := 1.0[ratio] + Invoer/Kengetallen/Constanten/BinnenTemp_A * Invoer/Kengetallen/Constanten/BinnenTemp_B ^ (kWh_m2_RV / 1[kWh_yr_m2]);
 
 			//========= gemeten vraag ruimteverwarming gecorrigeerd voor warmtewinsten
 			attribute<GJ_yr>     Gemeten_RV_i                  (..) := gemeten_correctie/verschilfactor * Functioneel/BaseValues/RV;

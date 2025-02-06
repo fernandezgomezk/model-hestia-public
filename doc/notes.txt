@@ -1,0 +1,27 @@
+TNO: Werk in ...
+  
+  /TussenResultaten/R1_2021/BebouwingsComponenten/Woning/BouwdeelActieveWoning/IsolatieNiveau_rel
+  /TussenResultaten/R1_2021/BebouwingsComponenten/Woning/BouwdeelActieveWoning/AmbitieBerekening := combine( BouwdeelActieveWoning , IV )
+  /TussenResultaten/R1_2021/BebouwingsComponenten/Woning/BouwdeelActieveWoning/AmbitieBerekening/IsolatieScore
+  /TussenResultaten/R1_2021/BebouwingsComponenten/Woning/BouwdeelActieveWoning/UniekAmbitie/Functioneel/SchilLabel_rel
+  
+  /Invoer/DefaultInstellingen/Basis/MinimumIsolatieNiveauEis/FunctioneleVraagLimiet
+  
+  
+  
+  
+  
+    /TussenResultaten/R1_2021/BebouwingsComponenten/Woning/BouwdeelActieveWoning/MaximumVraagWaarde
+	
+	tov
+	
+	/TussenResultaten/R1_2021/BebouwingsComponenten/Woning/BouwdeelActieveWoning/UniekAmbitie/Functioneel/RV_per_Bouwdeel_now/RB
+	:=
+		PrevState/Functioneel_base/RV_N0_per_Bouwdeel_now/@BN@[PrevState_rel] * makedefined(1.0[ratio] - R_RV[BouwdeelIsolatie_rel/@BN@], 1.0[ratio])
+		
+		,	'@BN@', classifications/Bouwdeel/name),
+
+
+TODO:
+- third_rel -> null wanneer > MaxS.
+- comment link to 

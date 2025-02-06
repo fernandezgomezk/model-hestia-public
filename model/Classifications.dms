@@ -699,10 +699,10 @@ container Classifications: Using = "Units", KeepData = "True", IsHidden = "True"
 		attribute<string> label          : [ 'Teruglevering', 'Klein Gebruik', 'Klein Middelgroot Gebruik', 'Midden Middelgroot Gebruik', 'Groot middelgroot en groot gebruik' ];
 		attribute<string> name           : [ 'Teruglevering', 'KleinGebruik', 'KleinMiddelGebruik', 'MiddelMiddelGebruik', 'GrootGebruik' ];
 		attribute<m3_yr>  gas_break_m3   : [-1e+10, 0,  5000, 170000,  1000000 ];
-		attribute<kwh_yr> elek_break_kwh : [-1e+10, 0, 10000,  50000, 10000000 ];
+		attribute<kWh_yr> elek_break_kWh : [-1e+10, 0, 10000,  50000, 10000000 ];
 
 		attribute<GJ_yr>  gas_break      := gas_break_m3 * Invoer/Kengetallen/constanten/GasEnergie;
-		attribute<GJ_yr>  elek_break     := elek_break_kwh [GJ_yr];
+		attribute<GJ_yr>  elek_break     := elek_break_kWh [GJ_yr];
 	}
 
 
