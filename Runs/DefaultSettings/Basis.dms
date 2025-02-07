@@ -203,7 +203,8 @@ container Basis : Using = "Units"
 		parameter<bool> MinimumIsolatieNiveauEis := true
 		{
 			parameter<Classifications/SchilLabel> eerste_niet_toegestane_schillabel_rel := Classifications/SchilLabel/V/C;
-			parameter<kWh_yr_m2> FunctioneleVraagLimiet := eerste_niet_toegestane_schillabel_rel->classbreak;
+			
+			parameter<kWh_yr_m2> FunctioneleVraagLimiet := eerste_niet_toegestane_schillabel_rel->classbreak; // Je kunt ook hier iets anders invullen.
 			parameter<GJ_yr_m2> FunctioneleVraagLimiet_GJ_yr_m2 := FunctioneleVraagLimiet * (3.6[ MJ / kWh ] * 0.001 [ GJ / MJ ]);
 		}
 		

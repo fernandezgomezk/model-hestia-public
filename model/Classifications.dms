@@ -409,7 +409,7 @@ container Classifications: Using = "Units", KeepData = "True", IsHidden = "True"
 		container V := for_each_nedv(name, 'value('+string(id(.))+', ..)', void, .);
 	}
 
-	unit<uint32> Bouwdeel: nrofrows = 10
+	unit<uint8> Bouwdeel: nrofrows = 10
 	{
 		attribute<string>    name       : ['RB', 'RO', 'DR', 'PL', 'VL', 'MG', 'MS', 'DP', 'DS', 'KR'];
 		attribute<string>    label      : ['Ramen Boven', 'Ramen Onder', 'Deuren', 'Paneel', 'Vloer', 'Gevel', 'Spouwmuur', 'Plat Dak', 'Schuin Dak', 'Kieren'];
@@ -437,7 +437,7 @@ container Classifications: Using = "Units", KeepData = "True", IsHidden = "True"
 		
 		container V := for_each_nedv(name, 'value('+string(id(.))+', ..)', void, .);
 	}
-	unit<uint32> BouwdeelIsolatie := combine(Bouwdeel,IsolatieNiveau)
+	unit<uint8> BouwdeelIsolatie := combine_uint8(Bouwdeel,IsolatieNiveau)
 	{
 		attribute<string> name               := Bouwdeel_name + '_' + IsolatieNiveau/name[second_rel];
 		attribute<string> label              := Bouwdeel/label[first_rel] + ': ' + IsolatieNiveau/label[second_rel];
@@ -454,7 +454,7 @@ container Classifications: Using = "Units", KeepData = "True", IsHidden = "True"
 
 		container V := for_each_nedv(name, 'value('+string(id(.))+', ..)', void, .);
 	}
-	unit<uint32> IsolatieMaatregel := select_with_org_rel(BouwdeelIsolatie/second_rel > 0b)
+	unit<uint8> IsolatieMaatregel := select_with_org_rel(BouwdeelIsolatie/second_rel > 0b)
 	{
 		attribute<BouwdeelIsolatie> BouwdeelIsolatie_rel := org_rel;
 		attribute<string>           name                 := BouwdeelIsolatie/name[BouwdeelIsolatie_rel];
