@@ -52,6 +52,9 @@ unit<uint32> BouwdeelActieveWoning := select_with_org_rel(BO/Activatie/BouwdeelA
 	unit<uint32> DP_Woning := select(DynamicProgramForMinimumIsolatieNiveauEis)
 	{
 		attribute<rdc_meter> Geometry := collect_by_cond(DP_Woning, BouwdeelActieveWoning/geometry);
+		
+		attribute<classifications/schillabel> DEBUG_Huidig_schillabel_rel := classify(collect_by_cond(DP_Woning, WorstKaasWaarde * 1000[MJ / GJ] / 3.6[MJ / kWh] / BO/Oppervlakte[BO_rel]), classifications/schillabel/ClassBreak);
+		attribute<classifications/schillabel> DEBUG_Beste_schillabel_rel  := classify(collect_by_cond(DP_Woning, BestKaasWaarde  * 1000[MJ / GJ] / 3.6[MJ / kWh] / BO/Oppervlakte[BO_rel]), classifications/schillabel/ClassBreak);
 
 		attribute<GJ_yr> VraagBucketSize := collect_by_cond(DP_Woning, MaximumVraagWaarde) / Float64(#VraagBucket);
 		unit<uint32> DP_Bucket := combine(DP_Woning, VraagBucket)
@@ -168,34 +171,52 @@ unit<uint32> BouwdeelActieveWoning := select_with_org_rel(BO/Activatie/BouwdeelA
 		,	replace('IsDefined(Geschiktheid/@BDI) ? exp(min_elem(Geschiktheid/@BDI * SpecificBeta/@BDI / 1[EUR], LOG_MAX_FLOAT64)) : 0.0'
 			,	'@BDI', classifications/IsolatieMaatregel/name)
 		,	AmbitieBerekening, float64
-		)
-		{
-			container Total := for_each_nedv(classifications/bouwdeel/name
-			, 'add(1.0, '+AsItemList(classifications/IsolatieMaatregel/name, classifications/IsolatieMaatregel/bouwdeel_rel)+')'
-			, AmbitieBerekening, float64
-			);
-		}
-		container P_unrestricted := for_each_nedv(classifications/IsolatieMaatregel/name
-		, 'OddsRatio/'+classifications/IsolatieMaatregel/name + ' / OddsRatio/Total/'+classifications/IsolatieMaatregel/bouwdeel_name
-		, AmbitieBerekening, float64
 		);
 		
 		// ================ BEGIN Berekening t.b.v. minimum score Ambitie specifiek deel
 		// zie https://github.com/ObjectVision/SAVI2/issues/174
 		
-		//DynamicProgramForMinimumIsolatieNiveauEis[BouwdeelActieveWoning_rel]
-		
-		
-			
-		unit<uint32> DP_WoningAmbitie := select(DynamicProgramForMinimumIsolatieNiveauEis[BouwdeelActieveWoning_rel])
+		attribute<bool> AmbitieHeeftRestrictie := DynamicProgramForMinimumIsolatieNiveauEis[BouwdeelActieveWoning_rel];
+		unit<uint32> DP_WoningAmbitie := select(AmbitieHeeftRestrictie)
 		{
-			attribute<GJ_Yr> VraagBucketSize := collect_by_cond(DP_WoningAmbitie, MaximumVraagWaarde[BouwdeelActieveWoning_rel]) / Float64(#VraagBucket);
+			attribute<GJ_Yr> VraagBucketSize := collect_by_cond(DP_WoningAmbitie, MaximumVraagWaarde[BouwdeelActieveWoning_rel]) / Float64(#VraagBucket + #Classifications/Bouwdeel);
+			container OddsRatio_raw := for_each_nedv(classifications/IsolatieMaatregel/name,
+				'collect_by_cond(DP_WoningAmbitie, .../OddsRatio/'+classifications/IsolatieMaatregel/name+')'
+			,	DP_WoningAmbitie, float64
+			)
+			{
+				container Total := for_each_nedv(classifications/bouwdeel/name
+				, 'add('+AsItemList(classifications/IsolatieMaatregel/name, classifications/IsolatieMaatregel/bouwdeel_rel)+')'
+				, DP_WoningAmbitie, float64
+				);
+			}
+			
+			container OddsRatio := for_each_nedv(classifications/IsolatieMaatregel/name
+			, 'OddsRatio_raw/'+classifications/IsolatieMaatregel/name + ' / OddsRatio_raw/Total/'+classifications/IsolatieMaatregel/bouwdeel_name
+			, DP_WoningAmbitie, float64
+			);
+			
+			container VerbruiksBijdrage := for_each_nedv(classifications/IsolatieMaatregel/name,
+				'collect_by_cond(DP_WoningAmbitie, ..../VerbruiksBijdrage/'+classifications/IsolatieMaatregel/name+'[BouwdeelActieveWoning_rel])'
+			,	DP_WoningAmbitie, float64
+			);
+			
+			container VerbruiksBucket := for_each_nedv(classifications/IsolatieMaatregel/name
+			,	'(VerbruiksBijdrage/'+classifications/IsolatieMaatregel/name+' / VraagBucketSize)[VraagBucket]'
+			,	DP_WoningAmbitie, VraagBucket
+			);
+			
 			unit<uint32> DP_Bucket := combine(DP_WoningAmbitie, VraagBucket)
 			{
+				container BucketHit := for_each_nedv(classifications/IsolatieMaatregel/name
+				,	'second_rel == VerbruiksBucket/'+classifications/IsolatieMaatregel/name+'[first_rel]'
+				,	DP_Bucket, bool
+				);
+				
 				container BucketMeasure := for_each_nedv(classifications/Bouwdeel/name,
 					replace(
 						AsList(
-							replace('collect_by_cond(DP_WoningAmbitie, P_unrestricted/@BD_@IN)[first_rel] * float64(second_rel == (collect_by_cond(DP_WoningAmbitie, VerbruiksBijdrage/@BD_@IN[BouwdeelActieveWoning_rel])[first_rel] / VraagBucketSize[first_rel])[VraagBucket])'
+							replace('OddsRatio/@BD_@IN[first_rel] * float64(BucketHit/@BD_@IN)'
 							, '@IN', classifications/IsolatieDoel/name)
 						, '+'
 						)
@@ -221,76 +242,76 @@ unit<uint32> BouwdeelActieveWoning := select_with_org_rel(BO/Activatie/BouwdeelA
 				attribute<float64> MeasureWays6 := sum(MeasureWays5[BucketIter/first_rel] * BucketMeasure/MG[BucketIter/DP_bucket_rel], BucketIter/DP_bucket_dest_rel);
 				attribute<float64> MeasureWays7 := sum(MeasureWays6[BucketIter/first_rel] * BucketMeasure/MS[BucketIter/DP_bucket_rel], BucketIter/DP_bucket_dest_rel);
 				attribute<float64> MeasureWays8 := sum(MeasureWays7[BucketIter/first_rel] * BucketMeasure/DP[BucketIter/DP_bucket_rel], BucketIter/DP_bucket_dest_rel);
-				attribute<float64> MeasureWays9 := sum(MeasureWays8[BucketIter/first_rel] * BucketMeasure/DS[BucketIter/DP_bucket_rel], BucketIter/DP_bucket_dest_rel);
+				attribute<float64> MeasureWays9 := sum(MeasureWays8[BucketIter/first_rel] * BucketMeasure/DS[BucketIter/DP_bucket_rel], BucketIter/DP_bucket_dest_rel);				
 				attribute<float64> MeasureWaysX := sum(MeasureWays9[BucketIter/first_rel] * BucketMeasure/KR[BucketIter/DP_bucket_rel], BucketIter/DP_bucket_dest_rel);
-				attribute<float64> TotalMeasure(DP_WoningAmbitie) := sum(MeasureWaysX, first_rel);
-				attribute<float64> CumulMeasure := cumulate(MeasureWaysX, first_rel);
-				attribute<float64> FracMeasure := CumulMeasure / TotalMeasure[first_rel];
-				attribute<float64> rndX(DP_WoningAmbitie) := rnd_uniform(10, DP_WoningAmbitie, range(0.0, 1.0));
 				
-				attribute<float64> RemeasureWays9 := MeasureWays9 *Float64(second_rel <=  chosenX[first_rel]) * BucketMeasure/KR[combine_data(DP_Bucket, first_rel, sub_or_null(chosenX[first_rel], second_rel))];
+				attribute<float64> RescaledWaysX := MeasureWaysX / sum(MeasureWaysX, first_rel)[first_rel];
+				attribute<float64> CumulWaysX := cumulate(RescaledWaysX, first_rel);
+				
+				attribute<float64> RemeasureWays9 := MeasureWays9 * BucketMeasure/KR[combine_data(DP_Bucket, first_rel, sub_or_null(chosenX[first_rel], second_rel))];
 				attribute<float64> RescaledWays9 := RemeasureWays9 / sum(RemeasureWays9, first_rel)[first_rel];
 				attribute<float64> CumulWays9 := cumulate(RescaledWays9, first_rel);
-				attribute<float64> rnd9(DP_WoningAmbitie) := rnd_uniform(9, DP_WoningAmbitie, range(0.0, 1.0));
 				
-				attribute<float64> RemeasureWays8 := MeasureWays8 *Float64(second_rel <=  chosen9[first_rel]) * BucketMeasure/DS[combine_data(DP_Bucket, first_rel, sub_or_null(chosenX[first_rel], second_rel))];
+				attribute<float64> RemeasureWays8 := MeasureWays8 * BucketMeasure/DS[combine_data(DP_Bucket, first_rel, sub_or_null(chosen9[first_rel], second_rel))];
 				attribute<float64> RescaledWays8 := RemeasureWays8 / sum(RemeasureWays8, first_rel)[first_rel];
 				attribute<float64> CumulWays8 := cumulate(RescaledWays8, first_rel);
-				attribute<float64> rnd8(DP_WoningAmbitie) := rnd_uniform(8, DP_WoningAmbitie, range(0.0, 1.0));
 				
-				attribute<float64> RemeasureWays7 := MeasureWays7 *Float64(second_rel <=  chosen8[first_rel]) * BucketMeasure/DP[combine_data(DP_Bucket, first_rel, sub_or_null(chosenX[first_rel], second_rel))];
+				attribute<float64> RemeasureWays7 := MeasureWays7 * BucketMeasure/DP[combine_data(DP_Bucket, first_rel, sub_or_null(chosen8[first_rel], second_rel))];
 				attribute<float64> RescaledWays7 := RemeasureWays7 / sum(RemeasureWays7, first_rel)[first_rel];
 				attribute<float64> CumulWays7 := cumulate(RescaledWays7, first_rel);
-				attribute<float64> rnd7(DP_WoningAmbitie) := rnd_uniform(7, DP_WoningAmbitie, range(0.0, 1.0));
 				
-				attribute<float64> RemeasureWays6 := MeasureWays6 *Float64(second_rel <=  chosen7[first_rel]) * BucketMeasure/MS[combine_data(DP_Bucket, first_rel, sub_or_null(chosenX[first_rel], second_rel))];
+				attribute<float64> RemeasureWays6 := MeasureWays6 * BucketMeasure/MS[combine_data(DP_Bucket, first_rel, sub_or_null(chosen7[first_rel], second_rel))];
 				attribute<float64> RescaledWays6 := RemeasureWays6 / sum(RemeasureWays6, first_rel)[first_rel];
 				attribute<float64> CumulWays6 := cumulate(RescaledWays6, first_rel);
-				attribute<float64> rnd6(DP_WoningAmbitie) := rnd_uniform(6, DP_WoningAmbitie, range(0.0, 1.0));
 				
-				attribute<float64> RemeasureWays5 := MeasureWays5 *Float64(second_rel <=  chosen6[first_rel]) * BucketMeasure/MG[combine_data(DP_Bucket, first_rel, sub_or_null(chosenX[first_rel], second_rel))];
+				attribute<float64> RemeasureWays5 := MeasureWays5 * BucketMeasure/MG[combine_data(DP_Bucket, first_rel, sub_or_null(chosen6[first_rel], second_rel))];
 				attribute<float64> RescaledWays5 := RemeasureWays5 / sum(RemeasureWays5, first_rel)[first_rel];
 				attribute<float64> CumulWays5 := cumulate(RescaledWays5, first_rel);
-				attribute<float64> rnd5(DP_WoningAmbitie) := rnd_uniform(5, DP_WoningAmbitie, range(0.0, 1.0));
 				
-				attribute<float64> RemeasureWays4 := MeasureWays4 *Float64(second_rel <=  chosen5[first_rel]) * BucketMeasure/VL[combine_data(DP_Bucket, first_rel, sub_or_null(chosenX[first_rel], second_rel))];
+				attribute<float64> RemeasureWays4 := MeasureWays4 * BucketMeasure/VL[combine_data(DP_Bucket, first_rel, sub_or_null(chosen5[first_rel], second_rel))];
 				attribute<float64> RescaledWays4 := RemeasureWays4 / sum(RemeasureWays4, first_rel)[first_rel];
 				attribute<float64> CumulWays4 := cumulate(RescaledWays4, first_rel);
-				attribute<float64> rnd4(DP_WoningAmbitie) := rnd_uniform(4, DP_WoningAmbitie, range(0.0, 1.0));
 				
-				attribute<float64> RemeasureWays3 := MeasureWays3 *Float64(second_rel <=  chosen4[first_rel]) * BucketMeasure/PL[combine_data(DP_Bucket, first_rel, sub_or_null(chosenX[first_rel], second_rel))];
+				attribute<float64> RemeasureWays3 := MeasureWays3 * BucketMeasure/PL[combine_data(DP_Bucket, first_rel, sub_or_null(chosen4[first_rel], second_rel))];
 				attribute<float64> RescaledWays3 := RemeasureWays3 / sum(RemeasureWays3, first_rel)[first_rel];
 				attribute<float64> CumulWays3 := cumulate(RescaledWays3, first_rel);
-				attribute<float64> rnd3(DP_WoningAmbitie) := rnd_uniform(3, DP_WoningAmbitie, range(0.0, 1.0));
 				
-				attribute<float64> RemeasureWays2 := MeasureWays2 *Float64(second_rel <=  chosen3[first_rel]) * BucketMeasure/DR[combine_data(DP_Bucket, first_rel, sub_or_null(chosenX[first_rel], second_rel))];
+				attribute<float64> RemeasureWays2 := MeasureWays2 * BucketMeasure/DR[combine_data(DP_Bucket, first_rel, sub_or_null(chosen3[first_rel], second_rel))];
 				attribute<float64> RescaledWays2 := RemeasureWays2 / sum(RemeasureWays2, first_rel)[first_rel];
 				attribute<float64> CumulWays2 := cumulate(RescaledWays2, first_rel);
-				attribute<float64> rnd2(DP_WoningAmbitie) := rnd_uniform(2, DP_WoningAmbitie, range(0.0, 1.0));
 				
-				attribute<float64> RemeasureWays1 := MeasureWays1 *Float64(second_rel <=  chosen2[first_rel]) * BucketMeasure/RO[combine_data(DP_Bucket, first_rel, sub_or_null(chosenX[first_rel], second_rel))];
+				attribute<float64> RemeasureWays1 := MeasureWays1 * BucketMeasure/RO[combine_data(DP_Bucket, first_rel, sub_or_null(chosen2[first_rel], second_rel))];
 				attribute<float64> RescaledWays1 := RemeasureWays1 / sum(RemeasureWays1, first_rel)[first_rel];
 				attribute<float64> CumulWays1 := cumulate(RescaledWays1, first_rel);
-				attribute<float64> rnd1(DP_WoningAmbitie) := rnd_uniform(1, DP_WoningAmbitie, range(0.0, 1.0));
 				
-				attribute<float64> RemeasureWays0 := Float64(second_rel <=  chosen1[first_rel]) * BucketMeasure/RB[combine_data(DP_Bucket, first_rel, sub_or_null(chosenX[first_rel], second_rel))];
+				attribute<float64> RemeasureWays0 := BucketMeasure/RB[combine_data(DP_Bucket, first_rel, sub_or_null(chosen1[first_rel], second_rel))];
 				attribute<float64> RescaledWays0 := RemeasureWays0 / sum(RemeasureWays0, first_rel)[first_rel];
 				attribute<float64> CumulWays0 := cumulate(RescaledWays0, first_rel);
-				attribute<float64> rnd0(DP_WoningAmbitie) := rnd_uniform(0, DP_WoningAmbitie, range(0.0, 1.0));
-				
 			}
 			
-			attribute<VraagBucket> chosenX(DP_WoningAmbitie) := =AsList(replace('DP_Bucket/rndX < DP_Bucket/FracMeasure[combine_data(DP_Bucket, ID(DP_WoningAmbitie), @VB[VraagBucket])] ? @VB[VraagBucket] :', '@VB', string(ID(VraagBucket))), '') + '(0/0)[VraagBucket]';
-			attribute<VraagBucket> chosen9(DP_WoningAmbitie) := =AsList(replace('DP_Bucket/rnd9 < DP_Bucket/CumulWays9 [combine_data(DP_Bucket, ID(DP_WoningAmbitie), @VB[VraagBucket])] ? @VB[VraagBucket] :', '@VB', string(ID(VraagBucket))), '') + '(0/0)[VraagBucket]';
-			attribute<VraagBucket> chosen8(DP_WoningAmbitie) := =AsList(replace('DP_Bucket/rnd8 < DP_Bucket/CumulWays8 [combine_data(DP_Bucket, ID(DP_WoningAmbitie), @VB[VraagBucket])] ? @VB[VraagBucket] :', '@VB', string(ID(VraagBucket))), '') + '(0/0)[VraagBucket]';
-			attribute<VraagBucket> chosen7(DP_WoningAmbitie) := =AsList(replace('DP_Bucket/rnd7 < DP_Bucket/CumulWays7 [combine_data(DP_Bucket, ID(DP_WoningAmbitie), @VB[VraagBucket])] ? @VB[VraagBucket] :', '@VB', string(ID(VraagBucket))), '') + '(0/0)[VraagBucket]';
-			attribute<VraagBucket> chosen6(DP_WoningAmbitie) := =AsList(replace('DP_Bucket/rnd6 < DP_Bucket/CumulWays6 [combine_data(DP_Bucket, ID(DP_WoningAmbitie), @VB[VraagBucket])] ? @VB[VraagBucket] :', '@VB', string(ID(VraagBucket))), '') + '(0/0)[VraagBucket]';
-			attribute<VraagBucket> chosen5(DP_WoningAmbitie) := =AsList(replace('DP_Bucket/rnd5 < DP_Bucket/CumulWays5 [combine_data(DP_Bucket, ID(DP_WoningAmbitie), @VB[VraagBucket])] ? @VB[VraagBucket] :', '@VB', string(ID(VraagBucket))), '') + '(0/0)[VraagBucket]';
-			attribute<VraagBucket> chosen4(DP_WoningAmbitie) := =AsList(replace('DP_Bucket/rnd4 < DP_Bucket/CumulWays4 [combine_data(DP_Bucket, ID(DP_WoningAmbitie), @VB[VraagBucket])] ? @VB[VraagBucket] :', '@VB', string(ID(VraagBucket))), '') + '(0/0)[VraagBucket]';
-			attribute<VraagBucket> chosen3(DP_WoningAmbitie) := =AsList(replace('DP_Bucket/rnd3 < DP_Bucket/CumulWays3 [combine_data(DP_Bucket, ID(DP_WoningAmbitie), @VB[VraagBucket])] ? @VB[VraagBucket] :', '@VB', string(ID(VraagBucket))), '') + '(0/0)[VraagBucket]';
-			attribute<VraagBucket> chosen2(DP_WoningAmbitie) := =AsList(replace('DP_Bucket/rnd2 < DP_Bucket/CumulWays2 [combine_data(DP_Bucket, ID(DP_WoningAmbitie), @VB[VraagBucket])] ? @VB[VraagBucket] :', '@VB', string(ID(VraagBucket))), '') + '(0/0)[VraagBucket]';
-			attribute<VraagBucket> chosen1(DP_WoningAmbitie) := =AsList(replace('DP_Bucket/rnd1 < DP_Bucket/CumulWays1 [combine_data(DP_Bucket, ID(DP_WoningAmbitie), @VB[VraagBucket])] ? @VB[VraagBucket] :', '@VB', string(ID(VraagBucket))), '') + '(0/0)[VraagBucket]';
-			attribute<VraagBucket> chosen0(DP_WoningAmbitie) := =AsList(replace('DP_Bucket/rnd0 < DP_Bucket/CumulWays0 [combine_data(DP_Bucket, ID(DP_WoningAmbitie), @VB[VraagBucket])] ? @VB[VraagBucket] :', '@VB', string(ID(VraagBucket))), '') + '(0/0)[VraagBucket]';
+			attribute<float64> rndX := rnd_uniform(10, DP_WoningAmbitie, range(0.0, 1.0));
+			attribute<float64> rnd9 := rnd_uniform( 9, DP_WoningAmbitie, range(0.0, 1.0));
+			attribute<float64> rnd8 := rnd_uniform( 8, DP_WoningAmbitie, range(0.0, 1.0));
+			attribute<float64> rnd7 := rnd_uniform( 7, DP_WoningAmbitie, range(0.0, 1.0));
+			attribute<float64> rnd6 := rnd_uniform( 6, DP_WoningAmbitie, range(0.0, 1.0));
+			attribute<float64> rnd5 := rnd_uniform( 5, DP_WoningAmbitie, range(0.0, 1.0));
+			attribute<float64> rnd4 := rnd_uniform( 4, DP_WoningAmbitie, range(0.0, 1.0));
+			attribute<float64> rnd3 := rnd_uniform( 3, DP_WoningAmbitie, range(0.0, 1.0));
+			attribute<float64> rnd2 := rnd_uniform( 2, DP_WoningAmbitie, range(0.0, 1.0));
+			attribute<float64> rnd1 := rnd_uniform( 1, DP_WoningAmbitie, range(0.0, 1.0));
+			attribute<float64> rnd0 := rnd_uniform( 0, DP_WoningAmbitie, range(0.0, 1.0));
+			
+			attribute<VraagBucket> chosenX := =AsList(replace('rndX <= DP_Bucket/CumulWaysX[combine_data(DP_Bucket, ID(DP_WoningAmbitie), @VB[VraagBucket])] ? @VB[VraagBucket] :', '@VB', string(ID(VraagBucket))), '') + '(0/0)[VraagBucket]';
+			attribute<VraagBucket> chosen9 := =AsList(replace('rnd9 <= DP_Bucket/CumulWays9[combine_data(DP_Bucket, ID(DP_WoningAmbitie), @VB[VraagBucket])] ? @VB[VraagBucket] :', '@VB', string(ID(VraagBucket))), '') + '(0/0)[VraagBucket]';
+			attribute<VraagBucket> chosen8 := =AsList(replace('rnd8 <= DP_Bucket/CumulWays8[combine_data(DP_Bucket, ID(DP_WoningAmbitie), @VB[VraagBucket])] ? @VB[VraagBucket] :', '@VB', string(ID(VraagBucket))), '') + '(0/0)[VraagBucket]';
+			attribute<VraagBucket> chosen7 := =AsList(replace('rnd7 <= DP_Bucket/CumulWays7[combine_data(DP_Bucket, ID(DP_WoningAmbitie), @VB[VraagBucket])] ? @VB[VraagBucket] :', '@VB', string(ID(VraagBucket))), '') + '(0/0)[VraagBucket]';
+			attribute<VraagBucket> chosen6 := =AsList(replace('rnd6 <= DP_Bucket/CumulWays6[combine_data(DP_Bucket, ID(DP_WoningAmbitie), @VB[VraagBucket])] ? @VB[VraagBucket] :', '@VB', string(ID(VraagBucket))), '') + '(0/0)[VraagBucket]';
+			attribute<VraagBucket> chosen5 := =AsList(replace('rnd5 <= DP_Bucket/CumulWays5[combine_data(DP_Bucket, ID(DP_WoningAmbitie), @VB[VraagBucket])] ? @VB[VraagBucket] :', '@VB', string(ID(VraagBucket))), '') + '(0/0)[VraagBucket]';
+			attribute<VraagBucket> chosen4 := =AsList(replace('rnd4 <= DP_Bucket/CumulWays4[combine_data(DP_Bucket, ID(DP_WoningAmbitie), @VB[VraagBucket])] ? @VB[VraagBucket] :', '@VB', string(ID(VraagBucket))), '') + '(0/0)[VraagBucket]';
+			attribute<VraagBucket> chosen3 := =AsList(replace('rnd3 <= DP_Bucket/CumulWays3[combine_data(DP_Bucket, ID(DP_WoningAmbitie), @VB[VraagBucket])] ? @VB[VraagBucket] :', '@VB', string(ID(VraagBucket))), '') + '(0/0)[VraagBucket]';
+			attribute<VraagBucket> chosen2 := =AsList(replace('rnd2 <= DP_Bucket/CumulWays2[combine_data(DP_Bucket, ID(DP_WoningAmbitie), @VB[VraagBucket])] ? @VB[VraagBucket] :', '@VB', string(ID(VraagBucket))), '') + '(0/0)[VraagBucket]';
+			attribute<VraagBucket> chosen1 := =AsList(replace('rnd1 <= DP_Bucket/CumulWays1[combine_data(DP_Bucket, ID(DP_WoningAmbitie), @VB[VraagBucket])] ? @VB[VraagBucket] :', '@VB', string(ID(VraagBucket))), '') + '(0/0)[VraagBucket]';
+			attribute<VraagBucket> chosen0 := =AsList(replace('rnd0 <= DP_Bucket/CumulWays0[combine_data(DP_Bucket, ID(DP_WoningAmbitie), @VB[VraagBucket])] ? @VB[VraagBucket] :', '@VB', string(ID(VraagBucket))), '') + '(0/0)[VraagBucket]';
 				
 			attribute<VraagBucket> chosenKR(DP_WoningAmbitie) := chosenX - chosen9;
 			attribute<VraagBucket> chosenDS(DP_WoningAmbitie) := chosen9 - chosen8;
@@ -303,16 +324,46 @@ unit<uint32> BouwdeelActieveWoning := select_with_org_rel(BO/Activatie/BouwdeelA
 			attribute<VraagBucket> chosenRO(DP_WoningAmbitie) := chosen2 - chosen1;
 			attribute<VraagBucket> chosenRB(DP_WoningAmbitie) := chosen1 - chosen0;
 				
+			container IM_on_chosenPath := for_each_nedv(classifications/IsolatieMaatregel/name
+			, 	replace('chosen@BD == VerbruiksBucket/@IM'
+				,	'@IM', classifications/IsolatieMaatregel/name
+				,	'@BD', classifications/IsolatieMaatregel/Bouwdeel_name
+				)
+			,	DP_WoningAmbitie, bool
+			)
+			{
+				container DEBUG_count := for_each_nedv(classifications/bouwdeel/name
+				, 'add('+AsItemList('uint8('+classifications/IsolatieMaatregel/name+')', classifications/IsolatieMaatregel/bouwdeel_rel)+')'
+				, DP_WoningAmbitie, UInt8
+				);
+			}
+			attribute<classifications/schillabel> DEBUG_RV_raw_schillabel := collect_by_cond(DP_WoningAmbitie, UniekAmbitie/Functioneel/RV_raw_Schillabel_rel[UniekAmbitie_rel]);
 		}
 		// ================ END   Berekening t.b.v. minimum score Ambitie specifiek deel
 			
-		container P := for_each_nedv(classifications/IsolatieMaatregel/name
-		, 	replace('P_unrestricted/@IM * recollect_by_cond(DynamicProgramForMinimumIsolatieNiveauEis[BouwdeelActieveWoning_rel], float64(DP_WoningAmbitie/chosen@BD == value(collect_by_cond(DP_WoningAmbitie, VerbruiksBijdrage/@IM[BouwdeelActieveWoning_rel]) / DP_WoningAmbitie/VraagBucketSize, VraagBucket)), 1.0)'
+		container IM_on_chosenPath := for_each_nedv(classifications/IsolatieMaatregel/name
+		, 	'recollect_by_cond(AmbitieHeeftRestrictie, DP_WoningAmbitie/IM_on_chosenPath/'+classifications/IsolatieMaatregel/name+', true)'
+		,	AmbitieBerekening, bool
+		);
+		
+		container RestrictedOddsRatio := for_each_nedv(classifications/IsolatieMaatregel/name
+		, 	replace('OddsRatio/@IM * float64(IM_on_chosenPath/@IM)'
 			,	'@IM', classifications/IsolatieMaatregel/name
-			,	'@BD', classifications/IsolatieMaatregel/Bouwdeel_name
 			)
 		,	AmbitieBerekening, float64
+		)
+		{
+			container Total := for_each_nedv(classifications/bouwdeel/name
+			, 'add(float64(not(AmbitieHeeftRestrictie)), '+AsItemList(classifications/IsolatieMaatregel/name, classifications/IsolatieMaatregel/bouwdeel_rel)+')'
+			, AmbitieBerekening, float64
+			);
+		}
+		
+		container P := for_each_nedv(classifications/IsolatieMaatregel/name
+		, 'RestrictedOddsRatio/'+classifications/IsolatieMaatregel/name + ' / RestrictedOddsRatio/Total/'+classifications/IsolatieMaatregel/bouwdeel_name
+		, AmbitieBerekening, float64
 		);
+		
 		
 		container KiesBouwdelen := for_each_ne(classifications/Bouwdeel/name
 		,	replace('KiesBouwDeelT(classifications/Bouwdeel/V/@BD, IsolatieNiveau_rel/@BD)'
@@ -501,7 +552,7 @@ unit<uint32> BouwdeelActieveWoning := select_with_org_rel(BO/Activatie/BouwdeelA
 		+ MakeDefined('+ '+classifications/IsolatieDoel/name[sub_or_null(ID(classifications/IsolatieDoel), 1b)], '')
 		, AmbitieBerekening, float64
 		);
-		attribute<float64> rnd (BouwdeelActieveWoning) := rnd_uniform(JaarSeed * 7u + bouwdeel_rel, BouwdeelActieveWoning, range(float64, 0.0, 1.0));
+		attribute<float64> rnd (BouwdeelActieveWoning) := rnd_uniform(JaarSeed * #Classifications/Bouwdeel + uint32(bouwdeel_rel), BouwdeelActieveWoning, range(float64, 0.0, 1.0));
 		
 		attribute<bool> Activatie (BouwdeelActieveWoning) := ='BO/Activatie/Bouwdelen/'+classifications/Bouwdeel/name[bouwdeel_rel]+'[BO_rel]';
 
