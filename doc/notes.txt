@@ -1,27 +1,15 @@
-TNO: Werk in ...
-  
-  /TussenResultaten/R1_2021/BebouwingsComponenten/Woning/BouwdeelActieveWoning/IsolatieNiveau_rel
-  /TussenResultaten/R1_2021/BebouwingsComponenten/Woning/BouwdeelActieveWoning/AmbitieBerekening := combine( BouwdeelActieveWoning , IV )
-  /TussenResultaten/R1_2021/BebouwingsComponenten/Woning/BouwdeelActieveWoning/AmbitieBerekening/IsolatieScore
-  /TussenResultaten/R1_2021/BebouwingsComponenten/Woning/BouwdeelActieveWoning/UniekAmbitie/Functioneel/SchilLabel_rel
-  
-  /Invoer/DefaultInstellingen/Basis/MinimumIsolatieNiveauEis/FunctioneleVraagLimiet
-  
-  
-  
-  
-  
-    /TussenResultaten/R1_2021/BebouwingsComponenten/Woning/BouwdeelActieveWoning/MaximumVraagWaarde
-	
-	tov
-	
-	/TussenResultaten/R1_2021/BebouwingsComponenten/Woning/BouwdeelActieveWoning/UniekAmbitie/Functioneel/RV_per_Bouwdeel_now/RB
-	:=
-		PrevState/Functioneel_base/RV_N0_per_Bouwdeel_now/@BN@[PrevState_rel] * makedefined(1.0[ratio] - R_RV[BouwdeelIsolatie_rel/@BN@], 1.0[ratio])
-		
-		,	'@BN@', classifications/Bouwdeel/name),
+TODO #174:
 
++ Bucketgebruik naar boven afronden: pessimistische variant: reken 1 step voor ieder bouwdeel dus 10 steps extra in berekening van VraagBucketSize
+- geen klimaat en gedragsfactoren in labelbepaling en doelstelling.
+- wat zijn de 2 of 3 of 5 undefined woningen en waarom
++ waarom wordt label niet behaald
+- code clean-up; verwijder DEBUG variabelen en herbeschouw wat per BouwdeelActieveWoning en wat per WoningAmbitie qua DP berekend moet worden
+- meer UInt32 -> UInt8 in classifications.
 
-TODO:
-- third_rel -> null wanneer > MaxS.
-- comment link to 
+Hulplinks:
+
+/TussenResultaten/R1_2021/BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/schillabel_rel
+/TussenResultaten/R10_2030/BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/schillabel_rel
+/TussenResultaten/R1_2021/BebouwingsComponenten/Woning/BouwdeelActieveWoning/UniekAmbitie/Functioneel/RV_raw_Schillabel_rel
+/TussenResultaten/R1_2021/BebouwingsComponenten/Woning/BouwdeelActieveWoning/AmbitieBerekening/DP_WoningAmbitie/DP_Bucket/TotalMeasure
