@@ -7,6 +7,46 @@
 
 container DK
 {
+	unit<uint32> BBN := ZichtjaarBeleid/BestaandeBouwNorm, ishidden = "True";
+	container Normen := for_each_ne(BBN/name, 'ImplSubs(BBN/V/'+BBN/name+')')
+	{
+		parameter<bool>      GeenNormen := sum(BBN/naleving) <= 0.0[ratio];
+
+		attribute<m2>        TotaalSchil (GeschiktObject) := ='add('+AsItemList('BO/Bouwdelen/'+classifications/bouwdeel/name+'[GeschiktObject/Bo_rel]')+') - BO/Bouwdelen/KR[GeschiktObject/Bo_rel]';
+		attribute<ratio>     Schilfactor (GeschiktObject) := Totaalschil / BO/oppervlakte[GeschiktObject/BO_rel];
+		attribute<yr_uint16> Bouwjaar    (GeschiktObject) := BO/bouwjaar[GeschiktObject/BO_rel];
+
+		attribute<Invoer/Kengetallen/OverigeInstallaties/DK/Installatietypes> Installatietype_norm (GeschiktObject) := 
+			 = GeenNormen ? 'const( (0/0)[Invoer/Kengetallen/OverigeInstallaties/DK/Installatietypes], GeschiktObject)' : 'max_elem('+AsItemList('Normen/'+BBN/name+'/Geldig ? BBN/Dakinstallatienorm/Dakinstallatietype_norm[Normen/'+BBN/name+'/BBN_rel] : (0/0)[Invoer/Kengetallen/OverigeInstallaties/DK/Installatietypes]')+')';
+
+	}
+	template ImplSubs : ishidden = "True"
+	{
+		//case parameters
+		parameter<BBN> BBN_rel;
+		//end case parameters
+
+		attribute<bool>  Naleving (GeschiktObject) := first(rnd_uniform(JaarSeed * 106u, GeschiktObject, range(float64, 0d, 1d)), GeschiktObject/BO_rel)[GeschiktObject/BO_rel] <= BBN/Naleving[BBN_rel];
+		
+
+		container voorwaarden
+		{
+			parameter<ratio>     MinSchilfactor  := BBN/voorwaarde/MinSchilfactor[BBN_rel];
+			parameter<ratio>     MaxSchilfactor  := BBN/voorwaarde/MaxSchilfactor[BBN_rel];
+			parameter<yr_uint16> MinBouwjaar     := BBN/voorwaarde/MinBouwjaar[BBN_rel];
+			parameter<yr_uint16> MaxBouwjaar     := BBN/voorwaarde/MaxBouwjaar[BBN_rel];
+
+			attribute<bool> InDoelgroepED (GeschiktObject) := ='OR('+AsItemList(replace('BBN/doelgroep/@ED[BBN_rel] && BO/Eigendom_rel[geschiktobject/BO_rel] == Classifications/Eigendom/V/@ED','@ED',Classifications/Eigendom/label))+')', ishidden = "True";
+			attribute<bool> InDoelgroepWT (GeschiktObject) := BBN/doelgroep/EGW[BBN_rel] && BO/IsMeergezins[GeschiktObject/BO_rel] || BBN/doelgroep/MGW[BBN_rel] && not(BO/IsMeergezins[GeschiktObject/BO_rel]);
+			
+			attribute<bool> SchilfactorVoldaan  (GeschiktObject) := Schilfactor >= MakeDefined(MinSchilfactor, 0.0) && Schilfactor < MakeDefined(MaxSchilfactor, 9999.0);
+			attribute<bool> BouwjaarVoldaan     (GeschiktObject) := Bouwjaar >= MakeDefined(MinBouwjaar, 0w) && Bouwjaar < MakeDefined(MaxBouwjaar, 9999w);
+
+			attribute<bool> VoorwaardenVoldaan  (GeschiktObject) := AND(SchilfactorVoldaan, BouwjaarVoldaan, InDoelgroepWT, InDoelgroepED);
+		}
+
+		attribute<bool>  Geldig   (GeschiktObject) := voorwaarden/VoorwaardenVoldaan && Naleving;
+	}
 	unit<uint32> inst := Invoer/Kengetallen/OverigeInstallaties/DK/Installatietypes;
 
 	//===== Oorspronkelijke dakinstallatie
@@ -91,7 +131,7 @@ container DK
 	}
 		
 	//===== Gekozen (nieuwe) dakinstallatie
-	attribute<inst> Installatietype_def (GeschiktObject) := =not(Afweging_DK) ? 'Installatietype_org' : 'Choice/Installatietype_def';
+	attribute<inst> Installatietype_def (GeschiktObject) := =not(Afweging_DK) ? 'Installatietype_org' : 'makedefined(Normen/Installatietype_norm, Choice/Installatietype_def)';
 
 	//===== Is dit een verandering?
 	attribute<bool> IsChangedNow (GeschiktObject) := Installatietype_org != Installatietype_def;
