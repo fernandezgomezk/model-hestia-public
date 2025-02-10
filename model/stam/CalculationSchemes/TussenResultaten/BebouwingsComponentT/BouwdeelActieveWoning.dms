@@ -25,7 +25,7 @@ unit<uint32> BouwdeelActieveWoning := select_with_org_rel(BO/Activatie/BouwdeelA
 	// ================ BEGIN Berekening t.b.v. minimum score
 	// zie https://github.com/ObjectVision/SAVI2/issues/174
 
-	attribute<GJ_yr> MaximumVraagWaarde := =voorkeuren/MinimumIsolatieNiveauEis ? 'voorkeuren/MinimumIsolatieNiveauEis/FunctioneleVraagLimiet_GJ_yr_m2 * BO/Oppervlakte[BO_rel]' : 'const(999999[GJ], BouwdeelActieveWoning)';
+	attribute<GJ_yr> MaximumVraagWaarde := =voorkeuren/MinimumIsolatieNiveauEis ? 'voorkeuren/MinimumIsolatieNiveauEis/FunctioneleVraagLimiet_GJ_yr_m2 * BO/Oppervlakte[BO_rel]' : 'const(999999[GJ_Yr], BouwdeelActieveWoning)';
 	
 	container VerbruiksBijdrage := for_each_nedv(classifications/BouwdeelIsolatie/name
 		, 	replace('BO/Functioneel_base/RV_N0_per_Bouwdeel_now_raw/@BD[BO_rel] * (1.0[ratio] - Classifications/BouwdeelIsolatie/R_RV[combine_data(Classifications/BouwdeelIsolatie, classifications/Bouwdeel/V/@BD, classifications/IsolatieNiveau/V/@IN)])'
