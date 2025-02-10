@@ -305,10 +305,13 @@ template BebouwingsComponentT
 			container BaseValues := for_each_nedv(Classifications/FunctioneleVraag/name, 'PrevObject/Functioneel/BaseValues/' + Classifications/FunctioneleVraag/name, .., GJ_yr);
 			container RV_N0_per_bouwdeel := for_each_nedv(Classifications/bouwdeel/name, 'PrevObject/Functioneel/RV_N0_per_bouwdeel/' + Classifications/bouwdeel/name, .., GJ_yr);
 				
+			container RV_N0_per_bouwdeel_now_raw := for_each_nedv(Classifications/bouwdeel/name,
+				'RV_N0_per_bouwdeel/'+ Classifications/bouwdeel/name+ ' * nrAansluitingen[float64]',
+				.., GJ_yr);
+				
 			container RV_N0_per_bouwdeel_now := for_each_nedv(Classifications/bouwdeel/name,
-				'RV_N0_per_bouwdeel/'+ Classifications/bouwdeel/name+ ' * Gedragfactor/RV * nrAansluitingen[float64] * Klimaateffect',
-				..,
-				GJ_yr);
+				'RV_N0_per_bouwdeel_now_raw/'+ Classifications/bouwdeel/name+ ' * Gedragfactor/RV * Klimaateffect',
+				.., GJ_yr);
 		}
 		container Functioneel          := CalculationSchemes/BerekenFunctioneel(BO, BO, id(.));
 		container MetervraagBerekening := CalculationSchemes/FunctioneelToMetervraag(BO, false); 

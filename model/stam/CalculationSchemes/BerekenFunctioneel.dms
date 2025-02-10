@@ -28,7 +28,7 @@ Template BerekenFunctioneel
 		* PrevState/Functioneel_base/Gedragfactor/VT
 		* PrevState/Functioneel_base/Fitfactor_VT[PrevState_rel], ishidden = "True";
 
-	attribute<kWh_yr_m2>                  kWh_m2_RV_raw  (BOdomain) := RV_per_Bouwdeel_now/Totaal / PrevState/Oppervlakte[PrevState_rel] * (1000 [ MJ / GJ] / 3.6[MJ / kWh]);
+	attribute<kWh_yr_m2>                  kWh_m2_RV_raw  (BOdomain) := RV_per_Bouwdeel_now_raw/Totaal / PrevState/Oppervlakte[PrevState_rel] * (1000 [ MJ / GJ] / 3.6[MJ / kWh]);
 	attribute<kWh_yr_m2>                  kWh_m2_RV      (BOdomain) := makedefined(((RV_per_Bouwdeel_now/Totaal + Vrv_VT) / 3.6[MJ / kWh] * 1000 [ MJ / GJ]) / PrevState/Oppervlakte[PrevState_rel],0.0[kWh_yr_m2]);
 	attribute<kWh_yr_m2>                  kWh_m2_tot     (BOdomain) := makedefined(((PrevState/Functioneel_base/VT[PrevState_rel]+KK+ EA / Invoer/Kengetallen/Constanten/Efficiency_EA + TW/0.72+KD*0.0+RV/1.04) / 3.6[MJ / kWh] * 1000 [ MJ / GJ]) / PrevState/Oppervlakte[PrevState_rel],0.0[kWh_yr_m2]);//, IntegrityCheck = "kWh_m2_tot < 1000[kWh_yr_m2]";
 	attribute<Classifications/Schillabel> Schillabel_rel (BOdomain) := classify(kWh_m2_tot, classifications/Schillabel/classbreak);
@@ -54,6 +54,17 @@ Template BerekenFunctioneel
 		,	'@BN@', classifications/Bouwdeel/name),
 		BOdomain,
 		Classifications/BouwdeelIsolatie), ishidden = "True";
+
+	container RV_per_Bouwdeel_now_raw := for_each_nedv(
+		classifications/Bouwdeel/name,
+		replace(
+			'PrevState/Functioneel_base/RV_N0_per_Bouwdeel_now_raw/@BN@[PrevState_rel] * makedefined(1.0[ratio] - Classifications/BouwdeelIsolatie/R_RV[BouwdeelIsolatie_rel/@BN@], 1.0[ratio])'
+		,	'@BN@', classifications/Bouwdeel/name),
+		BOdomain,
+		GJ_yr)
+	{
+		attribute<GJ_yr> Totaal (BOdomain):= ='add('+AsItemList(Classifications/bouwdeel/name)+')';
+	}
 
 	container RV_per_Bouwdeel_now := for_each_nedv(
 		classifications/Bouwdeel/name,

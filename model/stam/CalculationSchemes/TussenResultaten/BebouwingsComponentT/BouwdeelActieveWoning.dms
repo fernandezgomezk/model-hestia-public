@@ -28,7 +28,7 @@ unit<uint32> BouwdeelActieveWoning := select_with_org_rel(BO/Activatie/BouwdeelA
 	attribute<GJ_yr> MaximumVraagWaarde := =voorkeuren/MinimumIsolatieNiveauEis ? 'voorkeuren/MinimumIsolatieNiveauEis/FunctioneleVraagLimiet_GJ_yr_m2 * BO/Oppervlakte[BO_rel]' : 'const(999999[GJ], BouwdeelActieveWoning)';
 	
 	container VerbruiksBijdrage := for_each_nedv(classifications/BouwdeelIsolatie/name
-		, 	replace('BO/Functioneel_base/RV_N0_per_Bouwdeel_now/@BD[BO_rel] * (1.0[ratio] - Classifications/BouwdeelIsolatie/R_RV[combine_data(Classifications/BouwdeelIsolatie, classifications/Bouwdeel/V/@BD, classifications/IsolatieNiveau/V/@IN)])'
+		, 	replace('BO/Functioneel_base/RV_N0_per_Bouwdeel_now_raw/@BD[BO_rel] * (1.0[ratio] - Classifications/BouwdeelIsolatie/R_RV[combine_data(Classifications/BouwdeelIsolatie, classifications/Bouwdeel/V/@BD, classifications/IsolatieNiveau/V/@IN)])'
 			,	'@BD',    classifications/BouwdeelIsolatie/bouwdeel_name
 			,	'@IN',    classifications/BouwdeelIsolatie/isolatieniveau_name)
 		,	BouwdeelActieveWoning, GJ_Yr
