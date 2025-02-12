@@ -153,8 +153,9 @@ template StateNaAllocatieComponent
 																				case(rekenhuur < kwaliteitskortinggrens, 0[eur_mo]),
 																				(0/0)[eur_mo]);
 						attribute<eur_mo>  boven_aftopping			(BO) := rekenhuur > aftoppingsgrens ? rekenhuur - aftoppingsgrens : 0[eur_mo];
-						attribute<eur_yr>  huurtoeslag				(BO) := (Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/Vermogen[eur] > vermogensgrens ? 0[eur_mo] : 
-																			onder_kkg  + tussen_kkg_aftopping * ratio_kkg_aftopping + boven_aftopping + ratio_aftopping)[eur] * 12[_yr];	
+						attribute<eur_mo>  huurtoeslag_maand		(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/Vermogen[eur] > vermogensgrens ? 0[eur_mo] : 
+																			onder_kkg  + tussen_kkg_aftopping * ratio_kkg_aftopping + boven_aftopping + ratio_aftopping;
+						attribute<eur_yr>  huurtoeslag				(BO) := huurtoeslag_maand * 12[mo] /1[yr];													
 					}
 					
 					container Na_investering
@@ -169,8 +170,9 @@ template StateNaAllocatieComponent
 																				case(rekenhuur < kwaliteitskortinggrens, 0[eur_mo]),
 																				(0)[eur_mo]);
 						attribute<eur_mo>  boven_aftopping			(BO) := rekenhuur > aftoppingsgrens ? rekenhuur - aftoppingsgrens : 0[eur_mo];
-						attribute<eur_yr>  huurtoeslag				(BO) := (Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/Vermogen[eur] > vermogensgrens ? 0[eur_mo] : 
-																			onder_kkg  + tussen_kkg_aftopping * ratio_kkg_aftopping + boven_aftopping + ratio_aftopping)[eur]* 12[_yr];	
+						attribute<eur_mo>  huurtoeslag_maand		(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/Vermogen[eur] > vermogensgrens ? 0[eur_mo] : 
+																			onder_kkg  + tussen_kkg_aftopping * ratio_kkg_aftopping + boven_aftopping + ratio_aftopping;
+						attribute<eur_yr>  huurtoeslag				(BO) := huurtoeslag_maand * 12[mo] / 1[yr];																																
 					}
 					
 				}
@@ -361,7 +363,7 @@ template StateNaAllocatieComponent
 					}
 					parameter<string> OutputFolder := '%localDataProjDir%/Results';
 					unit<uint32> variable := SubItem_PropValues(table,'name');
-					container export_csv := Model/CalculationSchemes/Rapportage/WriteTable32ToCSV(table, AsList(variable/name, ';'), OutputFolder+'strategie_'+warmtestrategie+'_export.csv'); 
+					container export_csv := Model/CalculationSchemes/Rapportage/WriteTable32ToCSV(table, AsList(variable/name, ';'), OutputFolder+'/strategie_'+warmtestrategie+'_export.csv'); 
 				}
 			}
 		}
