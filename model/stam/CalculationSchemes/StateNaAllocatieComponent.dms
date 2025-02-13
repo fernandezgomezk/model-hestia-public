@@ -103,14 +103,14 @@ template StateNaAllocatieComponent
 					attribute<string> EL_na 			(BO) := lookup(BO/EL_rel, Classifications/EnergieLabel/Label);
 					attribute<string> label				(BO) := EL_voor + '_' + EL_na + '_' + oppervlakteklasse + '_' + woningtype;
 					
-					attribute<int32> huurpunten_voor	(BO) := round(Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/Huurpunten); // Hier afgerond naar hele huurpunten, leek me de bedoeling
-					attribute<int32> huurpunten_sprong  (BO) := makedefined(int32(rjoin(label, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_sprong/Label, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_sprong/Huurpunten)),0i);
-					attribute<int32> huurpunten_na	    (BO) := huurpunten_voor + huurpunten_sprong;
+					attribute<uint32> huurpunten_voor	(BO) := uint32(round(Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/Huurpunten)); // Hier afgerond naar hele huurpunten, leek me de bedoeling
+					attribute<uint32> huurpunten_sprong (BO):= makedefined(uint32(rjoin(label, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_sprong/Label, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_sprong/Huurpunten)),0u);
+					attribute<uint32> huurpunten_na	    (BO) := huurpunten_voor + huurpunten_sprong;
 					attribute<eur_mo>  huurgrens		(BO) := switch(
-																		case(huurpunten_na < 40i, rjoin(40i, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurpunten, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurgrens)), 
-																		case(huurpunten_na >= 40i && huurpunten_na <= 250i, rjoin(huurpunten_na, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurpunten, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurgrens)),
-																		case(huurpunten_na > 250i, rjoin(250i, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurpunten, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurgrens) + 
-																		((rjoin(250i, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurpunten, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurgrens) - rjoin(249i, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurpunten, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurgrens)) * float64(huurpunten_na -250i))),
+																		case(huurpunten_na < 40u, rjoin(40u, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurpunten, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurgrens)), 
+																		case(huurpunten_na >= 40u && huurpunten_na <= 250u, rjoin(huurpunten_na, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurpunten, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurgrens)),
+																		case(huurpunten_na > 250u, rjoin(250u, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurpunten, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurgrens) + 
+																		((rjoin(250u, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurpunten, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurgrens) - rjoin(249u, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurpunten, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurgrens)) * float64(huurpunten_na -250u))),
 																		float64(0/0));
 					// op deze manier wordt het aantal huurpunten niet geupdate, het verhoogde aantal huurpunten wordt niet opgeslagen voor een later jaar. Eigenlijk moet huurpunten ergens in 
 					// het model worden geupdate maar ik weet nog niet waar. Als we alleen naar 1 jaar kijken maakt het op zich niet uit maar het is niet heel netjes.
@@ -153,8 +153,9 @@ template StateNaAllocatieComponent
 																				case(rekenhuur < kwaliteitskortinggrens, 0[eur_mo]),
 																				(0/0)[eur_mo]);
 						attribute<eur_mo>  boven_aftopping			(BO) := rekenhuur > aftoppingsgrens ? rekenhuur - aftoppingsgrens : 0[eur_mo];
-						attribute<eur_mo>  huurtoeslag				(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/Vermogen[eur] > vermogensgrens ? 0[eur_mo] : 
-																			onder_kkg  + tussen_kkg_aftopping * ratio_kkg_aftopping + boven_aftopping + ratio_aftopping;	
+						attribute<eur_mo>  huurtoeslag_maand		(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/Vermogen[eur] > vermogensgrens ? 0[eur_mo] : 
+																			onder_kkg  + tussen_kkg_aftopping * ratio_kkg_aftopping + boven_aftopping + ratio_aftopping;
+						attribute<eur_yr>  huurtoeslag				(BO) := huurtoeslag_maand * 12[mo] /1[yr];													
 					}
 					
 					container Na_investering
@@ -169,8 +170,9 @@ template StateNaAllocatieComponent
 																				case(rekenhuur < kwaliteitskortinggrens, 0[eur_mo]),
 																				(0)[eur_mo]);
 						attribute<eur_mo>  boven_aftopping			(BO) := rekenhuur > aftoppingsgrens ? rekenhuur - aftoppingsgrens : 0[eur_mo];
-						attribute<eur_mo>  huurtoeslag				(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/Vermogen[eur] > vermogensgrens ? 0[eur_mo] : 
-																			onder_kkg  + tussen_kkg_aftopping * ratio_kkg_aftopping + boven_aftopping + ratio_aftopping;	
+						attribute<eur_mo>  huurtoeslag_maand		(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/Vermogen[eur] > vermogensgrens ? 0[eur_mo] : 
+																			onder_kkg  + tussen_kkg_aftopping * ratio_kkg_aftopping + boven_aftopping + ratio_aftopping;
+						attribute<eur_yr>  huurtoeslag				(BO) := huurtoeslag_maand * 12[mo] / 1[yr];																																
 					}
 					
 				}
@@ -361,7 +363,7 @@ template StateNaAllocatieComponent
 					}
 					parameter<string> OutputFolder := '%localDataProjDir%/Results';
 					unit<uint32> variable := SubItem_PropValues(table,'name');
-					container export_csv := Model/CalculationSchemes/Rapportage/WriteTable32ToCSV(table, AsList(variable/name, ';'), OutputFolder+'strategie_'+warmtestrategie+'_export.csv'); 
+					container export_csv := Model/CalculationSchemes/Rapportage/WriteTable32ToCSV(table, AsList(variable/name, ';'), OutputFolder+'/strategie_'+warmtestrategie+'_export.csv'); 
 				}
 				
 				container export_ref

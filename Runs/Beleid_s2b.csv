@@ -54,5 +54,3 @@ nrm_B_EGW2,Maatregelenpakket label B EGW 1930-1969,2024,2024,normering,"bestaand
 nrm_B_EGW3,Maatregelenpakket label B EGW na 1970,2024,2024,normering,"bestaande bouw, eengezins ","RB_N3,RO_N3,MS_N2",,,,,Bouwjaar: 1970-1993,1,
 nrm_B_MGW1,Maatregelenpakket label B MGW tot 1970,2024,2024,normering,"bestaande bouw, meergezins ","RB_N3,RO_N3,MS_N1",,,,,Bouwjaar: 0-1970,1,
 nrm_B_MGW2,Maatregelenpakket label B MGW na 1970,2024,2024,normering,"bestaande bouw, meergezins ","RB_N3,RO_N3,MS_N2",,,,,Bouwjaar: 1970-1993,1,
-act_instal,installatieactivatie 2024,2024,2024,activatie,alle,"RV,TW",,,,"Huidig label: A,B,C,D,E,F,G,N",,1,
-nrm_hWP_2,hybride warmtepomp normering,2024,2024,verbod,alle,"VR, HR, Bioketel, Pelletkachel, eWP_lw, eWP_bw, eWP_ll, IR, H2R, eBoiler, EWVgroot, EWVklein, mWKK, eWP_bw_uG, eWP_bw_uK, eWP_lw_u, DS_keuken, DS_douche",,,,"Huidig label: A,B,C,D,E,F,G,N",,1,
