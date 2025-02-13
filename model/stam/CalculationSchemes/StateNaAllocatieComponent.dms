@@ -363,6 +363,81 @@ template StateNaAllocatieComponent
 					unit<uint32> variable := SubItem_PropValues(table,'name');
 					container export_csv := Model/CalculationSchemes/Rapportage/WriteTable32ToCSV(table, AsList(variable/name, ';'), OutputFolder+'strategie_'+warmtestrategie+'_export.csv'); 
 				}
+				
+				container export_ref
+				{
+					unit<uint32> table := select_with_org_rel(BO/bouwjaar <= 2023[uint16])
+					{
+						attribute<string> vbo_BAG_ID		 := BO/code[org_rel];
+						attribute<string> strategie			 := const('Aardgas(referentie)', BO)[org_rel];
+						attribute<string> provincie			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/PROV_NAAM[buurt_rel][org_rel];
+						attribute<string> gemeente			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/GM_NAAM[buurt_rel][org_rel];
+						attribute<string> gemeentecode		 := Invoer/RuimtelijkeData/Studiegebied/Buurt/GM_code[buurt_rel][org_rel];
+						attribute<string> wijkcode			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/WK_CODE[buurt_rel][org_rel];
+						attribute<string> buurt				 := Invoer/RuimtelijkeData/Studiegebied/Buurt/BU_NAAM[buurt_rel][org_rel];
+						attribute<string> buurtcode			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/BU_CODE[buurt_rel][org_rel];
+						attribute<string> RDcoordinaten	 	 := string(geometry[org_rel]);
+						attribute<uint16> bouwjaar			 := BO/bouwjaar[org_rel];
+						attribute<string> woningtype 		 := classifications/woningtype/label[BO/woningtype_rel][org_rel];
+						attribute<string> eigendomstype		 := classifications/eigendom/label[BO/eigendom_rel][org_rel];
+						attribute<GJ_yr> gas_gj_jr 			 := BebouwingsComponenten/Woning/BO/MetervraagBerekening/result/Gas[org_rel];
+						attribute<GJ_yr> elek_gj_jr 		 := BebouwingsComponenten/Woning/BO/MetervraagBerekening/result/E[org_rel];
+						attribute<GJ_yr> Functioneel_RVb 	 := BebouwingsComponenten/Woning/BO/MetervraagBerekening/Functioneel_per_product/RVb[org_rel];
+						attribute<GJ_yr> Functioneel_RVp 	 := BebouwingsComponenten/Woning/BO/MetervraagBerekening/Functioneel_per_product/RVp[org_rel];
+						attribute<GJ_yr> Functioneel_TWb 	 := BebouwingsComponenten/Woning/BO/MetervraagBerekening/Functioneel_per_product/TWb[org_rel];
+						attribute<GJ_yr> Functioneel_TWp 	 := BebouwingsComponenten/Woning/BO/MetervraagBerekening/Functioneel_per_product/TWp[org_rel];
+						attribute<eur_yr> gas_var_eur_jr	 := BebouwingsComponenten/Woning/BO/Jaarlijks/Kj_gas[org_rel];
+						attribute<eur_yr> gas_vast_eur_jr 	 := BebouwingsComponenten/Woning/BO/Jaarlijks/Kj_vastrecht_G[org_rel];
+						attribute<eur_yr> elek_var_eur_jr	 := BebouwingsComponenten/Woning/BO/Jaarlijks/Kj_elek[org_rel];
+						attribute<eur_yr> elek_vast_eur_jr 	 := BebouwingsComponenten/Woning/BO/nrAansluitingen[org_rel] * float64(BebouwingsComponenten/Woning/BO/MetervraagBerekening/result/E[org_rel] != 0[GJ_yr]) * (prijzen/elektriciteit/VastRecht -  prijzen/Elektriciteit/bron/Heffingskorting [prijzen/Elektriciteit/JaarIndex]);
+						attribute<eur> Ki_isolatie_zst_eur	 := const(0[eur], BO)[org_rel]; //referentiescenario: geen isolatiemaatregelen
+						attribute<eur> Ki_isolatie_nat_eur 		 := const(0[eur], BO)[org_rel];
+						attribute<eur> Ki_warmtepomp_HR_eur		 := BebouwingsComponenten/Woning/VerbruiksOpties/Installatie/ki_asl[rlookup('HR', Classifications/Installatie_imp/name)] * BO/nrAansluitingen[org_rel]; // referentiescenario: een nieuwe HR ketel
+						attribute<eur> Ki_LTAS_eur 				 := const(0[eur], BO)[org_rel]; // referentiescenario: geen LT afgiftesysteem
+						attribute<eur> Ki_ventilatie_zst_eur 	 := const(0[eur], BO)[org_rel]; // referentiescenario: geen nieuw ventilatiesysteem
+						attribute<eur> Ki_ventilatie_nat_eur 	 := const(0[eur], BO)[org_rel];
+						attribute<eur> Ki_KK_eur 				 := const(0[eur], BO)[org_rel]; // referentiescenario: geen nieuwe kookinstallatie
+						attribute<eur> subsidie_isolatie_eur 	 := const(0[eur], BO)[org_rel];
+						attribute<eur> subsidie_warmtepomp_eur 	 := const(0[eur], BO)[org_rel];
+						
+						//financieringslasten zelfstandig moment
+						//eigenaarbewoner
+						attribute<eur_yr> fin_tot_eb_zst_hy_eur_jr 		 := const((0/0)[eur_yr], BO)[org_rel];
+						attribute<eur_yr> fin_tot_eb_zst_wf_eur_jr 		 := const((0/0)[eur_yr], BO)[org_rel];
+						attribute<eur_yr> fin_tot_eb_zst_wf0_eur_jr 	 := Ki_warmtepomp_HR_eur / 15[yr];
+						
+						//verhuurder
+						attribute<eur_yr> fin_tot_vh_zst_eur_jr 		 := Ki_warmtepomp_HR_eur / 15[yr];
+						
+						//financieringslasten natuurlijk moment
+						//eigenaarbewoner
+						attribute<eur_yr> fin_tot_eb_nat_hy_eur_jr 		 := const((0/0)[eur_yr], BO)[org_rel];
+						attribute<eur_yr> fin_tot_eb_nat_wf_eur_jr 		 := const((0/0)[eur_yr], BO)[org_rel];
+						attribute<eur_yr> fin_tot_eb_nat_wf0_eur_jr 	 := Ki_warmtepomp_HR_eur / 15[yr];
+						
+						//verhuurder
+						attribute<eur_yr> fin_tot_vh_nat_eur_jr 		 := Ki_warmtepomp_HR_eur / 15[yr];
+						
+						//jaarlijkse onderhoudskosten installaties
+						attribute<eur_yr> Kj_oh_installatie_eur_jr		 :=  BebouwingsComponenten/Woning/BO/Jaarlijks/Kj_oh_LO[org_rel];
+						
+						//Huurverhoging, huurtoeslag, hypotheekrenteaftrek
+						attribute<eur_yr> Extra_huur_hu_nat_eur_jr					 := const(0[eur_yr], BO)[org_rel];
+						attribute<eur_yr> Extra_huur_vh_nat_eur_jr					 := const(0[eur_yr], BO)[org_rel];
+						attribute<eur_yr> Extra_huurtoeslag_hu_nat_eur_jr			 := const(0[eur_yr], BO)[org_rel];
+						attribute<eur_yr> Extra_teruggave_eb_HRA_hy_nat_eur_jr		 := const(0[eur_yr], BO)[org_rel];
+						attribute<eur_yr> Extra_teruggave_eb_HRA_wf_nat_eur_jr		 := const(0[eur_yr], BO)[org_rel];
+						attribute<eur_yr> Extra_huur_hu_zst_eur_jr					 := const(0[eur_yr], BO)[org_rel];
+						attribute<eur_yr> Extra_huur_vh_zst_eur_jr					 := const(0[eur_yr], BO)[org_rel];
+						attribute<eur_yr> Extra_huurtoeslag_hu_zst_eur_jr			 := const(0[eur_yr], BO)[org_rel];
+						attribute<eur_yr> Extra_teruggave_eb_HRA_hy_zst_eur_jr		 := const(0[eur_yr], BO)[org_rel];
+						attribute<eur_yr> Extra_teruggave_eb_HRA_wf_zst_eur_jr		 := const(0[eur_yr], BO)[org_rel];
+					}
+					parameter<string> OutputFolder := '%localDataProjDir%/Results';
+					unit<uint32> variable := SubItem_PropValues(table,'name');
+					container export_csv := Model/CalculationSchemes/Rapportage/WriteTable32ToCSV(table, AsList(variable/name, ';'), OutputFolder+'ref_'+warmtestrategie+'_export.csv'); 
+				}
+
 			}
 		}
 	}
