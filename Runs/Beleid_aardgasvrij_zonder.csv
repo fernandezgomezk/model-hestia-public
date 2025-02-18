@@ -73,12 +73,12 @@ SEEH1,Subsidieregeling Energiebesparing Eigen Huis voor VvE,2027,2028,subsidie,"
 SEEH2,Subsidieregeling Energiebesparing Eigen Huis voor VvE,2027,2028,subsidie,"koopwoning, meergezins","(hybride) warmtepomp, isolatie, zonneboiler",0.3,0,0,Minimaal aantal maatregelen: 2,,0.06,hoort bij SEEH1
 SEEH1,Subsidieregeling Energiebesparing Eigen Huis voor VvE,2029,2030,subsidie,"koopwoning, meergezins",isolatie,0.15,0,0,Minimaal aantal maatregelen: 1,Maximaal aantal maatregelen: 1,0.06,hoort bij SEEH1
 SEEH2,Subsidieregeling Energiebesparing Eigen Huis voor VvE,2029,2030,subsidie,"koopwoning, meergezins","(hybride) warmtepomp, isolatie, zonneboiler",0.3,0,0,Minimaal aantal maatregelen: 2,,0.06,hoort bij SEEH1
-act_schil,Activatie bouwdelen 2025,2025,2025,activatie,alle,"RO_N0,RO_N1,RB_N0,RB_N1,DS_N0,DS_N1,DS_N2,DP_N1,DP_N2,DP_N0,MG_N1,MG_N2,MG_N0,MS_N0,PL_N0,VL_N1,VL_N2,VL_N0",,,,"Huidig label:C,D,E,F,G,N",,1,
-act_vent,Activatie ventilatie 2025,2025,2025,activatie,alle,"VT",,,,"Huidig label:C,D,E,F,G,N",,1,
+act_schil,Activatie bouwdelen 2025,2025,2025,activatie,alle,"RO_N0,RO_N1,RB_N0,RB_N1,DS_N0,DS_N1,DS_N2,DP_N1,DP_N2,DP_N0,MG_N1,MG_N2,MG_N0,MS_N0,PL_N0,VL_N1,VL_N2,VL_N0",,,,,,1,
+act_vent,Activatie ventilatie 2025,2025,2025,activatie,alle,"VT",,,,,,1,
 nrm_B_EGWvt,Ventilatie label B EGW tot 1996,2025,2025,normering,"bestaande bouw","VT_Mec_Glk_new",,,,,"Bouwjaar: 0-1996",1,
 nrm_B_EGW1,Maatregelenpakket label B EGW tot 1930,2025,2025,normering,"bestaande bouw","RB_N3,RO_N3,DS_N3,DP_N3,MG_N3,PL_N3,VL_N3",,,,,"Bouwjaar: 0-1930",1,
 nrm_B_EGW2,Maatregelenpakket label B EGW 1930-1969,2025,2025,normering,"bestaande bouw","RB_N3,RO_N3,DS_N3,DP_N3,MG_N3,MS_N1,VL_N3",,,,,"Bouwjaar: 1930-1970",1,
 nrm_B_EGW3,Maatregelenpakket label B EGW na 1970,2025,2025,normering,"bestaande bouw","RB_N3,RO_N3,DS_N3,DP_N3,MG_N3,MS_N2,VL_N3",,,,,"Bouwjaar: 1970-1993",1,
-act_instal,warmtepomp installatieactivatie 2025,2025,2025,activatie,alle,"RV,TW",,,,"Huidig label:A,B,C,D,E,F,G,N",,1,
+act_instal,warmtepomp installatieactivatie 2025,2025,2025,activatie,alle,"RV,TW",,,,,,1,
 nrm_eWP_lw,warmtepomp normering,2025,2025,verbod,alle,"VR,HR,Olieketel,Bioketel,Pelletkachel,BasisHWP_w,hHR,eWP_bw,eWP_ll,IR,H2R,eBoiler,EWVgroot,EWVklein,mWKK,eWP_bw_uG,eWP_bw_uK,hWP_lw_u,DS_keuken,DS_douche",,,,"Huidig label:A,B,C,D,E,F,G,N",,1,
 nrm_zonpv2,verbod zonpv,2020,2025,normering,bestaande bouw,DK_geen,,,,,,1,
