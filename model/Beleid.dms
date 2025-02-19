@@ -124,17 +124,17 @@ container Beleid
 				, bool
 				);
 				
-			attribute<bool>      BouwjaarVoorwaarde (Activatie) := strcount(voorwaarde1, 'bouwjaar') + strcount(voorwaarde2, 'bouwjaar') > 0;
+			attribute<bool>      BouwjaarVoorwaarde (Activatie) := strcount(LowerCase(voorwaarde1), 'bouwjaar') + strcount(LowerCase(voorwaarde2), 'bouwjaar') > 0;
 				attribute<yr_uint16> MinBouwjaar        (Activatie) := not(BouwjaarVoorwaarde) ? (0/0)[yr_uint16] :
 					makedefined(
-						strcount(voorwaarde1, 'bouwjaar') > 0 ? replace(trim(replace(voorwaarde1, 'bouwjaar: ', '')), ' ', '')    [yr_uint16] : (0/0)[yr_uint16],
-						strcount(voorwaarde2, 'bouwjaar') > 0 ? replace(trim(replace(voorwaarde2, 'bouwjaar: ', '')), ' ', '')    [yr_uint16] : (0/0)[yr_uint16]
+						strcount(LowerCase(voorwaarde1), 'bouwjaar') > 0 ? replace(trim(replace(LowerCase(voorwaarde1), 'bouwjaar: ', '')), ' ', '')    [yr_uint16] : (0/0)[yr_uint16],
+						strcount(LowerCase(voorwaarde2), 'bouwjaar') > 0 ? replace(trim(replace(LowerCase(voorwaarde2), 'bouwjaar: ', '')), ' ', '')    [yr_uint16] : (0/0)[yr_uint16]
 
 					);  
 				attribute<yr_uint16> MaxBouwjaar       (Activatie) := not(BouwjaarVoorwaarde) ? (0/0)[yr_uint16] :
 					makedefined(
-						strcount(voorwaarde1, 'bouwjaar') > 0 ? substr(replace(trim(replace(voorwaarde1, 'bouwjaar: ', '')), ' ', ''),  strpos(replace(trim(replace(voorwaarde1, 'bouwjaar: ', '')), ' ', ''), '-')+1)[yr_uint16] : (0/0)[yr_uint16],
-						strcount(voorwaarde2, 'bouwjaar') > 0 ? substr(replace(trim(replace(voorwaarde2, 'bouwjaar: ', '')), ' ', ''),  strpos(replace(trim(replace(voorwaarde2, 'bouwjaar: ', '')), ' ', ''), '-')+1)[yr_uint16] : (0/0)[yr_uint16]
+						strcount(LowerCase(voorwaarde1), 'bouwjaar') > 0 ? substr(replace(trim(replace(LowerCase(voorwaarde1), 'bouwjaar: ', '')), ' ', ''),  strpos(replace(trim(replace(LowerCase(voorwaarde1), 'bouwjaar: ', '')), ' ', ''), '-')+1)[yr_uint16] : (0/0)[yr_uint16],
+						strcount(LowerCase(voorwaarde2), 'bouwjaar') > 0 ? substr(replace(trim(replace(LowerCase(voorwaarde2), 'bouwjaar: ', '')), ' ', ''),  strpos(replace(trim(replace(LowerCase(voorwaarde2), 'bouwjaar: ', '')), ' ', ''), '-')+1)[yr_uint16] : (0/0)[yr_uint16]
 
 					); 				
 		}
