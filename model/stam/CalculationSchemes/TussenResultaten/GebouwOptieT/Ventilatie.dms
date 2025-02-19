@@ -45,8 +45,17 @@ container ventilatie
 			
 			attribute<bool> SchilfactorVoldaan  (GeschiktObject) := Schilfactor >= MakeDefined(MinSchilfactor, 0.0) && Schilfactor < MakeDefined(MaxSchilfactor, 9999.0);
 			attribute<bool> BouwjaarVoldaan     (GeschiktObject) := Bouwjaar >= MakeDefined(MinBouwjaar, 0w) && Bouwjaar < MakeDefined(MaxBouwjaar, 9999w);
+			
+			container VentilatieVoorwaarde := for_each_nedv(
+					 /Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes/name
+				, 'BBN/Voorwaarde/HuidigVT/'+Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes/name+'[BBN_rel]'
+				, void
+				, bool)
+			{	
+				attribute<bool> Voldaan (GeschiktObject) := ='merge(uint8(Afweging/Installatietype_org), bool, '+AsItemList(/Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes/name)+')';
+			}
 
-			attribute<bool> VoorwaardenVoldaan  (GeschiktObject) := AND(SchilfactorVoldaan, BouwjaarVoldaan, InDoelgroepWT, InDoelgroepED);
+			attribute<bool> VoorwaardenVoldaan  (GeschiktObject) := AND(SchilfactorVoldaan, BouwjaarVoldaan, InDoelgroepWT, InDoelgroepED, VentilatieVoorwaarde/Voldaan);
 		}
 
 		attribute<bool>  Geldig   (GeschiktObject) := voorwaarden/VoorwaardenVoldaan && Naleving;
