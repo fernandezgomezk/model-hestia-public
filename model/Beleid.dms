@@ -265,7 +265,18 @@ container Beleid
 						strcount(voorwaarde1, 'bouwjaar') > 0 ? substr(replace(trim(replace(voorwaarde1, 'bouwjaar: ', '')), ' ', ''),  strpos(replace(trim(replace(voorwaarde1, 'bouwjaar: ', '')), ' ', ''), '-')+1)[yr_uint16] : (0/0)[yr_uint16],
 						strcount(voorwaarde2, 'bouwjaar') > 0 ? substr(replace(trim(replace(voorwaarde2, 'bouwjaar: ', '')), ' ', ''),  strpos(replace(trim(replace(voorwaarde2, 'bouwjaar: ', '')), ' ', ''), '-')+1)[yr_uint16] : (0/0)[yr_uint16]
 
-					);  
+					);
+
+				attribute<bool>  VentilatieVoorwaarde (BestaandeBouwNorm) := strcount(voorwaarde1, 'vt_') + strcount(voorwaarde2, 'vt_') > 0;
+
+				container HuidigVT := for_each_nedv(
+					  lowercase(Ventilatienorm/Installatietype/name)
+					, 'not(VentilatieVoorwaarde) ? true :
+					  strcount(voorwaarde1,'+ quote('vt_') +') > 0 ? strcount(trim(replace(voorwaarde1,'+ quote('vt_') +','+ quote('')+')), '+quote(lowercase(Ventilatienorm/Installatietype/name))+') > 0 
+					: strcount(trim(replace(voorwaarde2, '+quote('vt_')+', '+quote('')+')), '+quote(lowercase(Ventilatienorm/Installatietype/name))+') > 0'
+					, BestaandeBouwNorm
+					, bool
+					); 					
 
 				attribute<bool> InputIntegrity (BestaandeBouwNorm) := and(
 					SchilAandeelVoorwaarde ? IsDefined(MinSchilAandeel) : IsNull(MinSchilAandeel),
@@ -547,11 +558,19 @@ container Beleid
 
 			container Voorwaarde
 			{
-				attribute<ratio>     MinSchilAandeel (BestaandebouwNorm) := /Invoer/Beleid/Normering/BestaandeBouwNorm/ParseVoorwaarde/MinSchilAandeel[org_rel];
-				attribute<ratio>     MinSchilfactor  (BestaandebouwNorm) := /Invoer/Beleid/Normering/BestaandeBouwNorm/ParseVoorwaarde/MinSchilfactor[org_rel];
-				attribute<ratio>     MaxSchilfactor  (BestaandebouwNorm) := /Invoer/Beleid/Normering/BestaandeBouwNorm/ParseVoorwaarde/MaxSchilfactor[org_rel];
-				attribute<yr_uint16> Minbouwjaar     (BestaandebouwNorm) := /Invoer/Beleid/Normering/BestaandeBouwNorm/ParseVoorwaarde/Minbouwjaar[org_rel];
-				attribute<yr_uint16> MaxBouwjaar     (BestaandebouwNorm) := /Invoer/Beleid/Normering/BestaandeBouwNorm/ParseVoorwaarde/MaxBouwjaar[org_rel];
+				attribute<ratio>     MinSchilAandeel 		(BestaandebouwNorm) := /Invoer/Beleid/Normering/BestaandeBouwNorm/ParseVoorwaarde/MinSchilAandeel[org_rel];
+				attribute<ratio>     MinSchilfactor  		(BestaandebouwNorm) := /Invoer/Beleid/Normering/BestaandeBouwNorm/ParseVoorwaarde/MinSchilfactor[org_rel];
+				attribute<ratio>     MaxSchilfactor  		(BestaandebouwNorm) := /Invoer/Beleid/Normering/BestaandeBouwNorm/ParseVoorwaarde/MaxSchilfactor[org_rel];
+				attribute<yr_uint16> Minbouwjaar     		(BestaandebouwNorm) := /Invoer/Beleid/Normering/BestaandeBouwNorm/ParseVoorwaarde/Minbouwjaar[org_rel];
+				attribute<yr_uint16> MaxBouwjaar     		(BestaandebouwNorm) := /Invoer/Beleid/Normering/BestaandeBouwNorm/ParseVoorwaarde/MaxBouwjaar[org_rel];
+				attribute<bool>  	 VentilatieVoorwaarde	(BestaandebouwNorm) := /Invoer/Beleid/Normering/BestaandeBouwNorm/ParseVoorwaarde/VentilatieVoorwaarde[org_rel];
+
+				container HuidigVT := for_each_nedv(
+					  /Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes/name
+					, '/Invoer/Beleid/Normering/BestaandeBouwNorm/ParseVoorwaarde/HuidigVT/'+/Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes/name+'[org_rel]'
+					, BestaandeBouwNorm
+					, bool
+					); 
 			}
 
 			container BouwdeelNorm := for_each_nedv(
