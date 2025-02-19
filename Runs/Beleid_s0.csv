@@ -70,3 +70,5 @@ sub_SVVE1	Subsidieregeling verduurzaming verenigingen van eigenaren	2023	2023	su
 sub_SVVE1_2024	Subsidieregeling verduurzaming verenigingen van eigenaren	2024	2024	subsidie	koopwoning, meergezins	isolatie	0.15	0	0	Minimaal aantal maatregelen: 1	Maximaal aantal maatregelen: 1	1	
 sub_SVVE2	Subsidieregeling verduurzaming verenigingen van eigenaren	2023	2023	subsidie	koopwoning, meergezins	(hybride) warmtepomp, isolatie, zonneboiler	0.3	0	0	Minimaal aantal maatregelen: 2		0.03	hoort bij sub_SVVE1
 sub_SVVE2_2024	Subsidieregeling verduurzaming verenigingen van eigenaren	2024	2024	subsidie	koopwoning, meergezins	(hybride) warmtepomp, isolatie, zonneboiler	0.3	0	0	Minimaal aantal maatregelen: 2		1	hoort bij sub_SVVE1
+vrb_inst	verbod op alle installaties	2024	2024	verbod	alle	VR,HR,Olieketel,Bioketel,Pelletkachel,BasisHWP_w,hHR,eWP_lw,eWP_bw,eWP_ll,IR,H2R,eBoiler,EWVgroot,EWVklein,mWKK,eWP_bw_uG,eWP_bw_uK,hWP_lw_u,DS_keuken,DS_douche,AircoVast,AircoMobiel				Huidig label:A,B,C,D,E,F,G,N		1	
+nrm_zonpv2	verbod zonpv	2024	2024	normering	bestaande bouw	DK_geen						1	
