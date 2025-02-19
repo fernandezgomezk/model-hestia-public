@@ -64,7 +64,7 @@ container HestiaRun
 		{
 			// Ophalen opties voor instellingen die per rekenstap gebruikt kunnen worden.
 			#include <%projDir%/Runs/DefaultSettings/Basis.dms>
-			#include <%projDir%/Runs/DefaultSettings/R5_2025.dms>
+			#include <%projDir%/Runs/DefaultSettings/Rekenstap_2024_eWP.dms>
 			#include <%projDir%/Runs/DefaultSettings/Rekenstap.dms>		
 		}
 
@@ -87,11 +87,10 @@ container HestiaRun
 			container RekenStappen
 			{
 				container StartJaar := DefaultInstellingen/Basis;
-				container R5_2025 := DefaultInstellingen/R5_2025/Specifiek;
+				container R4_2024 := DefaultInstellingen/R4_2024/Specifiek;
 				container R1_2021 := DefaultInstellingen/Rekenstap/Specifiek;
 				container R2_2022 := DefaultInstellingen/Rekenstap/Specifiek;
 				container R3_2023 := DefaultInstellingen/Rekenstap/Specifiek;
-				container R4_2024 := DefaultInstellingen/Rekenstap/Specifiek;
 
 			}
 			
