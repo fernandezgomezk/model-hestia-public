@@ -62,7 +62,7 @@ container HestiaRun
 		{
 			// Ophalen opties voor instellingen die per rekenstap gebruikt kunnen worden.
 			#include <%projDir%/Runs/DefaultSettings/Basis.dms>
-			#include <%projDir%/Runs/DefaultSettings/R5_2025.dms>
+			#include <%projDir%/Runs/DefaultSettings/Rekenstap_2025_hWP.dms>
 			#include <%projDir%/Runs/DefaultSettings/Rekenstap.dms>		
 		}
 

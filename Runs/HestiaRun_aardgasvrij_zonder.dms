@@ -62,6 +62,7 @@ container HestiaRun
 		{
 			// Ophalen opties voor instellingen die per rekenstap gebruikt kunnen worden.
 			#include <%projDir%/Runs/DefaultSettings/Basis.dms>
+			#include <%projDir%/Runs/DefaultSettings/Rekenstap_2025_eWP.dms>
 			#include <%projDir%/Runs/DefaultSettings/Rekenstap.dms>		
 		}
 
@@ -75,10 +76,20 @@ container HestiaRun
 			// Invoer: Per rekenstap worden specifieke instellingen gebruikt.
 			// De lijst van rekenstappen wordt gedefinieerd bij rekenstap.
 			
-			container RekenStappen := for_each_nt(rekenstap/repeats/name, rekenstap/Rx_xxxx)
+			/*	container RekenStappen := for_each_nt(rekenstap/repeats/name, rekenstap/Rx_xxxx)
 			{
 				container StartJaar := DefaultInstellingen/Basis;
 				container Overige   := DefaultInstellingen/Rekenstap/Specifiek;
+			}
+			*/
+			container RekenStappen
+			{
+				container StartJaar := DefaultInstellingen/Basis;
+				container R5_2025 := DefaultInstellingen/R5_2025/Specifiek;
+				container R1_2021 := DefaultInstellingen/Rekenstap/Specifiek;
+				container R2_2022 := DefaultInstellingen/Rekenstap/Specifiek;
+				container R3_2023 := DefaultInstellingen/Rekenstap/Specifiek;
+				container R4_2024 := DefaultInstellingen/Rekenstap/Specifiek;
 			}
 		}
 		// Ophalen ruimtelijke invoerbestanden, kengetallen en energieprijzen.

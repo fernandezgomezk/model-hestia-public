@@ -80,6 +80,6 @@ nrm_B_EGW1,Maatregelenpakket label B EGW tot 1930,2025,2025,normering,bestaande 
 nrm_B_EGW2,Maatregelenpakket label B EGW 1930-1969,2025,2025,normering,bestaande bouw,"RB_N3,RO_N3,DS_N3,DP_N3,MG_N3,MS_N1,VL_N3",,,,,Bouwjaar: 1930-1970,1,
 nrm_B_EGW3,Maatregelenpakket label B EGW na 1970,2025,2025,normering,bestaande bouw,"RB_N3,RO_N3,DS_N3,DP_N3,MG_N3,MS_N2,VL_N3",,,,,Bouwjaar: 1970-1993,1,
 act_instal,warmtepomp installatieactivatie 2025,2025,2025,activatie,alle,"RV,TW",,,,,,1,
-nrm_eWP_lw,warmtepomp normering,2025,2025,verbod,alle,"VR,HR,Olieketel,Bioketel,Pelletkachel,BasisHWP_w,hHR,eWP_bw,eWP_ll,IR,H2R,eBoiler,EWVgroot,EWVklein,mWKK,eWP_bw_uG,eWP_bw_uK,hWP_lw_u,DS_keuken,DS_douche",,,,"Huidig label:A,B,C,D,E,F,G,N",,1,
+nrm_eWP_lw,warmtepomp normering,2025,2025,verbod,alle,"VR,HR,Olieketel,Bioketel,Pelletkachel,BasisHWP_w,hHR,eWP_bw,eWP_ll,IR,H2R,eBoiler,EWVgroot,EWVklein,mWKK,eWP_bw_uG,eWP_bw_uK,hWP_lw_u,DS_keuken,DS_douche,AircoVast,AircoMobiel",,,,"Huidig label:A,B,C,D,E,F,G,N",,1,
 nrm_zonpv1,normering zonpv,2025,2025,normering,bestaande bouw,DK_Optimaal,,,,,,1,
 nrm_zonpv2,verbod zonpv,2020,2024,normering,bestaande bouw,DK_geen,,,,,,1,
