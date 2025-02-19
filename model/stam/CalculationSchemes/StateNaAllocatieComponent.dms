@@ -64,7 +64,7 @@ template StateNaAllocatieComponent
 				container Financieringslasten  		// Hypothecaire lening voor eigenaar-bewoner, vastgoedhypotheek voor particuliere verhuurder, WSW voor sociale verhuurder
 				{
 					attribute<percent_yr> rentepercentage 	(BO) := ='merge(uint8(BO/Eigendom_rel), percent_yr,'+ AsItemList('Invoer/Kengetallen/Eindgebruikerskosten/rentepercentages/PerJaar/R_' + Classifications/Eigendom/c + '[Classifications/Zichtjaar/Rekenjaar_rel[Zichtjaar_rel]]')+')';
-					attribute<float64> maandrente			(BO) := rentepercentage  / 12[percent_yr];
+					attribute<float64> maandrente			(BO) := rentepercentage  / 12[percent_yr] / 100d;
 					attribute<Eur_yr> Kj_installatie 		(BO) := 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-180d)) ) * Ki_installatie;
 					attribute<Eur_yr> Kj_isolatie			(BO) := Eigendom_rel == 0 ? 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-360.0d)) ) * Ki_isolatie : 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-300.0d)) ) * Ki_isolatie;					
 					attribute<Eur_yr> Kj_totaal				(BO) := Kj_installatie + Kj_isolatie;
@@ -72,7 +72,7 @@ template StateNaAllocatieComponent
 					container Warmtefondslening			// Warmtefondslening voor eigenaar-bewoner, null voor huurwoningen
 					{
 						attribute<percent_yr> rentepercentage	(BO) := Eigendom_rel == 0 ? const(Invoer/Kengetallen/Eindgebruikerskosten/rentepercentages/PerJaar/R_wf[Classifications/Zichtjaar/Rekenjaar_rel[Zichtjaar_rel]],BO) : float64(0/0);
-						attribute<float64> maandrente			(BO) := rentepercentage  / 12[percent_yr];
+						attribute<float64> maandrente			(BO) := rentepercentage  / 12[percent_yr] / 100d;
 						attribute<Eur_yr> Kj_installatie		(BO) := 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-180.0d)) ) * Ki_installatie;
 						attribute<Eur_yr> Kj_isolatie			(BO) := 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-240.0d)) ) * Ki_isolatie; 
 						attribute<Eur_yr> Kj_totaal				(BO) := Kj_installatie + Kj_isolatie;	
@@ -89,7 +89,7 @@ template StateNaAllocatieComponent
 				container Huurverhoging_huurcommissiemethode 
 				{
 					attribute<percent_yr> rentepercentage	(BO) := Eigendom_rel != 0 ? const(Invoer/Kengetallen/Eindgebruikerskosten/rentepercentages/PerJaar/R_hc[Classifications/Zichtjaar/Rekenjaar_rel[Zichtjaar_rel]],BO) : float64(0/0);
-					attribute<float64> maandrente			(BO) := rentepercentage  / 12[percent_yr];
+					attribute<float64> maandrente			(BO) := rentepercentage  / 12[percent_yr] / 100d;
 					attribute<Eur_yr> Kj_installatie 		(BO) := 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-180.0d)) ) * Ki_installatie;
 					attribute<Eur_yr> Kj_isolatie			(BO) :=	Eigendom_rel == 1 ? 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-300.0d)) ) * Ki_isolatie : 0d;
 					attribute<Eur_yr> Huurverhoging         (BO) := Kj_installatie + Kj_isolatie;
