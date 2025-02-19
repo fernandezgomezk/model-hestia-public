@@ -365,6 +365,255 @@ template StateNaAllocatieComponent
 					unit<uint32> variable := SubItem_PropValues(table,'name');
 					container export_csv := Model/CalculationSchemes/Rapportage/WriteTable32ToCSV(table, AsList(variable/name, ';'), OutputFolder+'/strategie_'+warmtestrategie+'_export.csv'); 
 				}
+				
+				container export_ref
+				{
+					unit<uint32> table := select_with_org_rel(BO/bouwjaar <= 2023[uint16])
+					{
+						attribute<string> vbo_BAG_ID		 := BO/code[org_rel];
+						attribute<string> strategie			 := const('Aardgas(referentie)', BO)[org_rel];
+						attribute<string> provincie			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/PROV_NAAM[buurt_rel][org_rel];
+						attribute<string> gemeente			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/GM_NAAM[buurt_rel][org_rel];
+						attribute<string> gemeentecode		 := Invoer/RuimtelijkeData/Studiegebied/Buurt/GM_code[buurt_rel][org_rel];
+						attribute<string> wijkcode			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/WK_CODE[buurt_rel][org_rel];
+						attribute<string> buurt				 := Invoer/RuimtelijkeData/Studiegebied/Buurt/BU_NAAM[buurt_rel][org_rel];
+						attribute<string> buurtcode			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/BU_CODE[buurt_rel][org_rel];
+						attribute<string> RDcoordinaten	 	 := string(geometry[org_rel]);
+						attribute<uint16> bouwjaar			 := BO/bouwjaar[org_rel];
+						attribute<string> woningtype 		 := classifications/woningtype/label[BO/woningtype_rel][org_rel];
+						attribute<string> eigendomstype		 := classifications/eigendom/label[BO/eigendom_rel][org_rel];
+						attribute<GJ_yr> gas_gj_jr 			 := BebouwingsComponenten/Woning/BO/MetervraagBerekening/result/Gas[org_rel];
+						attribute<GJ_yr> elek_gj_jr 		 := BebouwingsComponenten/Woning/BO/MetervraagBerekening/result/E[org_rel];
+						attribute<GJ_yr> Functioneel_RVb 	 := BebouwingsComponenten/Woning/BO/MetervraagBerekening/Functioneel_per_product/RVb[org_rel];
+						attribute<GJ_yr> Functioneel_RVp 	 := BebouwingsComponenten/Woning/BO/MetervraagBerekening/Functioneel_per_product/RVp[org_rel];
+						attribute<GJ_yr> Functioneel_TWb 	 := BebouwingsComponenten/Woning/BO/MetervraagBerekening/Functioneel_per_product/TWb[org_rel];
+						attribute<GJ_yr> Functioneel_TWp 	 := BebouwingsComponenten/Woning/BO/MetervraagBerekening/Functioneel_per_product/TWp[org_rel];
+						attribute<eur_yr> gas_var_eur_jr	 := BebouwingsComponenten/Woning/BO/Jaarlijks/Kj_gas[org_rel];
+						attribute<eur_yr> gas_vast_eur_jr 	 := BebouwingsComponenten/Woning/BO/Jaarlijks/Kj_vastrecht_G[org_rel];
+						attribute<eur_yr> elek_var_eur_jr	 := BebouwingsComponenten/Woning/BO/Jaarlijks/Kj_elek[org_rel];
+						attribute<eur_yr> elek_vast_eur_jr 	 := BebouwingsComponenten/Woning/BO/nrAansluitingen[org_rel] * float64(BebouwingsComponenten/Woning/BO/MetervraagBerekening/result/E[org_rel] != 0[GJ_yr]) * (prijzen/elektriciteit/VastRecht -  prijzen/Elektriciteit/bron/Heffingskorting [prijzen/Elektriciteit/JaarIndex]);
+						attribute<eur> Ki_isolatie_zst_eur	 := const(0[eur], BO)[org_rel]; //referentiescenario: geen isolatiemaatregelen
+						attribute<eur> Ki_isolatie_nat_eur 		 := const(0[eur], BO)[org_rel];
+						attribute<eur> Ki_warmtepomp_HR_eur		 := BebouwingsComponenten/Woning/VerbruiksOpties/Installatie/ki_asl[rlookup('HR', Classifications/Installatie_imp/name)] * BO/nrAansluitingen[org_rel]; // referentiescenario: een nieuwe HR ketel
+						attribute<eur> Ki_LTAS_eur 				 := const(0[eur], BO)[org_rel]; // referentiescenario: geen LT afgiftesysteem
+						attribute<eur> Ki_ventilatie_zst_eur 	 := const(0[eur], BO)[org_rel]; // referentiescenario: geen nieuw ventilatiesysteem
+						attribute<eur> Ki_ventilatie_nat_eur 	 := const(0[eur], BO)[org_rel];
+						attribute<eur> Ki_KK_eur 				 := const(0[eur], BO)[org_rel]; // referentiescenario: geen nieuwe kookinstallatie
+						attribute<eur> subsidie_isolatie_eur 	 := const(0[eur], BO)[org_rel];
+						attribute<eur> subsidie_warmtepomp_eur 	 := const(0[eur], BO)[org_rel];
+						
+						//financieringslasten zelfstandig moment
+						//eigenaarbewoner
+						attribute<eur_yr> fin_tot_eb_zst_hy_eur_jr 		 := const((0/0)[eur_yr], BO)[org_rel];
+						attribute<eur_yr> fin_tot_eb_zst_wf_eur_jr 		 := const((0/0)[eur_yr], BO)[org_rel];
+						attribute<eur_yr> fin_tot_eb_zst_wf0_eur_jr 	 := Ki_warmtepomp_HR_eur / 15[yr];
+						
+						//verhuurder
+						attribute<eur_yr> fin_tot_vh_zst_eur_jr 		 := Ki_warmtepomp_HR_eur / 15[yr];
+						
+						//financieringslasten natuurlijk moment
+						//eigenaarbewoner
+						attribute<eur_yr> fin_tot_eb_nat_hy_eur_jr 		 := const((0/0)[eur_yr], BO)[org_rel];
+						attribute<eur_yr> fin_tot_eb_nat_wf_eur_jr 		 := const((0/0)[eur_yr], BO)[org_rel];
+						attribute<eur_yr> fin_tot_eb_nat_wf0_eur_jr 	 := Ki_warmtepomp_HR_eur / 15[yr];
+						
+						//verhuurder
+						attribute<eur_yr> fin_tot_vh_nat_eur_jr 		 := Ki_warmtepomp_HR_eur / 15[yr];
+						
+						//jaarlijkse onderhoudskosten installaties
+						attribute<eur_yr> Kj_oh_installatie_eur_jr		 :=  BebouwingsComponenten/Woning/BO/Jaarlijks/Kj_oh_LO[org_rel];
+						
+						//Huurverhoging, huurtoeslag, hypotheekrenteaftrek
+						attribute<eur_yr> Extra_huur_hu_nat_eur_jr					 := const(0[eur_yr], BO)[org_rel];
+						attribute<eur_yr> Extra_huur_vh_nat_eur_jr					 := const(0[eur_yr], BO)[org_rel];
+						attribute<eur_yr> Extra_huurtoeslag_hu_nat_eur_jr			 := const(0[eur_yr], BO)[org_rel];
+						attribute<eur_yr> Extra_teruggave_eb_HRA_hy_nat_eur_jr		 := const(0[eur_yr], BO)[org_rel];
+						attribute<eur_yr> Extra_teruggave_eb_HRA_wf_nat_eur_jr		 := const(0[eur_yr], BO)[org_rel];
+						attribute<eur_yr> Extra_huur_hu_zst_eur_jr					 := const(0[eur_yr], BO)[org_rel];
+						attribute<eur_yr> Extra_huur_vh_zst_eur_jr					 := const(0[eur_yr], BO)[org_rel];
+						attribute<eur_yr> Extra_huurtoeslag_hu_zst_eur_jr			 := const(0[eur_yr], BO)[org_rel];
+						attribute<eur_yr> Extra_teruggave_eb_HRA_hy_zst_eur_jr		 := const(0[eur_yr], BO)[org_rel];
+						attribute<eur_yr> Extra_teruggave_eb_HRA_wf_zst_eur_jr		 := const(0[eur_yr], BO)[org_rel];
+					}
+					parameter<string> OutputFolder := '%localDataProjDir%/Results';
+					unit<uint32> variable := SubItem_PropValues(table,'name');
+					container export_csv := Model/CalculationSchemes/Rapportage/WriteTable32ToCSV(table, AsList(variable/name, ';'), OutputFolder+'ref_'+warmtestrategie+'_export.csv'); 
+				}
+				
+				container export_dummy
+				{
+					unit<uint32> table := select_with_org_rel(BO/bouwjaar <= 2023[uint16])
+					{
+						attribute<string> vbo_BAG_ID		 := BO/code[org_rel];
+						attribute<string> strategie			 := const('dummy', BO)[org_rel];
+						attribute<string> provincie			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/PROV_NAAM[buurt_rel][org_rel];
+						attribute<string> gemeente			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/GM_NAAM[buurt_rel][org_rel];
+						attribute<string> gemeentecode		 := Invoer/RuimtelijkeData/Studiegebied/Buurt/GM_code[buurt_rel][org_rel];
+						attribute<string> wijk   			 := 'wijknaam' + right(wijkcode, 2);	//dummy
+						attribute<string> wijkcode			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/WK_CODE[buurt_rel][org_rel];
+						attribute<string> buurt				 := Invoer/RuimtelijkeData/Studiegebied/Buurt/BU_NAAM[buurt_rel][org_rel];
+						attribute<string> buurtcode			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/BU_CODE[buurt_rel][org_rel];
+						attribute<string> RDcoordinaten	 	 := string(geometry[org_rel]);
+						//attribute<uint16> bouwjaar			 := BO/bouwjaar[org_rel];
+						attribute<string> bouwjaarklasse	 := BO/bouwjaar[org_rel] < 1945w ? '<1945' :
+																BO/bouwjaar[org_rel] >= 1945w && BO/bouwjaar[org_rel] < 1975w ? '1945 - 1974' :
+																BO/bouwjaar[org_rel] >= 1975w && BO/bouwjaar[org_rel] <= 1995w ? '1975 - 1995' :
+																BO/bouwjaar[org_rel] > 1995w ? '>1995' : '9999', IntegrityCheck = "this != '9999'";
+						//attribute<string> woningtype_i 		 := classifications/woningtype/label[BO/woningtype_rel][org_rel];
+						attribute<string> woningtype 		 := strcount(classifications/woningtype/label[BO/woningtype_rel][org_rel], 'meergezin') > 0 ? 'meergezinswoning' : classifications/woningtype/label[BO/woningtype_rel][org_rel];
+						attribute<string> eigendomstype		 := classifications/eigendom/label[BO/eigendom_rel][org_rel];
+						//attribute<GJ_yr> gas_gj_jr 			 := AllocatieResultaten/Woning/metervraag/Gas[org_rel];
+						attribute<m3_yr> gas_m3_jr 			 := AllocatieResultaten/Woning/metervraag/Gas[org_rel] / 0.03165[GJ_m3];
+						//attribute<GJ_yr> elek_gj_jr 		 := AllocatieResultaten/Woning/metervraag/E[org_rel];
+						attribute<kWh_yr> elek_kWh_jr 		 := AllocatieResultaten/Woning/metervraag/E[org_rel] / 0.0036 [GJ / kWh];
+						//attribute<GJ_yr> Functioneel_RVb 	 := AllocatieResultaten/Woning/BO/MetervraagBerekening/Functioneel_per_product/RVb[org_rel];
+						//attribute<GJ_yr> Functioneel_RVp 	 := AllocatieResultaten/Woning/BO/MetervraagBerekening/Functioneel_per_product/RVp[org_rel];
+						//attribute<GJ_yr> Functioneel_TWb 	 := AllocatieResultaten/Woning/BO/MetervraagBerekening/Functioneel_per_product/TWb[org_rel];
+						//attribute<GJ_yr> Functioneel_TWp 	 := AllocatieResultaten/Woning/BO/MetervraagBerekening/Functioneel_per_product/TWp[org_rel];
+						attribute<GJ_yr> warmte_gj_jr 		 := AllocatieResultaten/Woning/metervraag/Warmte_70[org_rel];
+						//attribute<classifications/installatie> RVb := BO/InstallatiePerProduct/RVb[org_rel];
+						attribute<eur_yr> gas_laag_eur_jr	 := Kj_vastrecht_G[org_rel] + Kj_gas[org_rel] * 0.80; //dummy
+						attribute<eur_yr> gas_midden_eur_jr	 := Kj_vastrecht_G[org_rel] + Kj_gas[org_rel];
+						attribute<eur_yr> gas_hoog_eur_jr	 := Kj_vastrecht_G[org_rel] + Kj_gas[org_rel] * 1.20; //dummy
+						//attribute<eur_yr> elek_var_eur_jr	 := Kj_elek[org_rel];
+						//attribute<eur_yr> elek_vast_eur_jr := BO/nrAansluitingen[org_rel] * float64(metervraag/e[org_rel] != 0[GJ_yr]) * (prijzen/elektriciteit/VastRecht -  prijzen/Elektriciteit/bron/Heffingskorting [prijzen/Elektriciteit/JaarIndex]);
+						attribute<eur_yr> elek_laag_eur_jr	 := (BO/nrAansluitingen[org_rel] * float64(metervraag/e[org_rel] != 0[GJ_yr]) * (prijzen/elektriciteit/VastRecht -  prijzen/Elektriciteit/bron/Heffingskorting [prijzen/Elektriciteit/JaarIndex])) + Kj_elek[org_rel] * 0.80; //dummy					
+						attribute<eur_yr> elek_midden_eur_jr := (BO/nrAansluitingen[org_rel] * float64(metervraag/e[org_rel] != 0[GJ_yr]) * (prijzen/elektriciteit/VastRecht -  prijzen/Elektriciteit/bron/Heffingskorting [prijzen/Elektriciteit/JaarIndex])) + Kj_elek[org_rel];					
+						attribute<eur_yr> elek_hoog_eur_jr	 := (BO/nrAansluitingen[org_rel] * float64(metervraag/e[org_rel] != 0[GJ_yr]) * (prijzen/elektriciteit/VastRecht -  prijzen/Elektriciteit/bron/Heffingskorting [prijzen/Elektriciteit/JaarIndex])) + Kj_elek[org_rel] * 1.20; //dummy				
+						attribute<eur_yr> warmte_laag_eur_jr	 := warmte_gj_jr > 0[GJ_yr] ? 482[eur_yr] + warmte_gj_jr * 39[eur_GJ] * 0.80d : 0[eur_yr]; //dummy
+						attribute<eur_yr> warmte_midden_eur_jr	 := warmte_gj_jr > 0[GJ_yr] ? 482[eur_yr] + warmte_gj_jr * 39[eur_GJ] : 0[eur_yr]; //dummy
+						attribute<eur_yr> warmte_hoog_eur_jr	 := warmte_gj_jr > 0[GJ_yr] ? 482[eur_yr] + warmte_gj_jr * 39[eur_GJ] * 1.20d : 0[eur_yr]; //dummy
+						attribute<eur_yr> energiekosten_laag_eur_jr	 		:= gas_laag_eur_jr + elek_laag_eur_jr + warmte_laag_eur_jr;
+						attribute<eur_yr> energiekosten_midden_eur_jr	 	:= gas_midden_eur_jr + elek_midden_eur_jr + warmte_midden_eur_jr;
+						attribute<eur_yr> energiekosten_hoog_eur_jr	 		:= gas_hoog_eur_jr + elek_hoog_eur_jr + warmte_hoog_eur_jr;
+						attribute<eur> Ki_isolatie_zst_eur	 := eenmalig/Ki_gv[org_rel];
+						attribute<eur> Ki_warmtepomp_HR_eur	 := eenmalig/Ki15_LO[org_rel];
+						attribute<eur> Ki_BAK_eur			 := const(5000[eur],.); //dummy
+						attribute<eur> Ki_LTAS_eur 			 := eenmalig/Ki_LTAS[org_rel];
+						attribute<eur> Ki_ventilatie_zst_eur 	 := eenmalig/Ki_VT[org_rel];
+						attribute<eur> Ki_koken_eur 			 := (eenmalig/Ki_KK[org_rel])/2d;
+						attribute<eur> Ki_inductie_eur 			 := (eenmalig/Ki_KK[org_rel])/2d;
+						attribute<eur> subsidies_eur 	 		:= eenmalig/Oi_gv[org_rel] +  eenmalig/Oi15_LO[org_rel];
+						attribute<eur> Ki_isolatie_nat_eur 	 	:= eenmalig/Ki_gv[org_rel] * 0.60d; // dummy
+						attribute<eur> Ki_ventilatie_nat_eur 	:= eenmalig/Ki_VT[org_rel] * 0.60d; //dummy
+
+						//financieringslasten zelfstandig moment
+						//eigenaarbewoner
+						attribute<eur_yr> fin_tot_eb_zst_hy_eur_jr 		 := eigendomstype == 'Koop' ? financieringslasten/Kj_totaal[org_rel] : (0/0)[eur_yr];
+						attribute<eur_yr> fin_tot_eb_zst_wf_eur_jr 		 := eigendomstype == 'Koop' ? financieringslasten/Warmtefondslening/Kj_totaal[org_rel] : (0/0)[eur_yr];
+						attribute<eur_yr> fin_tot_eb_zst_wf0_eur_jr 	 := eigendomstype == 'Koop' ? financieringslasten/nulprocentlening/Kj_totaal[org_rel] : (0/0)[eur_yr];
+						
+						//verhuurder
+						attribute<eur_yr> fin_tot_vh_zst_eur_jr 		 := eigendomstype == 'PartHuur' || eigendomstype == 'WoonCorp' ? financieringslasten/Kj_totaal[org_rel] : (0/0)[eur_yr];
+						
+						//financieringslasten natuurlijk moment
+						//eigenaarbewoner
+						attribute<eur_yr> fin_tot_eb_nat_hy_eur_jr 		 := eigendomstype == 'Koop' ? financieringslasten/Kj_totaal[org_rel] : (0/0)[eur_yr];
+						attribute<eur_yr> fin_tot_eb_nat_wf_eur_jr 		 := eigendomstype == 'Koop' ? financieringslasten/Warmtefondslening/Kj_totaal[org_rel] : (0/0)[eur_yr];
+						attribute<eur_yr> fin_tot_eb_nat_wf0_eur_jr 	 := eigendomstype == 'Koop' ? financieringslasten/nulprocentlening/Kj_totaal[org_rel] : (0/0)[eur_yr];
+						
+						//verhuurder
+						attribute<eur_yr> fin_tot_vh_nat_eur_jr 		 := eigendomstype == 'PartHuur' || eigendomstype == 'WoonCorp' ? financieringslasten/Kj_totaal[org_rel] : (0/0)[eur_yr];
+						
+						//jaarlijkse onderhoudskosten installaties en kosten koken
+						attribute<eur_yr> Kj_inductie_eur_jr			 := Ki_inductie_eur / 15[yr];
+						attribute<eur_yr> Kj_oh_installatie_eur_jr		 := Kj_oh_LO[org_rel];
+						//attribute<eur_yr> Kj_koken_eur_jr				 := Ki_koken_eur / 15[yr]; --> wordt gefinancierd met lening? Check met Casper
+
+						
+						//Huurverhoging, huurtoeslag, hypotheekrenteaftrek
+						attribute<eur_yr> Extra_huur_hu_nat_eur_jr					 := eigendomstype == 'PartHuur' || eigendomstype == 'WoonCorp' ? Huurverhoging_huurcommissiemethode/huurverhoging[org_rel] : (0/0)[eur_yr];
+						attribute<eur_yr> Extra_huur_vh_nat_eur_jr					 := eigendomstype == 'PartHuur' || eigendomstype == 'WoonCorp' ? -1d * (Huurverhoging_huurcommissiemethode/huurverhoging[org_rel]) : (0/0)[eur_yr];
+						attribute<eur_yr> Extra_huurtoeslag_hu_nat_eur_jr			 := eigendomstype == 'PartHuur' || eigendomstype == 'WoonCorp' ? -1d *(Huurtoeslag/Na_investering/Huurtoeslag[org_rel] - Huurtoeslag/Huidig/Huurtoeslag[org_rel]) : (0/0)[eur_yr];
+						attribute<eur_yr> Extra_teruggave_HRA_eb_hy_nat_eur_jr		 := eigendomstype == 'Koop' ? -1d *(Hypotheekrenteaftrek/Belastingteruggave[org_rel]) : (0/0)[eur_yr];
+						attribute<eur_yr> Extra_teruggave_HRA_eb_wf_nat_eur_jr		 := eigendomstype == 'Koop' ? -1d *(Hypotheekrenteaftrek/Belastingteruggave_warmtefondslening[org_rel]) : (0/0)[eur_yr];
+
+						attribute<eur_yr> Extra_huur_hu_zst_eur_jr					 := eigendomstype == 'PartHuur' || eigendomstype == 'WoonCorp' ? Huurverhoging_huurcommissiemethode/huurverhoging[org_rel] : (0/0)[eur_yr];
+						attribute<eur_yr> Extra_huur_vh_zst_eur_jr					 := eigendomstype == 'PartHuur' || eigendomstype == 'WoonCorp' ? -1d *(Huurverhoging_huurcommissiemethode/huurverhoging[org_rel]) : (0/0)[eur_yr];
+						attribute<eur_yr> Extra_huurtoeslag_hu_zst_eur_jr			 := eigendomstype == 'PartHuur' || eigendomstype == 'WoonCorp' ? -1d *(Huurtoeslag/Na_investering/Huurtoeslag[org_rel] - Huurtoeslag/Huidig/Huurtoeslag[org_rel]) : (0/0)[eur_yr];
+						attribute<eur_yr> Extra_teruggave_HRA_eb_hy_zst_eur_jr		 := eigendomstype == 'Koop' ? -1d *(Hypotheekrenteaftrek/Belastingteruggave[org_rel]) : (0/0)[eur_yr];
+						attribute<eur_yr> Extra_teruggave_HRA_eb_wf_zst_eur_jr		 := eigendomstype == 'Koop' ? -1d *(Hypotheekrenteaftrek/Belastingteruggave_warmtefondslening[org_rel]) : (0/0)[eur_yr];
+						
+						//jaarlijkse baten en kosten
+						attribute<eur_yr> jaarlijkse_baten_eb_nat_hy_eur_jr			:= Extra_teruggave_HRA_eb_hy_nat_eur_jr;
+						attribute<eur_yr> jaarlijkse_baten_eb_nat_wf_eur_jr			:= Extra_teruggave_HRA_eb_wf_nat_eur_jr;
+						attribute<eur_yr> jaarlijkse_baten_hu_nat_eur_jr			:= Extra_huurtoeslag_hu_nat_eur_jr;
+						attribute<eur_yr> jaarlijkse_baten_vh_nat_eur_jr			:= Extra_huur_vh_nat_eur_jr;
+						attribute<eur_yr> jaarlijkse_baten_eb_zst_hy_eur_jr			:= Extra_teruggave_HRA_eb_hy_zst_eur_jr;
+						attribute<eur_yr> jaarlijkse_baten_eb_zst_wf_eur_jr			:= Extra_teruggave_HRA_eb_wf_zst_eur_jr;
+						attribute<eur_yr> jaarlijkse_baten_hu_zst_eur_jr			:= Extra_huurtoeslag_hu_zst_eur_jr;
+						attribute<eur_yr> jaarlijkse_baten_vh_zst_eur_jr			:= Extra_huur_vh_zst_eur_jr;
+						attribute<eur_yr> jaarlijkse_kosten_eb_zst_hy_laag_eur_jr		:= energiekosten_laag_eur_jr 	+ fin_tot_eb_zst_hy_eur_jr 	+ Kj_oh_installatie_eur_jr + Kj_inductie_eur_jr;
+						attribute<eur_yr> jaarlijkse_kosten_eb_zst_hy_midden_eur_jr		:= energiekosten_midden_eur_jr 	+ fin_tot_eb_zst_hy_eur_jr 	+ Kj_oh_installatie_eur_jr + Kj_inductie_eur_jr;
+						attribute<eur_yr> jaarlijkse_kosten_eb_zst_hy_hoog_eur_jr		:= energiekosten_hoog_eur_jr 	+ fin_tot_eb_zst_hy_eur_jr 	+ Kj_oh_installatie_eur_jr + Kj_inductie_eur_jr;
+						attribute<eur_yr> jaarlijkse_kosten_eb_nat_hy_laag_eur_jr		:= energiekosten_laag_eur_jr 	+ fin_tot_eb_nat_hy_eur_jr 	+ Kj_oh_installatie_eur_jr + Kj_inductie_eur_jr;
+						attribute<eur_yr> jaarlijkse_kosten_eb_nat_hy_midden_eur_jr		:= energiekosten_midden_eur_jr 	+ fin_tot_eb_nat_hy_eur_jr 	+ Kj_oh_installatie_eur_jr + Kj_inductie_eur_jr;
+						attribute<eur_yr> jaarlijkse_kosten_eb_nat_hy_hoog_eur_jr		:= energiekosten_hoog_eur_jr 	+ fin_tot_eb_nat_hy_eur_jr 	+ Kj_oh_installatie_eur_jr + Kj_inductie_eur_jr;
+						attribute<eur_yr> Jaarlijkse_kosten_eb_zst_wf_laag_eur_jr		:= energiekosten_laag_eur_jr 	+ fin_tot_eb_zst_wf_eur_jr 	+ Kj_oh_installatie_eur_jr + Kj_inductie_eur_jr;
+						attribute<eur_yr> Jaarlijkse_kosten_eb_zst_wf_midden_eur_jr		:= energiekosten_midden_eur_jr 	+ fin_tot_eb_zst_wf_eur_jr 	+ Kj_oh_installatie_eur_jr + Kj_inductie_eur_jr;
+						attribute<eur_yr> Jaarlijkse_kosten_eb_zst_wf_hoog_eur_jr		:= energiekosten_hoog_eur_jr 	+ fin_tot_eb_zst_wf_eur_jr 	+ Kj_oh_installatie_eur_jr + Kj_inductie_eur_jr;
+						attribute<eur_yr> Jaarlijkse_kosten_eb_nat_wf_laag_eur_jr		:= energiekosten_laag_eur_jr 	+ fin_tot_eb_nat_wf_eur_jr 	+ Kj_oh_installatie_eur_jr + Kj_inductie_eur_jr;
+						attribute<eur_yr> Jaarlijkse_kosten_eb_nat_wf_midden_eur_jr		:= energiekosten_midden_eur_jr 	+ fin_tot_eb_nat_wf_eur_jr 	+ Kj_oh_installatie_eur_jr + Kj_inductie_eur_jr;
+						attribute<eur_yr> Jaarlijkse_kosten_eb_nat_wf_hoog_eur_jr		:= energiekosten_hoog_eur_jr 	+ fin_tot_eb_nat_wf_eur_jr 	+ Kj_oh_installatie_eur_jr + Kj_inductie_eur_jr;
+						attribute<eur_yr> Jaarlijkse_kosten_eb_zst_wf0_laag_eur_jr		:= energiekosten_laag_eur_jr 	+ fin_tot_eb_zst_wf0_eur_jr + Kj_oh_installatie_eur_jr + Kj_inductie_eur_jr;
+						attribute<eur_yr> Jaarlijkse_kosten_eb_zst_wf0_midden_eur_jr	:= energiekosten_midden_eur_jr 	+ fin_tot_eb_zst_wf0_eur_jr + Kj_oh_installatie_eur_jr + Kj_inductie_eur_jr;
+						attribute<eur_yr> Jaarlijkse_kosten_eb_zst_wf0_hoog_eur_jr		:= energiekosten_hoog_eur_jr 	+ fin_tot_eb_zst_wf0_eur_jr + Kj_oh_installatie_eur_jr + Kj_inductie_eur_jr;
+						attribute<eur_yr> Jaarlijkse_kosten_eb_nat_wf0_laag_eur_jr		:= energiekosten_laag_eur_jr 	+ fin_tot_eb_nat_wf0_eur_jr + Kj_oh_installatie_eur_jr + Kj_inductie_eur_jr;
+						attribute<eur_yr> Jaarlijkse_kosten_eb_nat_wf0_midden_eur_jr	:= energiekosten_midden_eur_jr 	+ fin_tot_eb_nat_wf0_eur_jr + Kj_oh_installatie_eur_jr + Kj_inductie_eur_jr;
+						attribute<eur_yr> Jaarlijkse_kosten_eb_nat_wf0_hoog_eur_jr		:= energiekosten_hoog_eur_jr 	+ fin_tot_eb_nat_wf0_eur_jr + Kj_oh_installatie_eur_jr + Kj_inductie_eur_jr;
+						attribute<eur_yr> jaarlijkse_kosten_vh_zst_eur_jr				:= 								  fin_tot_vh_zst_eur_jr 	+ Kj_oh_installatie_eur_jr;
+						attribute<eur_yr> jaarlijkse_kosten_vh_nat_eur_jr				:= 								  fin_tot_vh_nat_eur_jr 	+ Kj_oh_installatie_eur_jr;
+						attribute<eur_yr> jaarlijkse_kosten_hu_zst_laag_eur_jr			:= energiekosten_laag_eur_jr 															+ Kj_inductie_eur_jr + Extra_huur_hu_zst_eur_jr;					  
+						attribute<eur_yr> jaarlijkse_kosten_hu_zst_midden_eur_jr		:= energiekosten_midden_eur_jr 	 														+ Kj_inductie_eur_jr + Extra_huur_hu_zst_eur_jr;
+						attribute<eur_yr> jaarlijkse_kosten_hu_zst_hoog_eur_jr 			:= energiekosten_hoog_eur_jr 															+ Kj_inductie_eur_jr + Extra_huur_hu_zst_eur_jr;
+						attribute<eur_yr> jaarlijkse_kosten_hu_nat_laag_eur_jr			:= energiekosten_laag_eur_jr 															+ Kj_inductie_eur_jr + Extra_huur_hu_nat_eur_jr;
+						attribute<eur_yr> jaarlijkse_kosten_hu_nat_midden_eur_jr		:= energiekosten_midden_eur_jr 															+ Kj_inductie_eur_jr + Extra_huur_hu_nat_eur_jr;
+						attribute<eur_yr> jaarlijkse_kosten_hu_nat_hoog_eur_jr			:= energiekosten_hoog_eur_jr 															+ Kj_inductie_eur_jr + Extra_huur_hu_nat_eur_jr;
+
+						//Eindgebruikerskosten
+
+						attribute<eur_yr> egk_eb_nat_hy_laag_eur_jr		:= jaarlijkse_kosten_eb_nat_hy_laag_eur_jr	- jaarlijkse_baten_eb_nat_hy_eur_jr;	 
+						attribute<eur_yr> egk_eb_nat_hy_midden_eur_jr	:= jaarlijkse_kosten_eb_nat_hy_midden_eur_jr - jaarlijkse_baten_eb_nat_hy_eur_jr;
+						attribute<eur_yr> egk_eb_nat_hy_hoog_eur_jr		:= jaarlijkse_kosten_eb_nat_hy_hoog_eur_jr	- jaarlijkse_baten_eb_nat_hy_eur_jr;
+
+						attribute<eur_yr> egk_eb_zst_hy_laag_eur_jr		:= jaarlijkse_kosten_eb_zst_hy_laag_eur_jr	- jaarlijkse_baten_eb_zst_hy_eur_jr;
+						attribute<eur_yr> egk_eb_zst_hy_midden_eur_jr	:= jaarlijkse_kosten_eb_zst_hy_midden_eur_jr - jaarlijkse_baten_eb_zst_hy_eur_jr;
+						attribute<eur_yr> egk_eb_zst_hy_hoog_eur_jr		:= jaarlijkse_kosten_eb_zst_hy_hoog_eur_jr	- jaarlijkse_baten_eb_zst_hy_eur_jr;
+
+						attribute<eur_yr> egk_eb_nat_wf_laag_eur_jr		:= jaarlijkse_kosten_eb_nat_wf_laag_eur_jr	- jaarlijkse_baten_eb_nat_wf_eur_jr;
+						attribute<eur_yr> egk_eb_nat_wf_midden_eur_jr	:= jaarlijkse_kosten_eb_nat_wf_midden_eur_jr - jaarlijkse_baten_eb_nat_wf_eur_jr;
+						attribute<eur_yr> egk_eb_nat_wf_hoog_eur_jr		:= jaarlijkse_kosten_eb_nat_wf_hoog_eur_jr	- jaarlijkse_baten_eb_nat_wf_eur_jr;
+
+						attribute<eur_yr> egk_eb_zst_wf_laag_eur_jr		:= jaarlijkse_kosten_eb_zst_wf_laag_eur_jr	- jaarlijkse_baten_eb_zst_wf_eur_jr;
+						attribute<eur_yr> egk_eb_zst_wf_midden_eur_jr	:= jaarlijkse_kosten_eb_zst_wf_midden_eur_jr - jaarlijkse_baten_eb_zst_wf_eur_jr;
+						attribute<eur_yr> egk_eb_zst_wf_hoog_eur_jr		:= jaarlijkse_kosten_eb_zst_wf_hoog_eur_jr	- jaarlijkse_baten_eb_zst_wf_eur_jr;
+
+						attribute<eur_yr> egk_eb_nat_wf0_laag_eur_jr	:= jaarlijkse_kosten_eb_nat_wf0_laag_eur_jr;
+						attribute<eur_yr> egk_eb_nat_wf0_midden_eur_jr := jaarlijkse_kosten_eb_nat_wf0_midden_eur_jr;
+						attribute<eur_yr> egk_eb_nat_wf0_hoog_eur_jr   := jaarlijkse_kosten_eb_nat_wf0_hoog_eur_jr;
+
+						attribute<eur_yr> egk_eb_zst_wf0_laag_eur_jr   := jaarlijkse_kosten_eb_zst_wf0_laag_eur_jr;
+						attribute<eur_yr> egk_eb_zst_wf0_midden_eur_jr := jaarlijkse_kosten_eb_zst_wf0_midden_eur_jr;
+						attribute<eur_yr> egk_eb_zst_wf0_hoog_eur_jr   := jaarlijkse_kosten_eb_zst_wf0_hoog_eur_jr;
+
+						attribute<eur_yr> egk_hu_nat_laag_eur_jr       := jaarlijkse_kosten_hu_nat_laag_eur_jr - jaarlijkse_baten_hu_nat_eur_jr;
+						attribute<eur_yr> egk_hu_nat_midden_eur_jr     := jaarlijkse_kosten_hu_nat_midden_eur_jr - jaarlijkse_baten_hu_nat_eur_jr;
+						attribute<eur_yr> egk_hu_nat_hoog_eur_jr       := jaarlijkse_kosten_hu_nat_hoog_eur_jr - jaarlijkse_baten_hu_nat_eur_jr;
+
+						attribute<eur_yr> egk_hu_zst_laag_eur_jr       := jaarlijkse_kosten_hu_zst_laag_eur_jr - jaarlijkse_baten_hu_zst_eur_jr;
+						attribute<eur_yr> egk_hu_zst_midden_eur_jr     := jaarlijkse_kosten_hu_zst_midden_eur_jr - jaarlijkse_baten_hu_zst_eur_jr;
+						attribute<eur_yr> egk_hu_zst_hoog_eur_jr       := jaarlijkse_kosten_hu_zst_hoog_eur_jr - jaarlijkse_baten_hu_zst_eur_jr;
+
+						attribute<eur_yr> egk_vh_nat_eur_jr            := jaarlijkse_kosten_vh_nat_eur_jr - jaarlijkse_baten_vh_nat_eur_jr;
+						attribute<eur_yr> egk_vh_zst_eur_jr            := jaarlijkse_kosten_vh_zst_eur_jr - jaarlijkse_baten_vh_zst_eur_jr;
+
+
+					}
+					parameter<string> OutputFolder := '%localDataProjDir%/Results';
+					unit<uint32> variable := SubItem_PropValues(table,'name');
+					container export_csv := Model/CalculationSchemes/Rapportage/WriteTable32ToCSV(table, AsList(variable/name, ';'), OutputFolder+'/dummy_export.csv'); 
+				}
+
 			}
 		}
 	}
