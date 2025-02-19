@@ -486,16 +486,18 @@ template StateNaAllocatieComponent
 						attribute<eur_yr> energiekosten_laag_eur_jr	 		:= gas_laag_eur_jr + elek_laag_eur_jr + warmte_laag_eur_jr;
 						attribute<eur_yr> energiekosten_midden_eur_jr	 	:= gas_midden_eur_jr + elek_midden_eur_jr + warmte_midden_eur_jr;
 						attribute<eur_yr> energiekosten_hoog_eur_jr	 		:= gas_hoog_eur_jr + elek_hoog_eur_jr + warmte_hoog_eur_jr;
-						attribute<eur> Ki_isolatie_zst_eur	 := eenmalig/Ki_gv[org_rel];
-						attribute<eur> Ki_warmtepomp_HR_eur	 := eenmalig/Ki15_LO[org_rel];
-						attribute<eur> Ki_BAK_eur			 := const(5000[eur],.); //dummy
-						attribute<eur> Ki_LTAS_eur 			 := eenmalig/Ki_LTAS[org_rel];
-						attribute<eur> Ki_ventilatie_zst_eur 	 := eenmalig/Ki_VT[org_rel];
-						attribute<eur> Ki_koken_eur 			 := (eenmalig/Ki_KK[org_rel])/2d;
-						attribute<eur> Ki_inductie_eur 			 := (eenmalig/Ki_KK[org_rel])/2d;
-						attribute<eur> subsidies_eur 	 		:= eenmalig/Oi_gv[org_rel] +  eenmalig/Oi15_LO[org_rel];
-						attribute<eur> Ki_isolatie_nat_eur 	 	:= eenmalig/Ki_gv[org_rel] * 0.60d; // dummy
-						attribute<eur> Ki_ventilatie_nat_eur 	:= eenmalig/Ki_VT[org_rel] * 0.60d; //dummy
+						attribute<eur> ki_isolatie_zst_eur	 := eenmalig/Ki_gv[org_rel];
+						attribute<eur> ki_warmtepomp_HR_eur	 := eenmalig/Ki15_LO[org_rel];
+						attribute<eur> ki_BAK_eur			 := warmte_gj_jr > 0[gj_yr] ? const(5000[eur],.) : 0[eur]; //dummy
+						attribute<eur> ki_LTAS_eur 			 := eenmalig/Ki_LTAS[org_rel];
+						attribute<eur> ki_ventilatie_zst_eur 	 := eenmalig/Ki_VT[org_rel];
+						attribute<eur> ki_koken_eur 			 := (eenmalig/Ki_KK[org_rel])/2d;
+						attribute<eur> ki_inductie_eur 			 := (eenmalig/Ki_KK[org_rel])/2d;
+						attribute<eur> ki_isolatie_nat_eur 	 	:= eenmalig/Ki_gv[org_rel] * 0.60d; // dummy
+						attribute<eur> ki_ventilatie_nat_eur 	:= eenmalig/Ki_VT[org_rel] * 0.60d; //dummy
+						attribute<eur> subsidies_eur 	 		:= -1d * (eenmalig/Oi_gv[org_rel] +  eenmalig/Oi15_LO[org_rel]);
+						attribute<eur> ki_tot_zst_eur 	 		:= subsidies_eur + ki_isolatie_zst_eur + Ki_warmtepomp_HR_eur + ki_BAK_eur + Ki_LTAS_eur + ki_ventilatie_zst_eur + ki_koken_eur + ki_inductie_eur;
+						attribute<eur> ki_tot_nat_eur 	 		:= subsidies_eur + ki_isolatie_nat_eur + Ki_warmtepomp_HR_eur + ki_BAK_eur + Ki_LTAS_eur + ki_ventilatie_nat_eur + ki_koken_eur + ki_inductie_eur;
 
 						//financieringslasten zelfstandig moment
 						//eigenaarbewoner
