@@ -33,7 +33,13 @@ template StateNaAllocatieComponent
 			'BO_base/eenmalig/'+ Classifications/GebouwOptie_eenmalig/name,
 			BO,
 			Eur)
+			
 		{
+			attribute<Eur> Ki_gv_nat (BO) :=  BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/eenmalig/Ki_gv_nat;
+			attribute<Eur> Oi_gv_nat (BO) :=  BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/eenmalig/Oi_gv_nat;
+			attribute<Eur> Ki_vt_nat (BO) :=  BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/eenmalig/Ki_vt_nat;
+			attribute<Eur> Oi_vt_nat (BO) :=  BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/eenmalig/Oi_vt_nat;			
+
 			//Aansluitbijdrages
 			attribute<Eur> Ki_Asl_Enet (BO) := BC_kentallen/Ki_Aansl_e_asl * nraansluitingen + BC_kentallen/Ki_Aansl_e_opp * oppervlakte;
 			attribute<Eur> Ki_Asl_Gnet (BO) := Metervraag/gas <= 0[GJ_yr]
@@ -57,6 +63,7 @@ template StateNaAllocatieComponent
 			
 			container Eindgebruikerskosten
 			{	
+						
 				container warmtenetberekening
 				{
 					parameter<Eur_yr> vastrecht_warmte_HT := 582.82[Eur_yr] / 113.5d * 106.9d ; // maxprijzen 2024 volgens ACM, omgerekend naar eur 2020
@@ -93,38 +100,40 @@ template StateNaAllocatieComponent
 				}
 				
 				
-				attribute<Classifications/Eigendom>	Eigendom_rel	(BO) := BO/Eigendom_rel;				
-				attribute<Eur> Ki_installatie 	(BO) := switch(
-																case(warmtestrategie == 's2a', eenmalig/Ki_VT - eenmalig/Oi_VT + eenmalig/Ki_KK / 2d),
+				attribute<Classifications/Eigendom>	Eigendom_rel	(BO) := BO/Eigendom_rel;
+				attribute<Eur> Ki_ventilatie		(BO) := lowercase(vervangingsmoment) == 'zst' ? eenmalig/Ki_VT -  eenmalig/Oi_VT : eenmalig/Ki_VT_nat - eenmalig/Oi_VT_nat;	
+				attribute<Eur> Ki_looptijd_inst 	(BO) := switch(
+																case(warmtestrategie == 's2a', Ki_ventilatie + eenmalig/Ki_KK / 2d),
 																case(warmtestrategie == 's2b', eenmalig/Ki_KK / 2d),
-																case(warmtestrategie == 's3a', eenmalig/Ki_VT - eenmalig/Oi_VT + eenmalig/Ki_LTAS + eenmalig/Ki_KK / 2d + eenmalig/Ki15_LO - eenmalig/Oi15_LO),
-																case(warmtestrategie == 's3d', eenmalig/Ki_VT - eenmalig/Oi_VT + eenmalig/Ki_LTAS + eenmalig/Ki_KK / 2d + 3000d / 111.8d * 106.9d), //3000 is Ki_booster, omgerekend van euro2023 naar euro2020, en check of daar subsidie voor is
+																case(warmtestrategie == 's3a', Ki_ventilatie + eenmalig/Ki_LTAS + eenmalig/Ki_KK / 2d + eenmalig/Ki15_LO - eenmalig/Oi15_LO),
+																case(warmtestrategie == 's3d', Ki_ventilatie + eenmalig/Ki_LTAS + eenmalig/Ki_KK / 2d + 3000d / 111.8d * 106.9d), //3000 is Ki_booster, omgerekend van euro2023 naar euro2020, en check of daar subsidie voor is
 																case(warmtestrategie == 's3g', eenmalig/Ki_KK / 2d + eenmalig/Ki15_LO - eenmalig/Oi15_LO),
-																eenmalig/Ki15_LO + eenmalig/Ki_VT + eenmalig/Ki30_LO + eenmalig/Ki_LTAS + eenmalig/Ki_KK / 2d - eenmalig/Oi15_LO - eenmalig/Oi_VT - eenmalig/Oi30_LO); //check of LTAS hier ook bijhoort // voor koken alleen het deel voor woningaanpassing
-				attribute<Eur> Ki_isolatie 		(BO) := eenmalig/Ki_gv - eenmalig/Oi_gv + (strcount(warmtestrategie, 's2') + strcount(warmtestrategie, 's3') > 0 ? warmtenetberekening/BAK - warmtenetberekening/subsidie_BAK[Eigendom_rel]: 0d) ;
+																eenmalig/Ki15_LO + Ki_ventilatie + eenmalig/Ki30_LO + eenmalig/Ki_LTAS + eenmalig/Ki_KK / 2d - eenmalig/Oi15_LO - eenmalig/Oi30_LO); //check of LTAS hier ook bijhoort // voor koken alleen het deel voor woningaanpassing
+				attribute<Eur> Ki_isolatie			(BO) := lowercase(vervangingsmoment) == 'zst' ? eenmalig/Ki_gv -  eenmalig/Oi_gv : eenmalig/Ki_gv_nat - eenmalig/Oi_gv_nat;												
+				attribute<Eur> Ki_looptijd_iso		(BO) := Ki_isolatie + (strcount(lowercase(warmtestrategie), 's2') + strcount(lowercase(warmtestrategie), 's3') > 0 ? warmtenetberekening/BAK - warmtenetberekening/subsidie_BAK[Eigendom_rel]: 0d) ;
 					
 					
 				container Financieringslasten  		// Hypothecaire lening voor eigenaar-bewoner, vastgoedhypotheek voor particuliere verhuurder, WSW voor sociale verhuurder
 				{
 					attribute<percent_yr> rentepercentage 	(BO) := ='merge(uint8(BO/Eigendom_rel), percent_yr,'+ AsItemList('Invoer/Kengetallen/Eindgebruikerskosten/rentepercentages/PerJaar/R_' + Classifications/Eigendom/c + '[Classifications/Zichtjaar/Rekenjaar_rel[Zichtjaar_rel]]')+')';
 					attribute<float64> maandrente			(BO) := rentepercentage  / 12[percent_yr] / 100d;
-					attribute<Eur_yr> Kj_installatie 		(BO) := 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-180d)) ) * Ki_installatie;
-					attribute<Eur_yr> Kj_isolatie			(BO) := Eigendom_rel == 0 ? 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-360.0d)) ) * Ki_isolatie : 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-300.0d)) ) * Ki_isolatie;					
+					attribute<Eur_yr> Kj_installatie 		(BO) := 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-180d)) ) * Ki_looptijd_inst;
+					attribute<Eur_yr> Kj_isolatie			(BO) := Eigendom_rel == 0 ? 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-360.0d)) ) * Ki_looptijd_iso : 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-300.0d)) ) * Ki_looptijd_iso;					
 					attribute<Eur_yr> Kj_totaal				(BO) := Kj_installatie + Kj_isolatie;
 					
 					container Warmtefondslening			// Warmtefondslening voor eigenaar-bewoner, null voor huurwoningen
 					{
 						attribute<percent_yr> rentepercentage	(BO) := Eigendom_rel == 0 ? const(Invoer/Kengetallen/Eindgebruikerskosten/rentepercentages/PerJaar/R_wf[Classifications/Zichtjaar/Rekenjaar_rel[Zichtjaar_rel]],BO) : float64(0/0);
 						attribute<float64> maandrente			(BO) := rentepercentage  / 12[percent_yr] / 100d;
-						attribute<Eur_yr> Kj_installatie		(BO) := 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-180.0d)) ) * Ki_installatie;
-						attribute<Eur_yr> Kj_isolatie			(BO) := 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-240.0d)) ) * Ki_isolatie; 
+						attribute<Eur_yr> Kj_installatie		(BO) := 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-180.0d)) ) * Ki_looptijd_inst;
+						attribute<Eur_yr> Kj_isolatie			(BO) := 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-240.0d)) ) * Ki_looptijd_iso; 
 						attribute<Eur_yr> Kj_totaal				(BO) := Kj_installatie + Kj_isolatie;	
 					}
 					
 					container nulprocentlening 
 					{
-						attribute<Eur_yr> Kj_installatie		(BO) := 12.0[_yr] * Ki_installatie / 180d;
-						attribute<Eur_yr> Kj_isolatie			(BO) := 12.0[_yr] * Ki_isolatie / 240.0d ; 
+						attribute<Eur_yr> Kj_installatie		(BO) := 12.0[_yr] * Ki_looptijd_inst / 180d;
+						attribute<Eur_yr> Kj_isolatie			(BO) := 12.0[_yr] * Ki_looptijd_iso / 240.0d ; 
 						attribute<Eur_yr> Kj_totaal				(BO) := Kj_installatie + Kj_isolatie;
 					}
 				}
@@ -133,8 +142,8 @@ template StateNaAllocatieComponent
 				{
 					attribute<percent_yr> rentepercentage	(BO) := Eigendom_rel == 1 ? const(Invoer/Kengetallen/Eindgebruikerskosten/rentepercentages/PerJaar/R_hc[Classifications/Zichtjaar/Rekenjaar_rel[Zichtjaar_rel]],BO) : float64(0/0);
 					attribute<float64> maandrente			(BO) := rentepercentage  / 12[percent_yr] / 100d;
-					attribute<Eur_yr> Kj_installatie 		(BO) := 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-180.0d)) ) * Ki_installatie;
-					attribute<Eur_yr> Kj_isolatie			(BO) := 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-300.0d)) ) * Ki_isolatie;
+					attribute<Eur_yr> Kj_installatie 		(BO) := 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-180.0d)) ) * Ki_looptijd_inst;
+					attribute<Eur_yr> Kj_isolatie			(BO) := 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-300.0d)) ) * Ki_looptijd_iso;
 					attribute<Eur_yr> Huurverhoging         (BO) := Kj_installatie + Kj_isolatie;
 				}
 				
@@ -285,14 +294,14 @@ template StateNaAllocatieComponent
 						attribute<ratio> BelastingSchijf	(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BelastbaarInkomen[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_laag[ratio]
 						: Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BelastbaarInkomen[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_hoog 
 						: (0/0)[ratio];
-						attribute<Eur> WOZwaarde									(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/WOZwaarde[Eur] + aandeel_investering_WOZ * (Ki_isolatie + Ki_installatie) / 106.9d * 113.5d ; //investeringen omgerekend naar euro2024
+						attribute<Eur> WOZwaarde									(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/WOZwaarde[Eur] + aandeel_investering_WOZ * (Ki_looptijd_iso + Ki_looptijd_inst) / 106.9d * 113.5d ; //investeringen omgerekend naar euro2024
 						attribute<Eur_yr> eigenwoningforfait						(BO) :=  WOZwaarde < WOZ_grens_eigenwoningforfait[Eur] ? WOZwaarde[Eur] * eigenwoningforfait_laag[_yr]
 						: WOZwaarde[Eur] >= WOZ_grens_eigenwoningforfait[Eur] ? eigenwoningforfait_hoog_vast[Eur_yr] + (WOZwaarde[Eur] - WOZ_grens_eigenwoningforfait[Eur]) * eigenwoningforfait_hoog_variabel[_yr]
 						: (0/0)[Eur_yr];					
 							
 						container Hypothecaire_lening
 						{
-							attribute<Eur_yr> Bruto_rentelasten 				(BO) := Huidig/Rentelasten_per_jaar[Eur_yr] + (financieringslasten/rentepercentage[percent_yr]/100[percent])[_yr] * (Ki_isolatie + Ki_installatie) / 106.9d * 113.5d; //investeringen omgerekend naar euro2024
+							attribute<Eur_yr> Bruto_rentelasten 				(BO) := Huidig/Rentelasten_per_jaar[Eur_yr] + (financieringslasten/rentepercentage[percent_yr]/100[percent])[_yr] * (Ki_looptijd_iso + Ki_looptijd_inst) / 106.9d * 113.5d; //investeringen omgerekend naar euro2024
 							attribute<Eur_yr> Bruto_inkomen_na_rentelasten 		(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BelastbaarInkomen[Eur_yr] - Bruto_rentelasten[Eur_yr] + Eigenwoningforfait[Eur_yr];
 							
 							attribute<ratio> BelastingSchijf_na_rentelasten		(BO) := Bruto_inkomen_na_rentelasten[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_laag[ratio]
@@ -314,7 +323,7 @@ template StateNaAllocatieComponent
 						}
 						container Warmtefondslening
 						{
-							attribute<Eur_yr> Bruto_rentelasten 				(BO) := Huidig/Rentelasten_per_jaar[Eur_yr] + (financieringslasten/Warmtefondslening/rentepercentage[percent_yr]/100[percent])[_yr] * (Ki_isolatie + Ki_installatie) / 106.9d * 113.5d ; //investeringen omgerekend naar euro2024
+							attribute<Eur_yr> Bruto_rentelasten 				(BO) := Huidig/Rentelasten_per_jaar[Eur_yr] + (financieringslasten/Warmtefondslening/rentepercentage[percent_yr]/100[percent])[_yr] * (Ki_looptijd_iso + Ki_looptijd_inst) / 106.9d * 113.5d ; //investeringen omgerekend naar euro2024
 							attribute<Eur_yr> Bruto_inkomen_na_rentelasten 		(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BelastbaarInkomen[Eur_yr] - Bruto_rentelasten[Eur_yr] + Eigenwoningforfait[Eur_yr];
 							
 							attribute<ratio> BelastingSchijf_na_rentelasten		(BO) := Bruto_inkomen_na_rentelasten[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_laag[ratio]
@@ -401,8 +410,8 @@ template StateNaAllocatieComponent
 						attribute<eur> ki_ventilatie_zst_eur 	 := vervangingsmoment == 'Zst' ? eenmalig/Ki_VT[org_rel] : (0/0)[eur];
 						attribute<eur> ki_koken_eur 			 := (eenmalig/Ki_KK[org_rel])/2d;
 						attribute<eur> ki_inductie_eur 			 := (eenmalig/Ki_KK[org_rel])/2d;
-						attribute<eur> ki_isolatie_nat_eur 	 	:= vervangingsmoment == 'Nat' ? eenmalig/Ki_gv[org_rel] : (0/0)[eur];
-						attribute<eur> ki_ventilatie_nat_eur 	:= vervangingsmoment == 'Nat' ? eenmalig/Ki_VT[org_rel] : (0/0)[eur];
+						attribute<eur> ki_isolatie_nat_eur 	 	:= vervangingsmoment == 'Nat' ? eenmalig/Ki_gv_nat[org_rel] : (0/0)[eur];
+						attribute<eur> ki_ventilatie_nat_eur 	:= vervangingsmoment == 'Nat' ? eenmalig/Ki_VT_nat[org_rel] : (0/0)[eur];
 						attribute<eur> subsidies_eur 	 		:= -1d * (eenmalig/Oi_gv[org_rel] +  eenmalig/Oi15_LO[org_rel] + float64(warmte_gj_jr > 0[GJ_yr]) * warmtenetberekening/subsidie_BAK[BO/Eigendom_rel][org_rel]);
 						attribute<eur> ki_tot_zst_eur 	 		:= subsidies_eur + ki_isolatie_zst_eur + Ki_warmtepomp_HR_eur + ki_BAK_eur + Ki_LTAS_eur + ki_ventilatie_zst_eur + ki_koken_eur + ki_inductie_eur;
 						attribute<eur> ki_tot_nat_eur 	 		:= subsidies_eur + ki_isolatie_nat_eur + Ki_warmtepomp_HR_eur + ki_BAK_eur + Ki_LTAS_eur + ki_ventilatie_nat_eur + ki_koken_eur + ki_inductie_eur;

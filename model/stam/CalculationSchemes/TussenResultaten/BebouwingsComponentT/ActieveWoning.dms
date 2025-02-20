@@ -95,9 +95,10 @@ unit<uint32> ActieveWoning := select_with_org_rel(BO/Activatie/ProductActief || 
 				attribute<GJ_yr> Winst_RV      (xGebouwOptie) := union_data( xGebouwOptie , ProductActieveWoning/xIsolatieAmbitie/xGebouwOptie/functioneel/Winst_RV, BouwdeelActieveWoning/ProductInactieveAmbitie/functioneel/Winst_RV);
 				attribute<ratio> Correction_RV (xGebouwOptie) := union_data( xGebouwOptie , ProductActieveWoning/xIsolatieAmbitie/xGebouwOptie/functioneel/Correction_RV, BouwdeelActieveWoning/ProductInactieveAmbitie/functioneel/Correction_RV);
 			}
-			attribute<EUR>    Ki_gv  := =replace(constr_expr2, '@A', 'Ki_gv');
-			attribute<EUR_yr> Kji_gv := =replace(constr_expr2, '@A', 'Kji_gv');
-			attribute<EUR_yr> Kmi_gv := =replace(constr_expr2, '@A', 'Kmi_gv');
+			attribute<EUR>    Ki_gv  	:= =replace(constr_expr2, '@A', 'Ki_gv');
+			attribute<EUR>    Ki_gv_nat	:= =replace(constr_expr2, '@A', 'Ki_gv_nat');			
+			attribute<EUR_yr> Kji_gv 	:= =replace(constr_expr2, '@A', 'Kji_gv');
+			attribute<EUR_yr> Kmi_gv 	:= =replace(constr_expr2, '@A', 'Kmi_gv');
 	}
 
 	container GeschikteOptieBerekening := select_with_org_relGebouwOptieT(xGebouwOptie, BO);
@@ -292,7 +293,12 @@ unit<uint32> ActieveWoning := select_with_org_rel(BO/Activatie/ProductActief || 
 				BO,
 				Eur)
 			{
-				attribute<eur> Ki_gv (BO) := makedefined(GeschikteOptie/eenmalig/Ki_gv[Choice_per_BO/GeschikteOptie_rel], 0.0[eur]);
+				attribute<eur> Ki_gv 	 (BO) := makedefined(GeschikteOptie/eenmalig/Ki_gv[Choice_per_BO/GeschikteOptie_rel], 0.0[eur]);
+				attribute<eur> Ki_gv_nat (BO) := makedefined(GeschikteOptie/eenmalig/Ki_gv_nat[Choice_per_BO/GeschikteOptie_rel], 0.0[eur]);
+				attribute<eur> Oi_gv_nat (BO) := makedefined(GeschikteOptie/eenmalig/Oi_gv_nat[Choice_per_BO/GeschikteOptie_rel], 0.0[eur]);
+				attribute<eur> Ki_vt_nat (BO) := makedefined(GeschikteOptie/eenmalig/Ki_vt_nat[Choice_per_BO/GeschikteOptie_rel], 0.0[eur]);
+				attribute<eur> Oi_vt_nat (BO) := makedefined(GeschikteOptie/eenmalig/Oi_vt_nat[Choice_per_BO/GeschikteOptie_rel], 0.0[eur]);
+
 			}
 			container jaarlijks := for_each_nedv(
 				Classifications/GebouwOptie_jaarlijks/name,
