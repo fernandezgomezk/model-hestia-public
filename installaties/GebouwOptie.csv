@@ -21,8 +21,8 @@ Olie_mKD	1	0	ketel	Olie_mKD	N	Olieketel	Olieketel	Olieketel	Olieketel	AirCoMobie
 Bioketel_zKD	1	0	ketel	Bioketel_zKD	N	Bioketel	Bioketel	eBoiler	eBoiler	geen	geen
 Bioketel_vKD	1	0	ketel	Bioketel_vKD	N	Bioketel	Bioketel	eBoiler	eBoiler	AirCoVast	AirCoVast
 Bioketel_mKD	1	0	ketel	Bioketel_mKD	N	Bioketel	Bioketel	eBoiler	eBoiler	AirCoMobiel	AirCoMobiel
-LweWP_zKD	0	0	electric	LweWP_zKD	N	eWP_lw	eWP_lw	eWP_lw	eWP_lw	geen	geen
-LweWP_wKD	0	0	electric	LweWP_wKD	N	eWP_lw	eWP_lw	eWP_lw	eWP_lw	eWP_lw	eWP_lw
+LweWP_zKD	0	0	electric	LweWP_zKD	B	eWP_lw	eWP_lw	eWP_lw	eWP_lw	geen	geen
+LweWP_wKD	0	0	electric	LweWP_wKD	B	eWP_lw	eWP_lw	eWP_lw	eWP_lw	eWP_lw	eWP_lw
 BweWP_zKD	0	0	electric	BweWP_zKD	B	eWP_bw	eWP_bw	eWP_bw	eWP_bw	geen	geen
 BweWP_wKD	0	0	electric	BweWP_wKD	B	eWP_bw	eWP_bw	eWP_bw	eWP_bw	eWP_bw	eWP_bw
 LleWP_zKD	0	0	electric	LleWP_zKD	B	eWP_ll	eWP_ll	eWP_ll	eWP_ll	geen	geen
