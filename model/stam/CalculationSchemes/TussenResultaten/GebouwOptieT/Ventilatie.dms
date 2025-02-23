@@ -150,11 +150,11 @@ container ventilatie
 		attribute<Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes> Installatietype_def (GeschiktObject) := =not(Afweging_VT) ? 'Installatietype_org' : 'VentilatieActief ? makedefined(Normen/Installatietype_norm, Choice/Installatietype_def) : Installatietype_org';
 		
 		//====== waarden gekozen ventilatiesysteem
-		attribute<eur>    Ki_vent (GeschiktObject) := =not(Afweging_VT) ? 'const(0.0[eur],GeschiktObject)' : 'not(VentilatieActief) ? 0.0[eur] : Choice/Ki_VT';
-		attribute<eur_yr> Kji_VT  (GeschiktObject) := =not(Afweging_VT) ? 'const(0.0[eur_yr],GeschiktObject)' : 'not(VentilatieActief) ? 0.0[eur_yr] : Choice/Kji_VT';
-		attribute<eur_yr> Kmi_VT  (GeschiktObject) := =not(Afweging_VT) ? 'const(0.0[eur_yr],GeschiktObject)' : 'not(VentilatieActief) ? 0.0[eur_yr] : Choice/Kmi_VT';
-		attribute<GJ_yr>  V_RV    (GeschiktObject) := =not(Afweging_VT) ? 'BO/Functioneel/Vrv_VT[GeschiktObject/BO_rel]' : 'not(VentilatieActief) ? BO/Functioneel/Vrv_VT[GeschiktObject/BO_rel] : Choice/V_RV';
-		attribute<GJ_yr>  V_E     (GeschiktObject) := =not(Afweging_VT) ? 'BO/MetervraagBerekening/eEffect/Ventilatie/Vj_elek[GeschiktObject/BO_rel]' : 'not(VentilatieActief) ? BO/MetervraagBerekening/eEffect/Ventilatie/Vj_elek[GeschiktObject/BO_rel] : Choice/V_E';
+		attribute<eur>    Ki_vent (GeschiktObject) := =not(Afweging_VT) ? 'const(0.0[eur],GeschiktObject)' : 'not(VentilatieActief) ? 0.0[eur] : merge(uint8(rlookup(Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes/name[Installatietype_def],Ventilatieopties/name)), Eur   ,'+AsItemList('PerOptie/'+Ventilatieopties/Name+'/Ki_VT')+')';
+		attribute<eur_yr> Kji_VT  (GeschiktObject) := =not(Afweging_VT) ? 'const(0.0[eur_yr],GeschiktObject)' : 'not(VentilatieActief) ? 0.0[eur_yr] : merge(uint8(rlookup(Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes/name[Installatietype_def],Ventilatieopties/name)), Eur_yr   ,'+AsItemList('PerOptie/'+Ventilatieopties/Name+'/Kji_VT')+')';
+		attribute<eur_yr> Kmi_VT  (GeschiktObject) := =not(Afweging_VT) ? 'const(0.0[eur_yr],GeschiktObject)' : 'not(VentilatieActief) ? 0.0[eur_yr] : merge(uint8(rlookup(Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes/name[Installatietype_def],Ventilatieopties/name)), Eur_yr   ,'+AsItemList('PerOptie/'+Ventilatieopties/Name+'/Kmi_VT')+')';
+		attribute<GJ_yr>  V_RV    (GeschiktObject) := =not(Afweging_VT) ? 'BO/Functioneel/Vrv_VT[GeschiktObject/BO_rel]' : 'not(VentilatieActief) ? BO/Functioneel/Vrv_VT[GeschiktObject/BO_rel] : merge(uint8(rlookup(Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes/name[Installatietype_def],Ventilatieopties/name)), GJ_yr  ,'+AsItemList('PerOptie/'+Ventilatieopties/Name+'/V_RV')+')';
+		attribute<GJ_yr>  V_E     (GeschiktObject) := =not(Afweging_VT) ? 'BO/MetervraagBerekening/eEffect/Ventilatie/Vj_elek[GeschiktObject/BO_rel]' : 'not(VentilatieActief) ? BO/MetervraagBerekening/eEffect/Ventilatie/Vj_elek[GeschiktObject/BO_rel] : merge(uint8(rlookup(Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes/name[Installatietype_def],Ventilatieopties/name)), GJ_yr   ,'+AsItemList('PerOptie/'+Ventilatieopties/Name+'/V_E')+')';
 
 	}
 	//====== Gekozen ventilatiesysteem
