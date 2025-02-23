@@ -39,8 +39,18 @@ container Activatie
 			{
 				attribute<bool> Voldaan (BO) := ='merge(uint8(Energielabel_rel), bool, '+AsItemList(Classifications/Schillabel/name)+')';
 			}
+			
+						
+			container VentilatieVoorwaarde := for_each_nedv(
+					 /Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes/name
+				, 'ZBA/Voorwaarde/HuidigVT/'+Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes/name+'[ZBA_rel]'
+				, void
+				, bool)
+			{	
+				attribute<bool> Voldaan (BO) := ='merge(uint8(BO/Installatieperproduct/VT), bool, '+AsItemList(/Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes/name)+')';
+			}
 
-			attribute<bool> BoSelectie(BO) := Naleving && LabelVoorwaarde/Voldaan && InDoelgroep && BouwjaarVoldaan;
+			attribute<bool> BoSelectie(BO) := Naleving && LabelVoorwaarde/Voldaan && InDoelgroep && BouwjaarVoldaan && VentilatieVoorwaarde/Voldaan;
 			container Grondslag := for_each_nedv(
 				  classifications/bouwdeel/name
 				, 'ZBA/Grondslag/'+classifications/bouwdeel/name+'[ZBA_rel] && BoSelectie' 
