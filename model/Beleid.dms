@@ -136,7 +136,18 @@ container Beleid
 						strcount(LowerCase(voorwaarde1), 'bouwjaar') > 0 ? substr(replace(trim(replace(LowerCase(voorwaarde1), 'bouwjaar: ', '')), ' ', ''),  strpos(replace(trim(replace(LowerCase(voorwaarde1), 'bouwjaar: ', '')), ' ', ''), '-')+1)[yr_uint16] : (0/0)[yr_uint16],
 						strcount(LowerCase(voorwaarde2), 'bouwjaar') > 0 ? substr(replace(trim(replace(LowerCase(voorwaarde2), 'bouwjaar: ', '')), ' ', ''),  strpos(replace(trim(replace(LowerCase(voorwaarde2), 'bouwjaar: ', '')), ' ', ''), '-')+1)[yr_uint16] : (0/0)[yr_uint16]
 
-					); 				
+					); 	
+
+				attribute<bool>  VentilatieVoorwaarde (Activatie) := strcount(LowerCase(voorwaarde1), 'vt_') + strcount(LowerCase(voorwaarde2), 'vt_') > 0;
+
+				container HuidigVT := for_each_nedv(
+					  lowercase(/Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes/name)
+					, 'not(VentilatieVoorwaarde) ? true :
+					  strcount(lowercase(voorwaarde1),'+ quote('vt_') +') > 0 ? strcount(trim(replace(lowercase(voorwaarde1),'+ quote('vt_') +','+ quote('')+')), '+quote(lowercase(/Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes/name))+') > 0 
+					: strcount(trim(replace(lowercase(voorwaarde2), '+quote('vt_')+', '+quote('')+')), '+quote(lowercase(/Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes/name))+') > 0'
+					, Activatie
+					, bool
+					);					
 		}
 	}
 
@@ -477,6 +488,15 @@ container Beleid
 				container HuidigLabel := for_each_nedv(
 					  Classifications/Schillabel/name
 					, '/Invoer/Beleid/Activatie/ParseVoorwaarde/HuidigLabel/'+Classifications/Schillabel/name+'[org_rel]'
+					, Activatie
+					, bool
+					);
+					
+				attribute<bool>  VentilatieVoorwaarde (Activatie) := /Invoer/Beleid/Activatie/ParseVoorwaarde/VentilatieVoorwaarde[org_rel];
+
+				container HuidigVT := for_each_nedv(
+					  lowercase(/Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes/name)
+					, '/Invoer/Beleid/Activatie/ParseVoorwaarde/HuidigVT/'+/Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes/name+'[org_rel]'
 					, Activatie
 					, bool
 					);
