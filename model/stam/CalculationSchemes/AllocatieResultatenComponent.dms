@@ -63,6 +63,7 @@ template AllocatieResultatenComponent
 													  BO/Activatie/Bouwdelen/RenovatieMoment == FALSE &&
 													  BO/nrAansluitingen == 1[nrAsl])
 			{
+				attribute<string> Scen									:= const(scenario,.);
 				attribute<String> identificatie							:= BO/code[org_rel];
 				attribute<Eur_yr> Kj_gas       							:= BO/jaarlijks/Kj_gas[org_rel];
 				attribute<Eur_yr> Kj_e       							:= BO/jaarlijks/Kj_e[org_rel];
@@ -70,6 +71,10 @@ template AllocatieResultatenComponent
 				attribute<GJ_yr> Aardgas_voor    						:= BebouwingsComponenten/Woning/BO/MetervraagBerekening/result/Gas[org_rel];
 				attribute<GJ_yr> Elektriciteit_na       				:= Woning/Metervraag/E[org_rel];
 				attribute<GJ_yr> Elektriciteit_voor       				:= BebouwingsComponenten/Woning/BO/MetervraagBerekening/result/E[org_rel];
+				attribute<GJ_yr> Bruto_elektriciteit_na       			:= (Woning/Metervraag/E + BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/Metervraag/Oj_e_ZonPV)[org_rel];
+				attribute<GJ_yr> Bruto_elektriciteit_voor       		:= (BebouwingsComponenten/Woning/BO/MetervraagBerekening/result/E + BebouwingsComponenten/Woning/BO/MetervraagBerekening/eEffect/ZonPV/Oj_elek)[org_rel];
+				attribute<GJ_yr> Opbrengst_zonnepanelen_na				:= BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/Metervraag/Oj_e_ZonPV[org_rel];
+				attribute<GJ_yr> Opbrengst_zonnepanelen_voor			:= BebouwingsComponenten/Woning/BO/MetervraagBerekening/eEffect/ZonPV/Oj_elek[org_rel];
 				attribute<GJ_yr> Warmte_na								:= Woning/Metervraag/Warmte_70[org_rel];
 				attribute<GJ_yr> Warmte_voor							:= BebouwingsComponenten/Woning/BO/MetervraagBerekening/metervraag_per_input/Warmte_70[org_rel];
 				attribute<string> heeft_gas       						:= Woning/Metervraag/Gas[org_rel] > 0[GJ_yr] || Woning/Metervraag/H2[org_rel] > 0[GJ_yr] ? 'ja' : 'nee';
