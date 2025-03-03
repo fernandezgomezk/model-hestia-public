@@ -58,7 +58,7 @@ template StateNaAllocatieComponent
 			container Eindgebruikerskosten
 			{	
 				attribute<Classifications/Eigendom>	Eigendom_rel	(BO) := BO/Eigendom_rel;				
-				attribute<Eur> Ki_installatie 	(BO) := eenmalig/Ki15_LO + eenmalig/Ki_VT + eenmalig/Ki20_LO + eenmalig/Ki30_LO + eenmalig/Ki_LTAS - eenmalig/Oi15_LO - eenmalig/Oi_VT - eenmalig/Oi20_LO - eenmalig/Oi30_LO; //check of LTAS hier ook bijhoort
+				attribute<Eur> Ki_installatie 	(BO) := eenmalig/Ki15_LO + eenmalig/Ki_VT + eenmalig/Ki20_LO + eenmalig/Ki30_LO + eenmalig/Ki_LTAS + eenmalig/Ki_KK / 2d - eenmalig/Oi15_LO - eenmalig/Oi_VT - eenmalig/Oi20_LO - eenmalig/Oi30_LO; //check of LTAS hier ook bijhoort // voor koken: alleen het deel voor de woningaanpassing
 				attribute<Eur> Ki_isolatie 		(BO) := eenmalig/Ki_gv - eenmalig/Oi_gv;
 					
 				container Financieringslasten  		// Hypothecaire lening voor eigenaar-bewoner, vastgoedhypotheek voor particuliere verhuurder, WSW voor sociale verhuurder
@@ -345,7 +345,6 @@ template StateNaAllocatieComponent
 						
 						//jaarlijkse onderhoudskosten installaties en kosten koken
 						attribute<eur_yr> Kj_oh_installatie_eur_jr		 := Kj_oh_LO[org_rel];
-						attribute<eur_yr> Kj_koken_eur_jr				 := Ki_koken_eur / 15[yr];
 						attribute<eur_yr> Kj_inductie_eur_jr			 := Ki_inductie_eur / 15[yr];
 
 						
@@ -398,7 +397,8 @@ template StateNaAllocatieComponent
 						attribute<eur> Ki_LTAS_eur 				 := const(0[eur], BO)[org_rel]; // referentiescenario: geen LT afgiftesysteem
 						attribute<eur> Ki_ventilatie_zst_eur 	 := const(0[eur], BO)[org_rel]; // referentiescenario: geen nieuw ventilatiesysteem
 						attribute<eur> Ki_ventilatie_nat_eur 	 := const(0[eur], BO)[org_rel];
-						attribute<eur> Ki_KK_eur 				 := const(0[eur], BO)[org_rel]; // referentiescenario: geen nieuwe kookinstallatie
+						attribute<eur> Ki_koken_eur 			 := const(0[eur], BO)[org_rel]; //referentiescenario: geen nieuwe kookinstallatie
+						attribute<eur> Ki_inductie_eur 			 := const(0[eur], BO)[org_rel];
 						attribute<eur> subsidie_isolatie_eur 	 := const(0[eur], BO)[org_rel];
 						attribute<eur> subsidie_warmtepomp_eur 	 := const(0[eur], BO)[org_rel];
 						
@@ -520,8 +520,6 @@ template StateNaAllocatieComponent
 						//jaarlijkse onderhoudskosten installaties en kosten koken
 						attribute<eur_yr> Kj_inductie_eur_jr			 := Ki_inductie_eur / 15[yr];
 						attribute<eur_yr> Kj_oh_installatie_eur_jr		 := Kj_oh_LO[org_rel];
-						//attribute<eur_yr> Kj_koken_eur_jr				 := Ki_koken_eur / 15[yr]; --> wordt gefinancierd met lening? Check met Casper
-
 						
 						//Huurverhoging, huurtoeslag, hypotheekrenteaftrek
 						attribute<eur_yr> Extra_huur_hu_nat_eur_jr					 := eigendomstype == 'PartHuur' || eigendomstype == 'WoonCorp' ? Huurverhoging_huurcommissiemethode/huurverhoging[org_rel] : (0/0)[eur_yr];
