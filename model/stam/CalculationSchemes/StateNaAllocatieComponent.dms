@@ -457,9 +457,9 @@ template StateNaAllocatieComponent
 
 
 					}
-					parameter<string> OutputFolder := '%localDataProjDir%/Results';
+					parameter<string> OutputFolder := '%localDataProjDir%/Results/Eindgebruikerskosten';
 					unit<uint32> variable := SubItem_PropValues(table,'name');
-					container export_csv := Model/CalculationSchemes/Rapportage/WriteTable32ToCSV(table, AsList(variable/name, ';'), OutputFolder+'/Eindgebruikerskosten/dummy_export.csv'); 
+					container export_csv := Model/CalculationSchemes/Rapportage/WriteTable32ToCSV(table, AsList(variable/name, ';'), OutputFolder+'/'+warmtestrategie+'_export.csv');
 				}
 				
 				container export_ref
