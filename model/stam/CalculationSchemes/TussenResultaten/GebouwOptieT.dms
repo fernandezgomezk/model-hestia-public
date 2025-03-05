@@ -49,8 +49,8 @@ template select_with_org_relGebouwOptieT
 		
 		container AansluitCapaciteit
 		{
-			attribute<kW> RV (GeschiktObject) := collect_by_cond(GeschiktObject, ActiefObject/AansluitCapaciteit/RV);
-			attribute<kW> TW (GeschiktObject) := collect_by_cond(GeschiktObject, ActiefObject/AansluitCapaciteit/TW);
+			attribute<kW> RV (GeschiktObject) := lowercase(warmtestrategie) == 's3a' || lowercase(warmtestrategie) == 's3g' ? collect_by_cond(GeschiktObject, ActiefObject/AansluitCapaciteit/RV) * StateNaAllocatie/bebouwingImpl/Woning/BO/Jaarlijks/Eindgebruikerskosten/warmtenetberekening/AEO_ind_RV[GeschiktObject/schillabel_rel] : collect_by_cond(GeschiktObject, ActiefObject/AansluitCapaciteit/RV);
+			attribute<kW> TW (GeschiktObject) := lowercase(warmtestrategie) == 's3a' || lowercase(warmtestrategie) == 's3g' ? collect_by_cond(GeschiktObject, ActiefObject/AansluitCapaciteit/TW) * StateNaAllocatie/bebouwingImpl/Woning/BO/Jaarlijks/Eindgebruikerskosten/warmtenetberekening/AEO_ind_TW_30 : collect_by_cond(GeschiktObject, ActiefObject/AansluitCapaciteit/TW);
 			attribute<kW> KD (GeschiktObject) := collect_by_cond(GeschiktObject, ActiefObject/AansluitCapaciteit/KD);
 		}
 
