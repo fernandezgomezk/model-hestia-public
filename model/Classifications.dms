@@ -1105,6 +1105,7 @@ container Classifications: Using = "Units", KeepData = "True", IsHidden = "True"
 
 		attribute<GebouwOptieCategorie> Categorie_rel      := rlookup(categorie, GebouwOptieCategorie/name);
 		attribute<Schillabel>           Min_schillabel_rel := rlookup(min_schillabel, Schillabel/name);
+		attribute<Schillabel>           Min_schillabel_specifiek_rel := rlookup(min_schillabel_specifiek, Schillabel/name);
 		
 ///* REMOVE: gekopieerd of verplaatst naar GebouwOptieT, nu per GeschiktObject
 		unit<uint32> xProduct := combine(Product, GebouwOptie)
