@@ -15,7 +15,9 @@ container HestiaRun
 	parameter<uint16> eerste_jaar             := 2020[uint16], Descr = "Eerste zichtjaar";
 	parameter<uint8>  aantal_jaar             := 11[uint8]   , Descr = "Aantal zichtjaren";
 	parameter<string> Studiegebied            := Invoer/StudieGebied;
-	parameter<string> warmtestrategie 		  := 'S2b';
+	parameter<string> warmtestrategie 		  := 's3a';
+	parameter<string> vervangingsmoment 	  := 'Zst'; //Zst of Nat
+	parameter<units/yr_uint16> peiljaar		  := 2024[units/yr_uint16]; //zichtjaar eindgebruikerskosten
 
 	//====== Opbouw lijst van zichtjaren en rekenstappen
 	unit<uint8> all_rekenstap: nrofrows = 51, IsHidden = "True";
