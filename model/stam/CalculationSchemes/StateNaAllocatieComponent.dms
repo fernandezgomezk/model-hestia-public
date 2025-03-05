@@ -88,11 +88,30 @@ template StateNaAllocatieComponent
 				
 				container Huurverhoging_huurcommissiemethode 
 				{
-					attribute<percent_yr> rentepercentage	(BO) := Eigendom_rel != 0 ? const(Invoer/Kengetallen/Eindgebruikerskosten/rentepercentages/PerJaar/R_hc[Classifications/Zichtjaar/Rekenjaar_rel[Zichtjaar_rel]],BO) : float64(0/0);
+					attribute<percent_yr> rentepercentage	(BO) := Eigendom_rel == 1 ? const(Invoer/Kengetallen/Eindgebruikerskosten/rentepercentages/PerJaar/R_hc[Classifications/Zichtjaar/Rekenjaar_rel[Zichtjaar_rel]],BO) : float64(0/0);
 					attribute<float64> maandrente			(BO) := rentepercentage  / 12[percent_yr] / 100d;
 					attribute<Eur_yr> Kj_installatie 		(BO) := 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-180.0d)) ) * Ki_installatie;
-					attribute<Eur_yr> Kj_isolatie			(BO) :=	Eigendom_rel == 1 ? 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-300.0d)) ) * Ki_isolatie : 0d;
+					attribute<Eur_yr> Kj_isolatie			(BO) := 12.0[_yr] * ( maandrente / (1.0-((1.0 + maandrente)^-300.0d)) ) * Ki_isolatie;
 					attribute<Eur_yr> Huurverhoging         (BO) := Kj_installatie + Kj_isolatie;
+				}
+				
+				container huurverhoging_menukaart
+				{
+					unit<uint8> warmteklasse :nrofrows = 14
+					{
+						attribute<kWh_yr> warmtebehoefte:	[0,  3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000, 13000, 14000, 15000];
+						attribute<eur_mo> verhoging_ewp_lw: [25, 29,   32,   35,   38,   41,   43,   46,   48,	  48,    48,    48,    48,    48   ]; //bij COP van 4
+						attribute<eur_mo> verhoging_ewp_bw: [26, 31,   34,   37,   41,   44,   47,   50,   52,	  52,    52,    52,    52,    52   ]; //bij COP van 5
+						attribute<eur_mo> verhoging_hwp:    [6,  6,    6,    6,    6,    11,   12,   14,   15,	  17,    18,    20,    21,    14   ]; //bij COP van 4	
+					}
+					attribute<kWh_yr> warmtevraag 		  (BO) := Eigendom_rel == 2 ? BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/Functioneel/warmteverlies_theoretisch/Theoretisch_RV[kWh_yr] : float64(0/0);
+					attribute<float64> warmtevraag_per_m2 (BO) := warmtevraag / BO/oppervlakte;
+
+					attribute<eur_mo> huurverhoging		(BO) :=	switch(
+																		case(BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/RVb == 5 && warmtevraag_per_m2 <= 75d, warmteklasse/verhoging_ewp_lw[classify(warmtevraag, warmteklasse/warmtebehoefte)]),
+																		case(BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/RVb == 6 && warmtevraag_per_m2 <= 75d, warmteklasse/verhoging_ewp_bw[classify(warmtevraag, warmteklasse/warmtebehoefte)]),
+																		case(BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/RVb == 18 && warmtevraag_per_m2 <= 150d, warmteklasse/verhoging_hwp[classify(warmtevraag, warmteklasse/warmtebehoefte)]),
+																		float64(0/0));
 				}
 				
 				container Huurpuntgrens
@@ -139,12 +158,12 @@ template StateNaAllocatieComponent
 					attribute<ratio>   ratio_kkg_aftopping		(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/ratio_kkg_aftopping);
 					attribute<ratio>   ratio_aftopping			(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/ratio_aftopping);
 					
-					attribute<eur_yr>  reken_inkomen 			(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BelastbaarInkomen[Eur_yr]; //weet niet zeker of dit het goede inkomen is
+					attribute<eur_yr>  reken_inkomen 			(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BelastbaarInkomen[Eur_yr]; //updaten met nieuwe CBS inkomens (primair + secundair inkomen)
 					
 					container Huidig
 					{
 						attribute<eur_mo>  rekenhuur				(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/KaleHuur[eur_mo];
-						attribute<eur_mo>  normhuur					(BO) := reken_inkomen < inkomensgrens ? minimum_normhuur : factor_a * (reken_inkomen / 1[eur_yr]) ^ 2d + factor_b * reken_inkomen * 1[yr] / 1[mo]; //updaten met nieuwe CBS inkomens (primair + secundair inkomen)
+						attribute<eur_mo>  normhuur					(BO) := reken_inkomen < inkomensgrens ? minimum_normhuur : factor_a * (reken_inkomen / 1[eur_yr]) ^ 2d + factor_b * reken_inkomen * 1[yr] / 1[mo]; 
 						attribute<eur_mo>  basishuur				(BO) := normhuur + verhoging_normhuur;
 						attribute<eur_mo>  onder_kkg				(BO) := basishuur < kwaliteitskortinggrens ? kwaliteitskortinggrens - basishuur : 0[eur_mo];
 						attribute<eur_mo>  tussen_kkg_aftopping		(BO) := switch(
@@ -161,7 +180,7 @@ template StateNaAllocatieComponent
 					container Na_investering
 					{				
 						attribute<eur_mo>  rekenhuur				(BO) := Huurverhoging_huurcommissiemethode/Huurverhoging * 1[yr] / 12[mo] + Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/KaleHuur[eur_mo];
-						attribute<eur_mo>  normhuur					(BO) := reken_inkomen < inkomensgrens ? minimum_normhuur : factor_a * (reken_inkomen / 1[eur_yr]) ^ 2d + factor_b * reken_inkomen * 1[yr] / 1[mo]; //updaten met nieuwe CBS inkomens (primair + secundair inkomen)
+						attribute<eur_mo>  normhuur					(BO) := reken_inkomen < inkomensgrens ? minimum_normhuur : factor_a * (reken_inkomen / 1[eur_yr]) ^ 2d + factor_b * reken_inkomen * 1[yr] / 1[mo]; 
 						attribute<eur_mo>  basishuur				(BO) := normhuur + verhoging_normhuur;
 						attribute<eur_mo>  onder_kkg				(BO) := basishuur < kwaliteitskortinggrens ? kwaliteitskortinggrens - basishuur : 0[eur_mo];
 						attribute<eur_mo>  tussen_kkg_aftopping		(BO) := switch(
@@ -286,6 +305,7 @@ template StateNaAllocatieComponent
 					attribute<Eur_yr> RenteBedrag  (BO) := KL_totaal - wv_Aflossing;
 					attribute<Eur_yr> Aftrek       (BO) := RenteBedrag * BelastingSchijf;
 					*/
+					
 				}
 				
 				container export_strategie
