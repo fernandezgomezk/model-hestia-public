@@ -57,9 +57,52 @@ template StateNaAllocatieComponent
 			
 			container Eindgebruikerskosten
 			{	
+				container warmtenetberekening
+				{
+					parameter<Eur_yr> vastrecht_warmte_HT := 582.82[Eur_yr]; //alles nog in eur_2024
+					parameter<Eur_yr> vastrecht_warmte_LT := 310.52[Eur_yr]; 
+					parameter<Eur_yr> huur_afleverset 	  := 145.38[Eur_yr] * 12d; 
+					parameter<eur_GJ> warmteprijs 		  := 46.69[Eur_GJ];  
+					parameter<Eur>    BAK 				  := 5250.24[Eur]; 
+					parameter<Eur_yr> meettarief	   	  := 31.68[Eur_yr];
+
+					attribute<Eur>    subsidie_BAK (Classifications/Eigendom)   : [3775, 1575.072, 1575.072]; //ISDE voor eigenaar-bewoner, SAH voor huur
+					attribute<float64> SPF_RV	  (Classifications/Schillabel) : [8.00, 4.20, 3.20, 3.20, 3.20, 1.00, 1.00, 1.00];
+					attribute<float64> AEO_ind_RV (Classifications/Schillabel) : [0.60, 0.90, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00];
+					parameter<float64> SPF_TW_30	  := 2.75d;		  
+					parameter<float64> AEO_ind_TW_30  := 0.6d;
+					parameter<float64> SPF_TW_50	  := 4.4d;		  
+					parameter<float64> AEO_ind_TW_50  := 0.3d;
+					// inpandige kosten nemen we niet mee
+					
+					attribute<GJ_yr> metervraag_RV_W  (BO) := switch(
+																	case(warmtestrategie == 's2a' || warmtestrategie == 's2b' || warmtestrategie == 's3d', BO_Base/Functioneel/RV),
+																	case(warmtestrategie == 's3a' || warmtestrategie == 's3g', BO_Base/Functioneel/RV * (1d - AEO_ind_RV[BO/schillabel_rel])),
+																	float64(0/0));
+					attribute<GJ_yr> metervraag_RV_E  (BO) := warmtestrategie == 's3a' || warmtestrategie == 's3g' ? BO_Base/Functioneel/RV / SPF_RV[BO/schillabel_rel] * AEO_ind_RV[BO/schillabel_rel] : float64(0/0);
+					attribute<GJ_yr> metervraag_TW_W  (BO) := switch(
+																	case(warmtestrategie == 's2a' || warmtestrategie == 's2b', BO_Base/Functioneel/TW),
+																	case(warmtestrategie == 's3a' || warmtestrategie == 's3g', BO_Base/Functioneel/TW * (1d - AEO_ind_TW_30)),
+																	case(warmtestrategie == 's3d', BO_Base/Functioneel/TW * (1d - AEO_ind_TW_50)),
+																	float64(0/0));	
+					attribute<GJ_yr> metervraag_TW_E  (BO) := switch(
+																	case(warmtestrategie == 's3a' || warmtestrategie == 's3g', BO_Base/Functioneel/TW / SPF_TW_30 * AEO_ind_TW_30),
+																	case(warmtestrategie == 's3d', BO_Base/Functioneel/TW / SPF_TW_50 * AEO_ind_TW_50),
+																	float64(0/0));
+																
+				}
+				
+				
 				attribute<Classifications/Eigendom>	Eigendom_rel	(BO) := BO/Eigendom_rel;				
-				attribute<Eur> Ki_installatie 	(BO) := eenmalig/Ki15_LO + eenmalig/Ki_VT + eenmalig/Ki20_LO + eenmalig/Ki30_LO + eenmalig/Ki_LTAS + eenmalig/Ki_KK / 2d - eenmalig/Oi15_LO - eenmalig/Oi_VT - eenmalig/Oi20_LO - eenmalig/Oi30_LO; //check of LTAS hier ook bijhoort // voor koken: alleen het deel voor de woningaanpassing
-				attribute<Eur> Ki_isolatie 		(BO) := eenmalig/Ki_gv - eenmalig/Oi_gv;
+				attribute<Eur> Ki_installatie 	(BO) := switch(
+																case(warmtestrategie == 's2a', eenmalig/Ki_VT - eenmalig/Oi_VT + eenmalig/Ki_KK / 2d),
+																case(warmtestrategie == 's2b', eenmalig/Ki_KK / 2d),
+																case(warmtestrategie == 's3a', eenmalig/Ki_VT - eenmalig/Oi_VT + eenmalig/Ki_LTAS + eenmalig/Ki_KK / 2d + eenmalig/Ki15_LO - eenmalig/Oi15_LO),
+																case(warmtestrategie == 's3d', eenmalig/Ki_VT - eenmalig/Oi_VT + eenmalig/Ki_LTAS + eenmalig/Ki_KK / 2d + 3000d), //3000 is Ki_booster, check of euro2020, en check of daar subsidie voor is
+																case(warmtestrategie == 's3g', eenmalig/Ki_KK / 2d + eenmalig/Ki15_LO - eenmalig/Oi15_LO),
+																eenmalig/Ki15_LO + eenmalig/Ki_VT + eenmalig/Ki30_LO + eenmalig/Ki_LTAS + eenmalig/Ki_KK / 2d - eenmalig/Oi15_LO - eenmalig/Oi_VT - eenmalig/Oi30_LO); //check of LTAS hier ook bijhoort // voor koken alleen het deel voor woningaanpassing
+				attribute<Eur> Ki_isolatie 		(BO) := eenmalig/Ki_gv - eenmalig/Oi_gv + (strcount(warmtestrategie, 's2') + strcount(warmtestrategie, 's3') > 0 ? warmtenetberekening/BAK - warmtenetberekening/subsidie_BAK[Eigendom_rel]: 0d) ;
+					
 					
 				container Financieringslasten  		// Hypothecaire lening voor eigenaar-bewoner, vastgoedhypotheek voor particuliere verhuurder, WSW voor sociale verhuurder
 				{
@@ -97,7 +140,7 @@ template StateNaAllocatieComponent
 				
 				container huurverhoging_menukaart
 				{
-					unit<uint8> warmteklasse :nrofrows = 14
+					unit<uint8> warmteklasse : nrofrows = 14
 					{
 						attribute<kWh_yr> warmtebehoefte:	[0,  3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000, 13000, 14000, 15000];
 						attribute<eur_mo> verhoging_ewp_lw: [25, 29,   32,   35,   38,   41,   43,   46,   48,	  48,    48,    48,    48,    48   ]; //bij COP van 4
