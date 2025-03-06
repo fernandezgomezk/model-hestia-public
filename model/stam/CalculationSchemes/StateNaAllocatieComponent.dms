@@ -356,7 +356,7 @@ template StateNaAllocatieComponent
 					unit<uint32> table := select_with_org_rel(BO/bouwjaar <= 2023[uint16])
 					{
 						attribute<string> vbo_BAG_ID		 := BO/code[org_rel];
-						attribute<string> strategie			 := const(warmtestrategie, BO)[org_rel];
+						attribute<string> strategie			 := const(lowercase(warmtestrategie), BO)[org_rel];
 						attribute<string> provincie			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/PROV_NAAM[buurt_rel][org_rel];
 						attribute<string> gemeente			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/GM_NAAM[buurt_rel][org_rel];
 						attribute<string> gemeentecode		 := Invoer/RuimtelijkeData/Studiegebied/Buurt/GM_code[buurt_rel][org_rel];
@@ -370,43 +370,40 @@ template StateNaAllocatieComponent
 																BO/bouwjaar[org_rel] >= 1945w && BO/bouwjaar[org_rel] < 1975w ? '1945 - 1974' :
 																BO/bouwjaar[org_rel] >= 1975w && BO/bouwjaar[org_rel] <= 1995w ? '1975 - 1995' :
 																BO/bouwjaar[org_rel] > 1995w ? '>1995' : '9999', IntegrityCheck = "this != '9999'";
-						//attribute<string> woningtype_i 		 := classifications/woningtype/label[BO/woningtype_rel][org_rel];
 						attribute<string> woningtype 		 := strcount(classifications/woningtype/label[BO/woningtype_rel][org_rel], 'meergezin') > 0 ? 'meergezinswoning' : classifications/woningtype/label[BO/woningtype_rel][org_rel];
 						attribute<string> eigendomstype		 := classifications/eigendom/label[BO/eigendom_rel][org_rel];
-						//attribute<GJ_yr> gas_gj_jr 			 := AllocatieResultaten/Woning/metervraag/Gas[org_rel];
 						attribute<m3_yr> gas_m3_jr 			 := AllocatieResultaten/Woning/metervraag/Gas[org_rel] / 0.03165[GJ_m3];
-						//attribute<GJ_yr> elek_gj_jr 		 := AllocatieResultaten/Woning/metervraag/E[org_rel];
-						attribute<kWh_yr> elek_kWh_jr 		 := AllocatieResultaten/Woning/metervraag/E[org_rel] / 0.0036 [GJ / kWh];
-						//attribute<GJ_yr> Functioneel_RVb 	 := AllocatieResultaten/Woning/BO/MetervraagBerekening/Functioneel_per_product/RVb[org_rel];
-						//attribute<GJ_yr> Functioneel_RVp 	 := AllocatieResultaten/Woning/BO/MetervraagBerekening/Functioneel_per_product/RVp[org_rel];
-						//attribute<GJ_yr> Functioneel_TWb 	 := AllocatieResultaten/Woning/BO/MetervraagBerekening/Functioneel_per_product/TWb[org_rel];
-						//attribute<GJ_yr> Functioneel_TWp 	 := AllocatieResultaten/Woning/BO/MetervraagBerekening/Functioneel_per_product/TWp[org_rel];
-						attribute<GJ_yr> warmte_gj_jr 		 := AllocatieResultaten/Woning/metervraag/Warmte_70[org_rel];
+						attribute<kWh_yr> elek_kWh_jr 		 := lowercase(strategie) == 's3a'|| lowercase(strategie) == 's3g' ? 
+																(AllocatieResultaten/Woning/metervraag/E[org_rel] - BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/Metervraag/metervraag_elektriciteit_rv_basis[org_rel] 
+																												  - BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/Metervraag/metervraag_elektriciteit_rv_piek[org_rel] 
+																												  - BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/Metervraag/metervraag_elektriciteit_tw_basis[org_rel] 
+																												  - BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/Metervraag/metervraag_elektriciteit_tw_piek[org_rel] 
+																												  + warmtenetberekening/metervraag_RV_E[org_rel] + warmtenetberekening/metervraag_TW_E[org_rel]) / 0.0036[GJ / kWh] : 
+																												  AllocatieResultaten/Woning/metervraag/E[org_rel] / 0.0036[GJ / kWh]; 
+						attribute<GJ_yr> warmte_gj_jr 		 := warmtenetberekening/metervraag_RV_W[org_rel] + warmtenetberekening/metervraag_TW_W[org_rel]; 
 						//attribute<classifications/installatie> RVb := BO/InstallatiePerProduct/RVb[org_rel];
 						attribute<eur_yr> gas_laag_eur_jr	 := Kj_vastrecht_G[org_rel] + Kj_gas[org_rel] * (0.894855015456298d / 1.06901183439788d), source = 'Scenario,s voor aardgas- en elektriciteitsprijzen voor kleinverbruikers in de periode 2025-2040, PBL 24 mei 2023'; //lagere prijzen t.o.v. centraal (2030)
 						attribute<eur_yr> gas_midden_eur_jr	 := Kj_vastrecht_G[org_rel] + Kj_gas[org_rel];
 						attribute<eur_yr> gas_hoog_eur_jr	 := Kj_vastrecht_G[org_rel] + Kj_gas[org_rel] * (1.15790606201696d / 1.06901183439788d), source = 'Scenario,s voor aardgas- en elektriciteitsprijzen voor kleinverbruikers in de periode 2025-2040, PBL 24 mei 2023'; //hogere prijzen t.o.v. centraal (2030)
-						//attribute<eur_yr> elek_var_eur_jr	 := Kj_elek[org_rel];
-						//attribute<eur_yr> elek_vast_eur_jr := BO/nrAansluitingen[org_rel] * float64(metervraag/e[org_rel] != 0[GJ_yr]) * (prijzen/elektriciteit/VastRecht -  prijzen/Elektriciteit/bron/Heffingskorting [prijzen/Elektriciteit/JaarIndex]);
-						attribute<eur_yr> elek_laag_eur_jr	 := (BO/nrAansluitingen[org_rel] * float64(metervraag/e[org_rel] != 0[GJ_yr]) * (prijzen/elektriciteit/VastRecht -  Prijzen/Elektriciteit/Staffel/Heffingskorting[classify( metervraag/e[org_rel], Prijzen/Elektriciteit/Staffel/ClassBreak )])) + Kj_elek[org_rel] * (0.137043613220703d / 0.167386576674406d), source = 'Scenario,s voor aardgas- en elektriciteitsprijzen voor kleinverbruikers in de periode 2025-2040, PBL 24 mei 2023'; //lagere prijzen t.o.v. centraal (2030)					
-						attribute<eur_yr> elek_midden_eur_jr := (BO/nrAansluitingen[org_rel] * float64(metervraag/e[org_rel] != 0[GJ_yr]) * (prijzen/elektriciteit/VastRecht -  Prijzen/Elektriciteit/Staffel/Heffingskorting[classify( metervraag/e[org_rel], Prijzen/Elektriciteit/Staffel/ClassBreak )])) + Kj_elek[org_rel];					
-						attribute<eur_yr> elek_hoog_eur_jr	 := (BO/nrAansluitingen[org_rel] * float64(metervraag/e[org_rel] != 0[GJ_yr]) * (prijzen/elektriciteit/VastRecht -  Prijzen/Elektriciteit/Staffel/Heffingskorting[classify( metervraag/e[org_rel], Prijzen/Elektriciteit/Staffel/ClassBreak )])) + Kj_elek[org_rel] * (0.183922777938664d / 0.167386576674406d), source = 'Scenario,s voor aardgas- en elektriciteitsprijzen voor kleinverbruikers in de periode 2025-2040, PBL 24 mei 2023'; //hogere prijzen t.o.v. centraal (2030)				
-						attribute<eur_yr> warmte_laag_eur_jr	 := warmte_gj_jr > 0[GJ_yr] ? 482[eur_yr] + warmte_gj_jr * 39[eur_GJ] * (0.894855015456298d / 1.06901183439788d) : (0/0)[eur_yr], source = 'Scenario,s voor aardgas- en elektriciteitsprijzen voor kleinverbruikers in de periode 2025-2040, PBL 24 mei 2023'; //lagere prijzen t.o.v. centraal (2030)
-						attribute<eur_yr> warmte_midden_eur_jr	 := warmte_gj_jr > 0[GJ_yr] ? 482[eur_yr] + warmte_gj_jr * 39[eur_GJ] : (0/0)[eur_yr]; //dummy
-						attribute<eur_yr> warmte_hoog_eur_jr	 := warmte_gj_jr > 0[GJ_yr] ? 482[eur_yr] + warmte_gj_jr * 39[eur_GJ] * (1.15790606201696d / 1.06901183439788d) : (0/0)[eur_yr], source = 'Scenario,s voor aardgas- en elektriciteitsprijzen voor kleinverbruikers in de periode 2025-2040, PBL 24 mei 2023'; //hogere prijzen t.o.v. centraal (2030)
+						attribute<eur_yr> elek_laag_eur_jr	 := (BO/nrAansluitingen[org_rel] * float64(elek_kWh_jr != 0[kWh_yr]) * (prijzen/elektriciteit/VastRecht -  Prijzen/Elektriciteit/Staffel/Heffingskorting[classify(elek_kWh_jr * 0.0036[GJ / kWh], Prijzen/Elektriciteit/Staffel/ClassBreak )])) + elek_kWh_jr * 0.0036[GJ / kWh] * Prijzen/Elektriciteit/Staffel/KGJ_eindgebruik_excl [classify(elek_kWh_jr * 0.0036[GJ / kWh], Prijzen/Elektriciteit/Staffel/ClassBreak )] * (0.137043613220703d / 0.167386576674406d), source = 'Scenario,s voor aardgas- en elektriciteitsprijzen voor kleinverbruikers in de periode 2025-2040, PBL 24 mei 2023'; //lagere prijzen t.o.v. centraal (2030)					
+						attribute<eur_yr> elek_midden_eur_jr := (BO/nrAansluitingen[org_rel] * float64(elek_kWh_jr != 0[kWh_yr]) * (prijzen/elektriciteit/VastRecht -  Prijzen/Elektriciteit/Staffel/Heffingskorting[classify(elek_kWh_jr * 0.0036[GJ / kWh], Prijzen/Elektriciteit/Staffel/ClassBreak )])) + elek_kWh_jr * 0.0036[GJ / kWh] * Prijzen/Elektriciteit/Staffel/KGJ_eindgebruik_excl [classify(elek_kWh_jr * 0.0036[GJ / kWh], Prijzen/Elektriciteit/Staffel/ClassBreak )];					
+						attribute<eur_yr> elek_hoog_eur_jr	 := (BO/nrAansluitingen[org_rel] * float64(elek_kWh_jr != 0[kWh_yr]) * (prijzen/elektriciteit/VastRecht -  Prijzen/Elektriciteit/Staffel/Heffingskorting[classify(elek_kWh_jr * 0.0036[GJ / kWh], Prijzen/Elektriciteit/Staffel/ClassBreak )])) + elek_kWh_jr * 0.0036[GJ / kWh] * Prijzen/Elektriciteit/Staffel/KGJ_eindgebruik_excl [classify(elek_kWh_jr * 0.0036[GJ / kWh], Prijzen/Elektriciteit/Staffel/ClassBreak )] * (0.183922777938664d / 0.167386576674406d), source = 'Scenario,s voor aardgas- en elektriciteitsprijzen voor kleinverbruikers in de periode 2025-2040, PBL 24 mei 2023'; //hogere prijzen t.o.v. centraal (2030)				
+						attribute<eur_yr> warmte_laag_eur_jr	 := warmte_gj_jr == 0[GJ_yr] ? (0/0)[eur_yr] : lowercase(strategie) == 's3a' || lowercase(strategie) == 's3g' ? warmtenetberekening/vastrecht_warmte_LT + warmtenetberekening/meettarief + warmtenetberekening/huur_afleverset : warmtenetberekening/vastrecht_warmte_HT + warmtenetberekening/meettarief + warmtenetberekening/huur_afleverset + warmte_gj_jr * warmtenetberekening/warmteprijs * (0.894855015456298d / 1.06901183439788d), source = 'Scenario,s voor aardgas- en elektriciteitsprijzen voor kleinverbruikers in de periode 2025-2040, PBL 24 mei 2023'; //lagere prijzen t.o.v. centraal (2030)
+						attribute<eur_yr> warmte_midden_eur_jr	 := warmte_gj_jr == 0[GJ_yr] ? (0/0)[eur_yr] : lowercase(strategie) == 's3a' || lowercase(strategie) == 's3g' ? warmtenetberekening/vastrecht_warmte_LT + warmtenetberekening/meettarief + warmtenetberekening/huur_afleverset : warmtenetberekening/vastrecht_warmte_HT + warmtenetberekening/meettarief + warmtenetberekening/huur_afleverset + warmte_gj_jr * warmtenetberekening/warmteprijs; 
+						attribute<eur_yr> warmte_hoog_eur_jr	 := warmte_gj_jr == 0[GJ_yr] ? (0/0)[eur_yr] : lowercase(strategie) == 's3a' || lowercase(strategie) == 's3g' ? warmtenetberekening/vastrecht_warmte_LT + warmtenetberekening/meettarief + warmtenetberekening/huur_afleverset : warmtenetberekening/vastrecht_warmte_HT + warmtenetberekening/meettarief + warmtenetberekening/huur_afleverset + warmte_gj_jr * warmtenetberekening/warmteprijs * (1.15790606201696d / 1.06901183439788d), source = 'Scenario,s voor aardgas- en elektriciteitsprijzen voor kleinverbruikers in de periode 2025-2040, PBL 24 mei 2023'; //hogere prijzen t.o.v. centraal (2030)
 						attribute<eur_yr> energiekosten_laag_eur_jr	 		:= gas_laag_eur_jr + elek_laag_eur_jr + warmte_laag_eur_jr;
 						attribute<eur_yr> energiekosten_midden_eur_jr	 	:= gas_midden_eur_jr + elek_midden_eur_jr + warmte_midden_eur_jr;
 						attribute<eur_yr> energiekosten_hoog_eur_jr	 		:= gas_hoog_eur_jr + elek_hoog_eur_jr + warmte_hoog_eur_jr;
 						attribute<eur> ki_isolatie_zst_eur	 := vervangingsmoment == 'Zst' ? eenmalig/Ki_gv[org_rel] : (0/0)[eur];
-						attribute<eur> ki_warmtepomp_HR_eur	 := eenmalig/Ki15_LO[org_rel];
-						attribute<eur> ki_BAK_eur			 := warmte_gj_jr > 0[gj_yr] ? const(5000[eur],.) : 0[eur]; //dummy
+						attribute<eur> ki_warmtepomp_HR_eur	 := lowercase(strategie) == 's3d' ? 3000[eur] : eenmalig/Ki15_LO[org_rel]; 
+						attribute<eur> ki_BAK_eur			 := warmte_gj_jr > 0[gj_yr] ? const(warmtenetberekening/BAK, BO)[org_rel] : (0/0)[eur];
 						attribute<eur> ki_LTAS_eur 			 := eenmalig/Ki_LTAS[org_rel];
 						attribute<eur> ki_ventilatie_zst_eur 	 := vervangingsmoment == 'Zst' ? eenmalig/Ki_VT[org_rel] : (0/0)[eur];
 						attribute<eur> ki_koken_eur 			 := (eenmalig/Ki_KK[org_rel])/2d;
 						attribute<eur> ki_inductie_eur 			 := (eenmalig/Ki_KK[org_rel])/2d;
 						attribute<eur> ki_isolatie_nat_eur 	 	:= vervangingsmoment == 'Nat' ? eenmalig/Ki_gv[org_rel] : (0/0)[eur];
 						attribute<eur> ki_ventilatie_nat_eur 	:= vervangingsmoment == 'Nat' ? eenmalig/Ki_VT[org_rel] : (0/0)[eur];
-						attribute<eur> subsidies_eur 	 		:= -1d * (eenmalig/Oi_gv[org_rel] +  eenmalig/Oi15_LO[org_rel]);
+						attribute<eur> subsidies_eur 	 		:= -1d * (eenmalig/Oi_gv[org_rel] +  eenmalig/Oi15_LO[org_rel] + float64(warmte_gj_jr > 0[GJ_yr]) * warmtenetberekening/subsidie_BAK[BO/Eigendom_rel][org_rel]);
 						attribute<eur> ki_tot_zst_eur 	 		:= subsidies_eur + ki_isolatie_zst_eur + Ki_warmtepomp_HR_eur + ki_BAK_eur + Ki_LTAS_eur + ki_ventilatie_zst_eur + ki_koken_eur + ki_inductie_eur;
 						attribute<eur> ki_tot_nat_eur 	 		:= subsidies_eur + ki_isolatie_nat_eur + Ki_warmtepomp_HR_eur + ki_BAK_eur + Ki_LTAS_eur + ki_ventilatie_nat_eur + ki_koken_eur + ki_inductie_eur;
 
