@@ -59,12 +59,12 @@ template StateNaAllocatieComponent
 			{	
 				container warmtenetberekening
 				{
-					parameter<Eur_yr> vastrecht_warmte_HT := 582.82[Eur_yr]; //alles nog in eur_2024
-					parameter<Eur_yr> vastrecht_warmte_LT := 310.52[Eur_yr]; 
-					parameter<Eur_yr> huur_afleverset 	  := 145.38[Eur_yr] * 12d; 
-					parameter<eur_GJ> warmteprijs 		  := 46.69[Eur_GJ];  
-					parameter<Eur>    BAK 				  := 5250.24[Eur]; 
-					parameter<Eur_yr> meettarief	   	  := 31.68[Eur_yr];
+					parameter<Eur_yr> vastrecht_warmte_HT := 582.82[Eur_yr] / 113.5d * 106.9d ; // maxprijzen 2024 volgens ACM, omgerekend naar eur 2020
+					parameter<Eur_yr> vastrecht_warmte_LT := 310.52[Eur_yr]/ 113.5d * 106.9d ; 
+					parameter<Eur_yr> huur_afleverset 	  := 145.38[Eur_mo] * 12[mo / yr] / 113.5d * 106.9d;
+					parameter<eur_GJ> warmteprijs 		  := 46.69[Eur_GJ] / 113.5d * 106.9d;  
+					parameter<Eur>    BAK 				  := 5250.24[Eur] / 113.5d * 106.9d; 
+					parameter<Eur_yr> meettarief	   	  := 31.68[Eur_yr] / 113.5d * 106.9d;
 
 					attribute<Eur>   subsidie_BAK (Classifications/Eigendom)   : [3775, 1575.072, 1575.072]; //ISDE voor eigenaar-bewoner, SAH voor huur
 					attribute<float64> SPF_RV	  (Classifications/Schillabel) : [8.00, 4.20, 3.20, 3.20, 3.20, 1.00, 1.00, 1.00];
@@ -98,7 +98,7 @@ template StateNaAllocatieComponent
 																case(warmtestrategie == 's2a', eenmalig/Ki_VT - eenmalig/Oi_VT + eenmalig/Ki_KK / 2d),
 																case(warmtestrategie == 's2b', eenmalig/Ki_KK / 2d),
 																case(warmtestrategie == 's3a', eenmalig/Ki_VT - eenmalig/Oi_VT + eenmalig/Ki_LTAS + eenmalig/Ki_KK / 2d + eenmalig/Ki15_LO - eenmalig/Oi15_LO),
-																case(warmtestrategie == 's3d', eenmalig/Ki_VT - eenmalig/Oi_VT + eenmalig/Ki_LTAS + eenmalig/Ki_KK / 2d + 3000d), //3000 is Ki_booster, check of euro2020, en check of daar subsidie voor is
+																case(warmtestrategie == 's3d', eenmalig/Ki_VT - eenmalig/Oi_VT + eenmalig/Ki_LTAS + eenmalig/Ki_KK / 2d + 3000d / 111.8d * 106.9d), //3000 is Ki_booster, omgerekend van euro2023 naar euro2020, en check of daar subsidie voor is
 																case(warmtestrategie == 's3g', eenmalig/Ki_KK / 2d + eenmalig/Ki15_LO - eenmalig/Oi15_LO),
 																eenmalig/Ki15_LO + eenmalig/Ki_VT + eenmalig/Ki30_LO + eenmalig/Ki_LTAS + eenmalig/Ki_KK / 2d - eenmalig/Oi15_LO - eenmalig/Oi_VT - eenmalig/Oi30_LO); //check of LTAS hier ook bijhoort // voor koken alleen het deel voor woningaanpassing
 				attribute<Eur> Ki_isolatie 		(BO) := eenmalig/Ki_gv - eenmalig/Oi_gv + (strcount(warmtestrategie, 's2') + strcount(warmtestrategie, 's3') > 0 ? warmtenetberekening/BAK - warmtenetberekening/subsidie_BAK[Eigendom_rel]: 0d) ;
@@ -154,7 +154,7 @@ template StateNaAllocatieComponent
 																		case(BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/RVb == 5 && warmtevraag_per_m2 <= 75d, warmteklasse/verhoging_ewp_lw[classify(warmtevraag, warmteklasse/warmtebehoefte)]),
 																		case(BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/RVb == 6 && warmtevraag_per_m2 <= 75d, warmteklasse/verhoging_ewp_bw[classify(warmtevraag, warmteklasse/warmtebehoefte)]),
 																		case(BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/RVb == 18 && warmtevraag_per_m2 <= 150d, warmteklasse/verhoging_hwp[classify(warmtevraag, warmteklasse/warmtebehoefte)]),
-																		float64(0/0));
+																		float64(0/0)) / 113.5d * 106.9d; // omgerekend naar euro2020
 				}
 				
 				container Huurpuntgrens
@@ -173,7 +173,7 @@ template StateNaAllocatieComponent
 																		case(huurpunten_na >= 40u && huurpunten_na <= 250u, rjoin(huurpunten_na, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurpunten, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurgrens)),
 																		case(huurpunten_na > 250u, rjoin(250u, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurpunten, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurgrens) + 
 																		((rjoin(250u, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurpunten, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurgrens) - rjoin(249u, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurpunten, Invoer/Kengetallen/Eindgebruikerskosten/huurpunten_maxhuur/huurgrens)) * float64(huurpunten_na -250u))),
-																		float64(0/0));
+																		float64(0/0)) / 113.5d * 106.9d; // omgerekend naar euro2020
 					// op deze manier wordt het aantal huurpunten niet geupdate, het verhoogde aantal huurpunten wordt niet opgeslagen voor een later jaar. Eigenlijk moet huurpunten ergens in 
 					// het model worden geupdate maar ik weet nog niet waar. Als we alleen naar 1 jaar kijken maakt het op zich niet uit maar het is niet heel netjes.
 				}
@@ -217,12 +217,12 @@ template StateNaAllocatieComponent
 						attribute<eur_mo>  boven_aftopping			(BO) := rekenhuur > aftoppingsgrens ? rekenhuur - aftoppingsgrens : 0[eur_mo];
 						attribute<eur_mo>  huurtoeslag_maand		(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/Vermogen[eur] > vermogensgrens ? 0[eur_mo] : 
 																			onder_kkg  + tussen_kkg_aftopping * ratio_kkg_aftopping + boven_aftopping + ratio_aftopping;
-						attribute<eur_yr>  huurtoeslag				(BO) := huurtoeslag_maand * 12[mo] /1[yr];													
+						attribute<eur_yr>  huurtoeslag				(BO) := huurtoeslag_maand * 12[mo] /1[yr] / 113.5d * 106.9d ; //omgerekend naar eur2020													
 					}
 					
 					container Na_investering
 					{				
-						attribute<eur_mo>  rekenhuur				(BO) := Huurverhoging_huurcommissiemethode/Huurverhoging * 1[yr] / 12[mo] + Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/KaleHuur[eur_mo];
+						attribute<eur_mo>  rekenhuur				(BO) := Huurverhoging_huurcommissiemethode/Huurverhoging / 106.9d * 113.5d / 12[mo] * 1[yr] + Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/KaleHuur[eur_mo]; //huurverhoging omgerekend naar euro2024
 						attribute<eur_mo>  normhuur					(BO) := reken_inkomen < inkomensgrens ? minimum_normhuur : factor_a * (reken_inkomen / 1[eur_yr]) ^ 2d + factor_b * reken_inkomen * 1[yr] / 1[mo]; 
 						attribute<eur_mo>  basishuur				(BO) := normhuur + verhoging_normhuur;
 						attribute<eur_mo>  onder_kkg				(BO) := basishuur < kwaliteitskortinggrens ? kwaliteitskortinggrens - basishuur : 0[eur_mo];
@@ -234,7 +234,7 @@ template StateNaAllocatieComponent
 						attribute<eur_mo>  boven_aftopping			(BO) := rekenhuur > aftoppingsgrens ? rekenhuur - aftoppingsgrens : 0[eur_mo];
 						attribute<eur_mo>  huurtoeslag_maand		(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/Vermogen[eur] > vermogensgrens ? 0[eur_mo] : 
 																			onder_kkg  + tussen_kkg_aftopping * ratio_kkg_aftopping + boven_aftopping + ratio_aftopping;
-						attribute<eur_yr>  huurtoeslag				(BO) := huurtoeslag_maand * 12[mo] / 1[yr];																																
+						attribute<eur_yr>  huurtoeslag				(BO) := huurtoeslag_maand * 12[mo] / 1[yr] / 113.5d * 106.9d ; //omgerekend naar eur2020																															
 					}
 					
 				}
@@ -285,14 +285,14 @@ template StateNaAllocatieComponent
 						attribute<ratio> BelastingSchijf	(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BelastbaarInkomen[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_laag[ratio]
 						: Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BelastbaarInkomen[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_hoog 
 						: (0/0)[ratio];
-						attribute<Eur> WOZwaarde									(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/WOZwaarde[Eur] + aandeel_investering_WOZ * (Ki_isolatie + Ki_installatie); 
+						attribute<Eur> WOZwaarde									(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/WOZwaarde[Eur] + aandeel_investering_WOZ * (Ki_isolatie + Ki_installatie) / 106.9d * 113.5d ; //investeringen omgerekend naar euro2024
 						attribute<Eur_yr> eigenwoningforfait						(BO) :=  WOZwaarde < WOZ_grens_eigenwoningforfait[Eur] ? WOZwaarde[Eur] * eigenwoningforfait_laag[_yr]
 						: WOZwaarde[Eur] >= WOZ_grens_eigenwoningforfait[Eur] ? eigenwoningforfait_hoog_vast[Eur_yr] + (WOZwaarde[Eur] - WOZ_grens_eigenwoningforfait[Eur]) * eigenwoningforfait_hoog_variabel[_yr]
 						: (0/0)[Eur_yr];					
 							
 						container Hypothecaire_lening
 						{
-							attribute<Eur_yr> Bruto_rentelasten 				(BO) := Huidig/Rentelasten_per_jaar[Eur_yr] + (financieringslasten/rentepercentage[percent_yr]/100[percent])[_yr] * (Ki_isolatie + Ki_installatie);
+							attribute<Eur_yr> Bruto_rentelasten 				(BO) := Huidig/Rentelasten_per_jaar[Eur_yr] + (financieringslasten/rentepercentage[percent_yr]/100[percent])[_yr] * (Ki_isolatie + Ki_installatie) / 106.9d * 113.5d; //investeringen omgerekend naar euro2024
 							attribute<Eur_yr> Bruto_inkomen_na_rentelasten 		(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BelastbaarInkomen[Eur_yr] - Bruto_rentelasten[Eur_yr] + Eigenwoningforfait[Eur_yr];
 							
 							attribute<ratio> BelastingSchijf_na_rentelasten		(BO) := Bruto_inkomen_na_rentelasten[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_laag[ratio]
@@ -314,7 +314,7 @@ template StateNaAllocatieComponent
 						}
 						container Warmtefondslening
 						{
-							attribute<Eur_yr> Bruto_rentelasten 				(BO) := Huidig/Rentelasten_per_jaar[Eur_yr] + (financieringslasten/Warmtefondslening/rentepercentage[percent_yr]/100[percent])[_yr] * (Ki_isolatie + Ki_installatie);
+							attribute<Eur_yr> Bruto_rentelasten 				(BO) := Huidig/Rentelasten_per_jaar[Eur_yr] + (financieringslasten/Warmtefondslening/rentepercentage[percent_yr]/100[percent])[_yr] * (Ki_isolatie + Ki_installatie) / 106.9d * 113.5d ; //investeringen omgerekend naar euro2024
 							attribute<Eur_yr> Bruto_inkomen_na_rentelasten 		(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BelastbaarInkomen[Eur_yr] - Bruto_rentelasten[Eur_yr] + Eigenwoningforfait[Eur_yr];
 							
 							attribute<ratio> BelastingSchijf_na_rentelasten		(BO) := Bruto_inkomen_na_rentelasten[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_laag[ratio]
@@ -337,8 +337,8 @@ template StateNaAllocatieComponent
 					}	
 					
 				
-					attribute<Eur_yr> Belastingteruggave 						(BO) := (huidig/inkomstenbelasting - na_investering/Hypothecaire_lening/inkomstenbelasting);
-					attribute<Eur_yr> Belastingteruggave_warmtefondslening 		(BO) := (huidig/inkomstenbelasting - na_investering/Warmtefondslening/inkomstenbelasting);
+					attribute<Eur_yr> Belastingteruggave 						(BO) := (huidig/inkomstenbelasting - na_investering/Hypothecaire_lening/inkomstenbelasting) / 113.5d * 106.9d; //omgerekend naar euro2020
+					attribute<Eur_yr> Belastingteruggave_warmtefondslening 		(BO) := (huidig/inkomstenbelasting - na_investering/Warmtefondslening/inkomstenbelasting) / 113.5d * 106.9d;   //omgerekend naar euro2020
 					
 					/*
 					parameter<ratio> BelastingSchijf := 0.37[ratio]; // 0.371 of 0.495 (2022)
