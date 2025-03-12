@@ -231,7 +231,10 @@ template StateNaAllocatieComponent
 					
 					container Na_investering
 					{				
-						attribute<eur_mo>  rekenhuur				(BO) := Huurverhoging_huurcommissiemethode/Huurverhoging / 106.9d * 113.5d / 12[mo] * 1[yr] + Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/KaleHuur[eur_mo]; //huurverhoging omgerekend naar euro2024
+						attribute<eur_mo>  rekenhuur				(BO) := switch(
+																					case(Eigendom_rel == 1, Huurverhoging_huurcommissiemethode/Huurverhoging / 106.9d * 113.5d / 12[mo] * 1[yr] + Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/KaleHuur[eur_mo]),
+																					case(Eigendom_rel == 2, huurverhoging_menukaart/huurverhoging / 106.9d * 113.5d + Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/KaleHuur[eur_mo]),
+																					float64(0/0)); //huurverhoging omgerekend naar euro2024
 						attribute<eur_mo>  normhuur					(BO) := reken_inkomen < inkomensgrens ? minimum_normhuur : factor_a * (reken_inkomen / 1[eur_yr]) ^ 2d + factor_b * reken_inkomen * 1[yr] / 1[mo]; 
 						attribute<eur_mo>  basishuur				(BO) := normhuur + verhoging_normhuur;
 						attribute<eur_mo>  onder_kkg				(BO) := basishuur < kwaliteitskortinggrens ? kwaliteitskortinggrens - basishuur : 0[eur_mo];
