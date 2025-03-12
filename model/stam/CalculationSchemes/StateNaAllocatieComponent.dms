@@ -73,7 +73,7 @@ template StateNaAllocatieComponent
 					parameter<Eur>    BAK 				  := 5250.24[Eur] / 113.5d * 106.9d; 
 					parameter<Eur_yr> meettarief	   	  := 31.68[Eur_yr] / 113.5d * 106.9d;
 
-					attribute<Eur>   subsidie_BAK (Classifications/Eigendom)   : [3775, 1575.072, 1575.072]; //ISDE voor eigenaar-bewoner, SAH voor huur
+					attribute<Eur>   subsidie_BAK (Classifications/Eigendom)   : [3555.48, 1483.48, 1483.48]; //ISDE voor eigenaar-bewoner, SAH voor huur, omgerekend naar euro2020
 					attribute<float64> SPF_RV	  (Classifications/Schillabel) : [8.00, 4.20, 3.20, 3.20, 3.20, 1.00, 1.00, 1.00];
 					attribute<float64> AEO_ind_RV (Classifications/Schillabel) : [0.60, 0.90, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00];
 					parameter<float64> SPF_TW_30	  := 2.75d;		  
