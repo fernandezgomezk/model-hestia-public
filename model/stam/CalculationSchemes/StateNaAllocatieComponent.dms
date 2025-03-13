@@ -353,10 +353,89 @@ template StateNaAllocatieComponent
 				
 				container export_strategie
 				{
-					unit<uint32> table := select_with_org_rel(BO/bouwjaar <= 2023[uint16])
+					unit<uint32> table := select_with_org_rel(BO/bouwjaar < 2023[uint16])
 					{
 						attribute<string> vbo_BAG_ID		 := BO/code[org_rel];
 						attribute<string> strategie			 := const(lowercase(warmtestrategie), BO)[org_rel];
+						
+						//Tussenresultaten voor checks, niet opleveren				
+						attribute<GJ_yr> temp_Aardgas_voor    						:= BebouwingsComponenten/Woning/BO/MetervraagBerekening/result/Gas[org_rel];
+						attribute<GJ_yr> temp_Elektriciteit_voor       				:= BebouwingsComponenten/Woning/BO/MetervraagBerekening/result/E[org_rel];
+						attribute<GJ_yr> temp_Functioneel_RuimteVerwarming_na		:= BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/Functioneel/RV[org_rel];
+						attribute<GJ_yr> temp_Functioneel_RuimteVerwarming_voor		:= BebouwingsComponenten/Woning/BO/Functioneel/RV[org_rel];
+						attribute<GJ_yr> temp_Functioneel_Tapwater_na				:= BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/Functioneel/TW[org_rel];
+						attribute<GJ_yr> temp_Functioneel_Tapwater_voor				:= BebouwingsComponenten/Woning/BO/Functioneel/TW[org_rel];
+						attribute<classifications/schillabel> temp_Energielabel_rel	:= BO/Energielabel_rel[org_rel];
+						attribute<UInt16> temp_bouwjaar								:= BO/bouwjaar[org_rel];
+						attribute<string> temp_code_isolatie_voor	:= string(float64(temp_RB_m2 > 0[m2]) * float64(temp_RB_voor)) +
+																		string(float64(temp_RO_m2 > 0[m2]) * float64(temp_RO_voor)) +
+																		string(float64(temp_DR_m2 > 0[m2]) * float64(temp_DR_voor)) +
+																		string(float64(temp_PL_m2 > 0[m2]) * float64(temp_PL_voor)) +
+																		string(float64(temp_VL_m2 > 0[m2]) * float64(temp_VL_voor)) +
+																		string(float64(temp_MG_m2 > 0[m2]) * float64(temp_MG_voor)) +
+																		string(float64(temp_MS_m2 > 0[m2]) * float64(temp_MS_voor)) +
+																		string(float64(temp_DP_m2 > 0[m2]) * float64(temp_DP_voor)) +
+																		string(float64(temp_DS_m2 > 0[m2]) * float64(temp_DS_voor)) +
+																		string(float64(temp_KR_voor));
+						attribute<string> temp_code_isolatie_na	:= string(float64(temp_RB_m2 > 0[m2]) * float64(temp_RB_na)) +
+																		string(float64(temp_RO_m2 > 0[m2]) * float64(temp_RO_na)) +
+																		string(float64(temp_DR_m2 > 0[m2]) * float64(temp_DR_na)) +
+																		string(float64(temp_PL_m2 > 0[m2]) * float64(temp_PL_na)) +
+																		string(float64(temp_VL_m2 > 0[m2]) * float64(temp_VL_na)) +
+																		string(float64(temp_MG_m2 > 0[m2]) * float64(temp_MG_na)) +
+																		string(float64(temp_MS_m2 > 0[m2]) * float64(temp_MS_na)) +
+																		string(float64(temp_DP_m2 > 0[m2]) * float64(temp_DP_na)) +
+																		string(float64(temp_DS_m2 > 0[m2]) * float64(temp_DS_na)) +
+																		string(float64(temp_KR_na));
+						attribute<m2> temp_RB_m2										:= BO/Bouwdelen/RB [org_rel];
+						attribute<m2> temp_RO_m2										:= BO/Bouwdelen/RO [org_rel];
+						attribute<m2> temp_DR_m2										:= BO/Bouwdelen/DR [org_rel];
+						attribute<m2> temp_PL_m2										:= BO/Bouwdelen/PL [org_rel];
+						attribute<m2> temp_VL_m2										:= BO/Bouwdelen/VL [org_rel];
+						attribute<m2> temp_MG_m2										:= BO/Bouwdelen/MG [org_rel];
+						attribute<m2> temp_MS_m2										:= BO/Bouwdelen/MS [org_rel];
+						attribute<m2> temp_DP_m2										:= BO/Bouwdelen/DP [org_rel];
+						attribute<m2> temp_DS_m2										:= BO/Bouwdelen/DS [org_rel];
+						attribute<Classifications/IsolatieNiveau> temp_RB_na			:= BO/Bouwdelen/Isolatie/RB [org_rel];
+						attribute<Classifications/IsolatieNiveau> temp_RB_voor		:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/RB[org_rel];
+						attribute<Classifications/IsolatieNiveau> temp_RO_na			:= BO/Bouwdelen/Isolatie/RO[org_rel];
+						attribute<Classifications/IsolatieNiveau> temp_RO_voor		:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/RO[org_rel];
+						attribute<Classifications/IsolatieNiveau> temp_DR_na			:= BO/Bouwdelen/Isolatie/DR[org_rel];
+						attribute<Classifications/IsolatieNiveau> temp_DR_voor		:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/DR[org_rel];
+						attribute<Classifications/IsolatieNiveau> temp_PL_na			:= BO/Bouwdelen/Isolatie/PL[org_rel];
+						attribute<Classifications/IsolatieNiveau> temp_PL_voor		:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/PL[org_rel];
+						attribute<Classifications/IsolatieNiveau> temp_VL_na			:= BO/Bouwdelen/Isolatie/VL[org_rel];
+						attribute<Classifications/IsolatieNiveau> temp_VL_voor		:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/VL[org_rel];
+						attribute<Classifications/IsolatieNiveau> temp_MG_na			:= BO/Bouwdelen/Isolatie/MG[org_rel];
+						attribute<Classifications/IsolatieNiveau> temp_MG_voor		:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/MG[org_rel];
+						attribute<Classifications/IsolatieNiveau> temp_MS_na			:= BO/Bouwdelen/Isolatie/MS[org_rel];
+						attribute<Classifications/IsolatieNiveau> temp_MS_voor		:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/MS[org_rel];
+						attribute<Classifications/IsolatieNiveau> temp_DP_na			:= BO/Bouwdelen/Isolatie/DP[org_rel];
+						attribute<Classifications/IsolatieNiveau> temp_DP_voor		:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/DP[org_rel];
+						attribute<Classifications/IsolatieNiveau> temp_DS_na			:= BO/Bouwdelen/Isolatie/DS[org_rel];
+						attribute<Classifications/IsolatieNiveau> temp_DS_voor		:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/DS[org_rel];
+						attribute<Classifications/IsolatieNiveau> temp_KR_na    		:= BO/Bouwdelen/Isolatie/KR[org_rel];
+						attribute<Classifications/IsolatieNiveau> temp_KR_voor    	:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/KR[org_rel];
+						attribute<Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes> temp_VT_na    := BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/VT[org_rel];
+						attribute<Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes> temp_VT_voor    := Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/VT[org_rel];
+						attribute<Invoer/Kengetallen/OverigeInstallaties/DK/Installatietypes> temp_DK_na		:= BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/DK[org_rel];
+						attribute<Invoer/Kengetallen/OverigeInstallaties/KK/Installatietypes> temp_KK_na		:= BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/KK[org_rel];
+						attribute<Invoer/Kengetallen/OverigeInstallaties/KK/Installatietypes> temp_KK_voor    := Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/KK[org_rel];
+						attribute<Classifications/Installatie> temp_RVb_na		:= BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/RVb[org_rel];
+						attribute<Classifications/Installatie> temp_RVb_voor		:= Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/RVb[org_rel];
+						attribute<Classifications/Installatie> temp_RVp_na		:= BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/RVp[org_rel];
+						attribute<Classifications/Installatie> temp_RVp_voor		:= Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/RVp[org_rel]; //toegevoegd op 11/07/2023
+						attribute<Classifications/Installatie> temp_TWb_na		:= BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/TWb[org_rel];//toegevoegd op 11/07/2023
+						attribute<Classifications/Installatie> temp_TWb_voor		:= Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/TWb[org_rel];//toegevoegd op 11/07/2023
+						attribute<Classifications/Installatie> temp_TWp_na		:= BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/TWp[org_rel];//toegevoegd op 11/07/2023
+						attribute<Classifications/Installatie> temp_TWp_voor		:= Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/TWp[org_rel];//toegevoegd op 11/07/2023
+						attribute<Classifications/Installatie> temp_KDb_voor		:= Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/KDb[org_rel];
+						attribute<Classifications/Installatie> temp_KDp_voor		:= Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/KDp[org_rel];
+						attribute<Classifications/Installatie> temp_KDb_na		:= BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/KDb[org_rel];
+						attribute<Classifications/Installatie> temp_KDp_na		:= BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/KDp[org_rel];
+
+
+
 						attribute<string> provincie			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/PROV_NAAM[buurt_rel][org_rel];
 						attribute<string> gemeente			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/GM_NAAM[buurt_rel][org_rel];
 						attribute<string> gemeentecode		 := Invoer/RuimtelijkeData/Studiegebied/Buurt/GM_code[buurt_rel][org_rel];
@@ -524,7 +603,7 @@ template StateNaAllocatieComponent
 				
 				container export_ref
 				{
-					unit<uint32> table := select_with_org_rel(BO/bouwjaar <= 2023[uint16])
+					unit<uint32> table := select_with_org_rel(BO/bouwjaar < 2023[uint16])
 					{
 						attribute<string> vbo_BAG_ID		 := BO/code[org_rel];
 						attribute<string> strategie			 := const('Aardgas(referentie)', BO)[org_rel];
