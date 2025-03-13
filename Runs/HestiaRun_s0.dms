@@ -16,7 +16,7 @@ container HestiaRun
 	parameter<uint8>  aantal_jaar             := 6[uint8]   , Descr = "Aantal zichtjaren";
 	parameter<string> Studiegebied            := Invoer/StudieGebied;
 	parameter<string> warmtestrategie 		  := 's0';
-	parameter<string> vervangingsmoment 	  := 'Nat'; //Zst of Nat
+	parameter<string> vervangingsmoment 	  := 'Zst'; //Zst of Nat
 	parameter<units/yr_uint16> peiljaar		  := 2024[units/yr_uint16]; //zichtjaar eindgebruikerskosten
 
 	//====== Opbouw lijst van zichtjaren en rekenstappen

@@ -455,6 +455,24 @@ unit<uint32> BouwdeelActieveWoning := select_with_org_rel(BO/Activatie/BouwdeelA
 			{
 				attribute<Eur> Totaal(UniekAmbitie) := ='add('+AsItemList(Classifications/bouwdeel/name)+')';
 			}
+			
+			container Ki_gv_nat := for_each_nedv(
+				classifications/Bouwdeel/name,
+				replace(
+					'makedefined(BO/Bouwdelen/@BD[BO_rel] '
+					'*  Classifications/IsolatieMaatregel/xUitvoering/kosten['
+							'combine_data(Classifications/IsolatieMaatregel/xUitvoering'
+							', IsolatieMaatregel_rel/@BD'
+							', BO/Activatie/Uitvoering[BO_Rel] + 4'
+							')'
+						']'
+					', 0.0[Eur])'
+				,	'@BD', classifications/Bouwdeel/name),
+				UniekAmbitie, Eur)
+			{
+				attribute<Eur> Totaal(UniekAmbitie) := ='add('+AsItemList(Classifications/bouwdeel/name)+')';
+			}
+			
 			container Kji_gv := for_each_nedv(
 				  classifications/Bouwdeel/name
 				, replace('Ki_gv/@BD * NCWrefs/AF_'+ string(Classifications/Bouwdeel/AT[Classifications/Bouwdeel]) 
@@ -475,6 +493,7 @@ unit<uint32> BouwdeelActieveWoning := select_with_org_rel(BO/Activatie/BouwdeelA
 			}
 		}
 		attribute<Eur>    Ki_gv  (UniekAmbitie):= Bouwdelen/Ki_gv/Totaal;
+		attribute<Eur>    Ki_gv_nat  (UniekAmbitie):= Bouwdelen/Ki_gv_nat/Totaal;
 		attribute<Eur_yr> Kji_gv (UniekAmbitie):= Bouwdelen/Kji_gv/Totaal;
 		attribute<Eur_yr> Kmi_gv (UniekAmbitie):= Bouwdelen/Kmi_gv/Totaal;
 		
@@ -557,9 +576,10 @@ unit<uint32> BouwdeelActieveWoning := select_with_org_rel(BO/Activatie/BouwdeelA
 				replace('GeenAmbitie ? 0[EUR] : collect_by_cond(ProductInactieveAmbitie, UniekAmbitie/Bouwdelen/Ki_gv/@BD@)', '@BD@', Classifications/Bouwdeel/name ),
 				ProductInactieveAmbitie,
 				Eur);
-		attribute<eur>    Ki_gv  (ProductInactieveAmbitie) := GeenAmbitie ? 0[EUR]    : collect_by_cond(., UniekAmbitie/Ki_gv );
-		attribute<eur_yr> Kji_gv (ProductInactieveAmbitie) := GeenAmbitie ? 0[EUR_yr] : collect_by_cond(., UniekAmbitie/Kji_gv);
-		attribute<eur_yr> Kmi_gv (ProductInactieveAmbitie) := GeenAmbitie ? 0[EUR_yr] : collect_by_cond(., UniekAmbitie/Kmi_gv);
+		attribute<eur>    Ki_gv  	(ProductInactieveAmbitie) := GeenAmbitie ? 0[EUR]    : collect_by_cond(., UniekAmbitie/Ki_gv );
+		attribute<eur>    Ki_gv_nat (ProductInactieveAmbitie) := GeenAmbitie ? 0[EUR]    : collect_by_cond(., UniekAmbitie/Ki_gv_nat );		
+		attribute<eur_yr> Kji_gv 	(ProductInactieveAmbitie) := GeenAmbitie ? 0[EUR_yr] : collect_by_cond(., UniekAmbitie/Kji_gv);
+		attribute<eur_yr> Kmi_gv 	(ProductInactieveAmbitie) := GeenAmbitie ? 0[EUR_yr] : collect_by_cond(., UniekAmbitie/Kmi_gv);
 		
 		container functioneel := for_each_nedv(
 				Classifications/FunctioneleVraag/name,
