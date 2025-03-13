@@ -186,9 +186,9 @@
 					
 					
 				}
-				unit<uint32> y_variabelen_continu := unique(gemeente_continu_src/y_variable) // Opzetje
+				unit<uint32> y_variabelen_continu := unique(buurt_continu_src/y_variable)
 				{
-					attribute<string> label      : ['BelastbaarInkomen', 'Huurpunten', 'Hypotheekrentelasten', 'KaleHuur', 'Hypotheekschuld', 'Vermogen', 'WOZwaarde'];
+					attribute<string> label      : ['Huurpunten', 'BrutoInkomen', 'Hypotheekrentelasten', 'KaleHuur', 'Hypotheekschuld', 'Vermogen', 'WOZwaarde'];
 					//attribute<string> alpha_naam : [ '' ,'alpha_kalehuur' , ''];
 					//attribute<string> beta_naam  : [ '' ,'beta_kalehuur' , ''];
 				}
@@ -463,7 +463,8 @@
 			
 				container huishoudenskenmerken := for_each_nedv(
 				class/y_variabelen_continu/label,
-				'makedefined(buurt_continu_per_vbo/continu_per_vbo/' + class/y_variabelen_continu/label + ' , gemeente_continu_per_vbo/continu_per_vbo/'+ class/y_variabelen_continu/label + ' )',
+				//'makedefined(buurt_continu_per_vbo/continu_per_vbo/' + class/y_variabelen_continu/label + ' , gemeente_continu_per_vbo/continu_per_vbo/'+ class/y_variabelen_continu/label + ' )',
+				'buurt_continu_per_vbo/continu_per_vbo/' + class/y_variabelen_continu/label, 
 				.,
 				float64)
 				{
@@ -481,6 +482,7 @@
 					attribute<Class/y_categorien_discreet/AantPersHH> 		AantPersHH 	(..)		:= buurt_discreet_per_vbo/AantPersHH/AantPersHH > 0[Class/y_categorien_discreet/AantPersHH] ? buurt_discreet_per_vbo/AantPersHH/AantPersHH : gemeente_discreet_per_vbo/AantPersHH/AantPersHH;
 					attribute<Class/y_categorien_discreet/LeeftijdRefPers> 	LeeftijdRefPers (..)	:= buurt_discreet_per_vbo/LeeftijdRefPers/LeeftijdRefPers > 0[Class/y_categorien_discreet/LeeftijdRefPers] ? buurt_discreet_per_vbo/LeeftijdRefPers/LeeftijdRefPers : gemeente_discreet_per_vbo/LeeftijdRefPers/LeeftijdRefPers;
 					attribute<Class/y_categorien_discreet/TypeHH> 			TypeHH 		(..)		:= buurt_discreet_per_vbo/TypeHH/TypeHH > 0[Class/y_categorien_discreet/TypeHH] ? buurt_discreet_per_vbo/TypeHH/TypeHH : gemeente_discreet_per_vbo/TypeHH/TypeHH;
+					attribute<float64> TweedeBrutoInkomen (VBO) := AantPersHH > 1[Class/y_categorien_discreet/AantPersHH] ? (0.37d / (1d - 0.37d)) * BrutoInkomen : BrutoInkomen, source = 'https://www.cbs.nl/nl-nl/nieuws/2023/28/ongelijk-inkomen-voor-meeste-tweeverdieners-niet-echt-een-probleem';
 				}
 				
 				/*container huishoudenskenmerken_zonder_spreiding := for_each_nedv(
@@ -491,7 +493,7 @@
 				*/
 			}
 			
-			unit<uint32> gemeente_discreet_src : StorageName = "%HestiaDataDir%/Eindgebruikerskosten/20240711_gemeente_discreet_gesplitst.csv"
+			unit<uint32> gemeente_discreet_src : StorageName = "%HestiaDataDir%/Eindgebruikerskosten/20250313_Gemeente_discreet.csv"
 			,	StorageType     = "gdal.vect"
 			,	StorageReadOnly = "True"
 			{
@@ -608,7 +610,7 @@
 					
 				}				
 			}
-			
+			/*
 			unit<uint32> gemeente_continu_src : StorageName = "%HestiaDataDir%/Eindgebruikerskosten/gemeente_continu.csv"
 			,	StorageType     = "gdal.vect"
 			,	StorageReadOnly = "True"
@@ -674,8 +676,8 @@
 				., 
 				float64);					
 			}
-			
-			unit<uint32> buurt_discreet_src : StorageName = "%HestiaDataDir%/Eindgebruikerskosten/buurt_discreet.csv"
+			*/
+			unit<uint32> buurt_discreet_src : StorageName = "%HestiaDataDir%/Eindgebruikerskosten/20250313_Buurt_discreet.csv"
 			,	StorageType     = "gdal.vect"
 			,	StorageReadOnly = "True"
 			{
@@ -792,7 +794,7 @@
 					
 				}
 			}
-			unit<uint32> buurt_continu_src : StorageName = "%HestiaDataDir%/Eindgebruikerskosten/buurt_continu.csv"
+			unit<uint32> buurt_continu_src : StorageName = "%HestiaDataDir%/Eindgebruikerskosten/20250313_Buurt_continu.csv"
 			,	StorageType     = "gdal.vect"
 			,	StorageReadOnly = "True"
 			{

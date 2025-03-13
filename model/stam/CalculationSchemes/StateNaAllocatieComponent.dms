@@ -210,7 +210,7 @@ template StateNaAllocatieComponent
 					attribute<ratio>   ratio_kkg_aftopping		(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/ratio_kkg_aftopping);
 					attribute<ratio>   ratio_aftopping			(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/ratio_aftopping);
 					
-					attribute<eur_yr>  reken_inkomen 			(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BelastbaarInkomen[Eur_yr]; //updaten met nieuwe CBS inkomens (primair + secundair inkomen)
+					attribute<eur_yr>  reken_inkomen 			(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BrutoInkomen[Eur_yr] + Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/TweedeBrutoInkomen[Eur_yr];
 					
 					container Huidig
 					{
@@ -264,8 +264,8 @@ template StateNaAllocatieComponent
 					
 					container Huidig
 					{
-						attribute<ratio> BelastingSchijf	(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BelastbaarInkomen[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_laag[ratio]
-						: Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BelastbaarInkomen[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_hoog 
+						attribute<ratio> BelastingSchijf	(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BrutoInkomen[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_laag[ratio]
+						: Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BrutoInkomen[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_hoog 
 						: (0/0)[ratio];
 						
 						attribute<Eur_yr> Rentelasten_per_jaar 		(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/Hypotheekrentelasten * 12d [Eur_yr];
@@ -275,7 +275,7 @@ template StateNaAllocatieComponent
 						: Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/WOZwaarde[Eur] >= WOZ_grens_eigenwoningforfait[Eur] ? eigenwoningforfait_hoog_vast[Eur_yr] + (Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/WOZwaarde[Eur] - WOZ_grens_eigenwoningforfait[Eur]) * eigenwoningforfait_hoog_variabel[_yr] :
 						(0/0)[Eur_yr];
 						
-						attribute<Eur_yr> Bruto_inkomen_na_rentelasten 							(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BelastbaarInkomen[Eur_yr] - Rentelasten_per_jaar[Eur_yr] + Eigenwoningforfait[Eur_yr];
+						attribute<Eur_yr> Bruto_inkomen_na_rentelasten 							(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BrutoInkomen[Eur_yr] - Rentelasten_per_jaar[Eur_yr] + Eigenwoningforfait[Eur_yr];
 						
 						attribute<ratio> BelastingSchijf_na_rentelasten						(BO) := Bruto_inkomen_na_rentelasten[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_laag[ratio]
 						: Bruto_inkomen_na_rentelasten[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_hoog 
@@ -294,8 +294,8 @@ template StateNaAllocatieComponent
 					
 					container Na_investering
 					{
-						attribute<ratio> BelastingSchijf	(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BelastbaarInkomen[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_laag[ratio]
-						: Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BelastbaarInkomen[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_hoog 
+						attribute<ratio> BelastingSchijf	(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BrutoInkomen[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_laag[ratio]
+						: Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BrutoInkomen[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_hoog 
 						: (0/0)[ratio];
 						attribute<Eur> WOZwaarde									(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/WOZwaarde[Eur] + aandeel_investering_WOZ * (Ki_looptijd_iso + Ki_looptijd_inst) / 106.9d * 113.5d ; //investeringen omgerekend naar euro2024
 						attribute<Eur_yr> eigenwoningforfait						(BO) :=  WOZwaarde < WOZ_grens_eigenwoningforfait[Eur] ? WOZwaarde[Eur] * eigenwoningforfait_laag[_yr]
@@ -305,7 +305,7 @@ template StateNaAllocatieComponent
 						container Hypothecaire_lening
 						{
 							attribute<Eur_yr> Bruto_rentelasten 				(BO) := Huidig/Rentelasten_per_jaar[Eur_yr] + (financieringslasten/rentepercentage[percent_yr]/100[percent])[_yr] * (Ki_looptijd_iso + Ki_looptijd_inst) / 106.9d * 113.5d; //investeringen omgerekend naar euro2024
-							attribute<Eur_yr> Bruto_inkomen_na_rentelasten 		(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BelastbaarInkomen[Eur_yr] - Bruto_rentelasten[Eur_yr] + Eigenwoningforfait[Eur_yr];
+							attribute<Eur_yr> Bruto_inkomen_na_rentelasten 		(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BrutoInkomen[Eur_yr] - Bruto_rentelasten[Eur_yr] + Eigenwoningforfait[Eur_yr];
 							
 							attribute<ratio> BelastingSchijf_na_rentelasten		(BO) := Bruto_inkomen_na_rentelasten[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_laag[ratio]
 							: Bruto_inkomen_na_rentelasten[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_hoog 
@@ -327,7 +327,7 @@ template StateNaAllocatieComponent
 						container Warmtefondslening
 						{
 							attribute<Eur_yr> Bruto_rentelasten 				(BO) := Huidig/Rentelasten_per_jaar[Eur_yr] + (financieringslasten/Warmtefondslening/rentepercentage[percent_yr]/100[percent])[_yr] * (Ki_looptijd_iso + Ki_looptijd_inst) / 106.9d * 113.5d ; //investeringen omgerekend naar euro2024
-							attribute<Eur_yr> Bruto_inkomen_na_rentelasten 		(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BelastbaarInkomen[Eur_yr] - Bruto_rentelasten[Eur_yr] + Eigenwoningforfait[Eur_yr];
+							attribute<Eur_yr> Bruto_inkomen_na_rentelasten 		(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BrutoInkomen[Eur_yr] - Bruto_rentelasten[Eur_yr] + Eigenwoningforfait[Eur_yr];
 							
 							attribute<ratio> BelastingSchijf_na_rentelasten		(BO) := Bruto_inkomen_na_rentelasten[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_laag[ratio]
 							: Bruto_inkomen_na_rentelasten[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_hoog 
