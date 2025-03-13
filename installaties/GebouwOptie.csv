@@ -23,8 +23,8 @@ Bioketel_vKD	1	0	ketel	Bioketel_vKD	N	N	Bioketel	Bioketel	eBoiler	eBoiler	AirCoV
 Bioketel_mKD	1	0	ketel	Bioketel_mKD	N	N	Bioketel	Bioketel	eBoiler	eBoiler	AirCoMobiel	AirCoMobiel
 LweWP_zKD	0	0	electric	LweWP_zKD	B	N	eWP_lw	eWP_lw	eWP_lw	eWP_lw	geen	geen
 LweWP_wKD	0	0	electric	LweWP_wKD	B	N	eWP_lw	eWP_lw	eWP_lw	eWP_lw	eWP_lw	eWP_lw
-BweWP_zKD	0	0	electric	BweWP_zKD	B	B	eWP_bw	eWP_bw	eWP_bw	eWP_bw	geen	geen
-BweWP_wKD	0	0	electric	BweWP_wKD	B	B	eWP_bw	eWP_bw	eWP_bw	eWP_bw	eWP_bw	eWP_bw
+BweWP_zKD	0	0	electric	BweWP_zKD	B	N	eWP_bw	eWP_bw	eWP_bw	eWP_bw	geen	geen
+BweWP_wKD	0	0	electric	BweWP_wKD	B	N	eWP_bw	eWP_bw	eWP_bw	eWP_bw	eWP_bw	eWP_bw
 LleWP_zKD	0	0	electric	LleWP_zKD	B	B	eWP_ll	eWP_ll	eWP_ll	eWP_ll	geen	geen
 LleWP_wKD	0	0	electric	LleWP_wKD	B	B	eWP_ll	eWP_ll	eWP_ll	eWP_ll	eWP_ll	eWP_ll
 hEWV_TWg_zKD	0	1	hybride	hEWV_TWg_zKD	D	D	EWVklein	hHR	hHR	hHR	geen	geen
