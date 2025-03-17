@@ -163,7 +163,7 @@ template StateNaAllocatieComponent
 																		case(BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/RVb == 5 && warmtevraag_per_m2 <= 75d, warmteklasse/verhoging_ewp_lw[classify(warmtevraag, warmteklasse/warmtebehoefte)]),
 																		case(BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/RVb == 6 && warmtevraag_per_m2 <= 75d, warmteklasse/verhoging_ewp_bw[classify(warmtevraag, warmteklasse/warmtebehoefte)]),
 																		case(BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/RVb == 18 && warmtevraag_per_m2 <= 150d, warmteklasse/verhoging_hwp[classify(warmtevraag, warmteklasse/warmtebehoefte)]),
-																		float64(0/0)) / 113.5d * 106.9d; // omgerekend naar euro2020
+																		0d) / 113.5d * 106.9d; // omgerekend naar euro2020
 				}
 				
 				container Huurpuntgrens
@@ -529,7 +529,7 @@ template StateNaAllocatieComponent
 																								case(eigendomstype == 'PartHuur', Huurverhoging_huurcommissiemethode/huurverhoging[org_rel]), 
 																								case(eigendomstype == 'WoonCorp', huurverhoging_menukaart/huurverhoging[org_rel] * 12[mo] / 1[yr]),
 																								(0/0)[eur_yr]) * -1d;
-						attribute<eur_yr> Extra_huurtoeslag_hu_nat_eur_jr			 := eigendomstype == 'PartHuur' ? -1d *(Huurtoeslag/Na_investering/Huurtoeslag[org_rel] - Huurtoeslag/Huidig/Huurtoeslag[org_rel]) : (0/0)[eur_yr];
+						attribute<eur_yr> Extra_huurtoeslag_hu_nat_eur_jr			 := eigendomstype == 'PartHuur' || eigendomstype == 'WoonCorp' ? -1d *(Huurtoeslag/Na_investering/Huurtoeslag[org_rel] - Huurtoeslag/Huidig/Huurtoeslag[org_rel]) : (0/0)[eur_yr];
 						attribute<eur_yr> Extra_teruggave_HRA_eb_hy_nat_eur_jr		 := eigendomstype == 'Koop' ? -1d *(Hypotheekrenteaftrek/Belastingteruggave[org_rel]) : (0/0)[eur_yr];
 						attribute<eur_yr> Extra_teruggave_HRA_eb_wf_nat_eur_jr		 := eigendomstype == 'Koop' ? -1d *(Hypotheekrenteaftrek/Belastingteruggave_warmtefondslening[org_rel]) : (0/0)[eur_yr];
 
@@ -540,7 +540,7 @@ template StateNaAllocatieComponent
 						attribute<eur_yr> Extra_huur_vh_zst_eur_jr					 := switch(
 																								case(eigendomstype == 'PartHuur', Huurverhoging_huurcommissiemethode/huurverhoging[org_rel]), 
 																								case(eigendomstype == 'WoonCorp', huurverhoging_menukaart/huurverhoging[org_rel] * 12[mo] / 1[yr]),
-																								(0/0)[eur_yr]);
+																								(0/0)[eur_yr])* -1d;
 						attribute<eur_yr> Extra_huurtoeslag_hu_zst_eur_jr			 := eigendomstype == 'PartHuur' || eigendomstype == 'WoonCorp' ? -1d *(Huurtoeslag/Na_investering/Huurtoeslag[org_rel] - Huurtoeslag/Huidig/Huurtoeslag[org_rel]) : (0/0)[eur_yr];
 						attribute<eur_yr> Extra_teruggave_HRA_eb_hy_zst_eur_jr		 := eigendomstype == 'Koop' ? -1d *(Hypotheekrenteaftrek/Belastingteruggave[org_rel]) : (0/0)[eur_yr];
 						attribute<eur_yr> Extra_teruggave_HRA_eb_wf_zst_eur_jr		 := eigendomstype == 'Koop' ? -1d *(Hypotheekrenteaftrek/Belastingteruggave_warmtefondslening[org_rel]) : (0/0)[eur_yr];
@@ -583,21 +583,21 @@ template StateNaAllocatieComponent
 
 						//Eindgebruikerskosten
 
-						attribute<eur_yr> egk_eb_nat_hy_laag_eur_jr		:= jaarlijkse_kosten_eb_nat_hy_laag_eur_jr	- jaarlijkse_baten_eb_nat_hy_eur_jr;	 
-						attribute<eur_yr> egk_eb_nat_hy_midden_eur_jr	:= jaarlijkse_kosten_eb_nat_hy_midden_eur_jr - jaarlijkse_baten_eb_nat_hy_eur_jr;
-						attribute<eur_yr> egk_eb_nat_hy_hoog_eur_jr		:= jaarlijkse_kosten_eb_nat_hy_hoog_eur_jr	- jaarlijkse_baten_eb_nat_hy_eur_jr;
+						attribute<eur_yr> egk_eb_nat_hy_laag_eur_jr		:= jaarlijkse_kosten_eb_nat_hy_laag_eur_jr	+ jaarlijkse_baten_eb_nat_hy_eur_jr;	 
+						attribute<eur_yr> egk_eb_nat_hy_midden_eur_jr	:= jaarlijkse_kosten_eb_nat_hy_midden_eur_jr + jaarlijkse_baten_eb_nat_hy_eur_jr;
+						attribute<eur_yr> egk_eb_nat_hy_hoog_eur_jr		:= jaarlijkse_kosten_eb_nat_hy_hoog_eur_jr	+ jaarlijkse_baten_eb_nat_hy_eur_jr;
 
-						attribute<eur_yr> egk_eb_zst_hy_laag_eur_jr		:= jaarlijkse_kosten_eb_zst_hy_laag_eur_jr	- jaarlijkse_baten_eb_zst_hy_eur_jr;
-						attribute<eur_yr> egk_eb_zst_hy_midden_eur_jr	:= jaarlijkse_kosten_eb_zst_hy_midden_eur_jr - jaarlijkse_baten_eb_zst_hy_eur_jr;
-						attribute<eur_yr> egk_eb_zst_hy_hoog_eur_jr		:= jaarlijkse_kosten_eb_zst_hy_hoog_eur_jr	- jaarlijkse_baten_eb_zst_hy_eur_jr;
+						attribute<eur_yr> egk_eb_zst_hy_laag_eur_jr		:= jaarlijkse_kosten_eb_zst_hy_laag_eur_jr	+ jaarlijkse_baten_eb_zst_hy_eur_jr;
+						attribute<eur_yr> egk_eb_zst_hy_midden_eur_jr	:= jaarlijkse_kosten_eb_zst_hy_midden_eur_jr + jaarlijkse_baten_eb_zst_hy_eur_jr;
+						attribute<eur_yr> egk_eb_zst_hy_hoog_eur_jr		:= jaarlijkse_kosten_eb_zst_hy_hoog_eur_jr	+ jaarlijkse_baten_eb_zst_hy_eur_jr;
 
-						attribute<eur_yr> egk_eb_nat_wf_laag_eur_jr		:= jaarlijkse_kosten_eb_nat_wf_laag_eur_jr	- jaarlijkse_baten_eb_nat_wf_eur_jr;
-						attribute<eur_yr> egk_eb_nat_wf_midden_eur_jr	:= jaarlijkse_kosten_eb_nat_wf_midden_eur_jr - jaarlijkse_baten_eb_nat_wf_eur_jr;
-						attribute<eur_yr> egk_eb_nat_wf_hoog_eur_jr		:= jaarlijkse_kosten_eb_nat_wf_hoog_eur_jr	- jaarlijkse_baten_eb_nat_wf_eur_jr;
+						attribute<eur_yr> egk_eb_nat_wf_laag_eur_jr		:= jaarlijkse_kosten_eb_nat_wf_laag_eur_jr	+ jaarlijkse_baten_eb_nat_wf_eur_jr;
+						attribute<eur_yr> egk_eb_nat_wf_midden_eur_jr	:= jaarlijkse_kosten_eb_nat_wf_midden_eur_jr + jaarlijkse_baten_eb_nat_wf_eur_jr;
+						attribute<eur_yr> egk_eb_nat_wf_hoog_eur_jr		:= jaarlijkse_kosten_eb_nat_wf_hoog_eur_jr	+ jaarlijkse_baten_eb_nat_wf_eur_jr;
 
-						attribute<eur_yr> egk_eb_zst_wf_laag_eur_jr		:= jaarlijkse_kosten_eb_zst_wf_laag_eur_jr	- jaarlijkse_baten_eb_zst_wf_eur_jr;
-						attribute<eur_yr> egk_eb_zst_wf_midden_eur_jr	:= jaarlijkse_kosten_eb_zst_wf_midden_eur_jr - jaarlijkse_baten_eb_zst_wf_eur_jr;
-						attribute<eur_yr> egk_eb_zst_wf_hoog_eur_jr		:= jaarlijkse_kosten_eb_zst_wf_hoog_eur_jr	- jaarlijkse_baten_eb_zst_wf_eur_jr;
+						attribute<eur_yr> egk_eb_zst_wf_laag_eur_jr		:= jaarlijkse_kosten_eb_zst_wf_laag_eur_jr	+ jaarlijkse_baten_eb_zst_wf_eur_jr;
+						attribute<eur_yr> egk_eb_zst_wf_midden_eur_jr	:= jaarlijkse_kosten_eb_zst_wf_midden_eur_jr + jaarlijkse_baten_eb_zst_wf_eur_jr;
+						attribute<eur_yr> egk_eb_zst_wf_hoog_eur_jr		:= jaarlijkse_kosten_eb_zst_wf_hoog_eur_jr	+ jaarlijkse_baten_eb_zst_wf_eur_jr;
 
 						attribute<eur_yr> egk_eb_nat_wf0_laag_eur_jr	:= jaarlijkse_kosten_eb_nat_wf0_laag_eur_jr;
 						attribute<eur_yr> egk_eb_nat_wf0_midden_eur_jr := jaarlijkse_kosten_eb_nat_wf0_midden_eur_jr;
@@ -607,16 +607,16 @@ template StateNaAllocatieComponent
 						attribute<eur_yr> egk_eb_zst_wf0_midden_eur_jr := jaarlijkse_kosten_eb_zst_wf0_midden_eur_jr;
 						attribute<eur_yr> egk_eb_zst_wf0_hoog_eur_jr   := jaarlijkse_kosten_eb_zst_wf0_hoog_eur_jr;
 
-						attribute<eur_yr> egk_hu_nat_laag_eur_jr       := jaarlijkse_kosten_hu_nat_laag_eur_jr - jaarlijkse_baten_hu_nat_eur_jr;
-						attribute<eur_yr> egk_hu_nat_midden_eur_jr     := jaarlijkse_kosten_hu_nat_midden_eur_jr - jaarlijkse_baten_hu_nat_eur_jr;
-						attribute<eur_yr> egk_hu_nat_hoog_eur_jr       := jaarlijkse_kosten_hu_nat_hoog_eur_jr - jaarlijkse_baten_hu_nat_eur_jr;
+						attribute<eur_yr> egk_hu_nat_laag_eur_jr       := jaarlijkse_kosten_hu_nat_laag_eur_jr + jaarlijkse_baten_hu_nat_eur_jr;
+						attribute<eur_yr> egk_hu_nat_midden_eur_jr     := jaarlijkse_kosten_hu_nat_midden_eur_jr + jaarlijkse_baten_hu_nat_eur_jr;
+						attribute<eur_yr> egk_hu_nat_hoog_eur_jr       := jaarlijkse_kosten_hu_nat_hoog_eur_jr + jaarlijkse_baten_hu_nat_eur_jr;
 
-						attribute<eur_yr> egk_hu_zst_laag_eur_jr       := jaarlijkse_kosten_hu_zst_laag_eur_jr - jaarlijkse_baten_hu_zst_eur_jr;
-						attribute<eur_yr> egk_hu_zst_midden_eur_jr     := jaarlijkse_kosten_hu_zst_midden_eur_jr - jaarlijkse_baten_hu_zst_eur_jr;
-						attribute<eur_yr> egk_hu_zst_hoog_eur_jr       := jaarlijkse_kosten_hu_zst_hoog_eur_jr - jaarlijkse_baten_hu_zst_eur_jr;
+						attribute<eur_yr> egk_hu_zst_laag_eur_jr       := jaarlijkse_kosten_hu_zst_laag_eur_jr + jaarlijkse_baten_hu_zst_eur_jr;
+						attribute<eur_yr> egk_hu_zst_midden_eur_jr     := jaarlijkse_kosten_hu_zst_midden_eur_jr + jaarlijkse_baten_hu_zst_eur_jr;
+						attribute<eur_yr> egk_hu_zst_hoog_eur_jr       := jaarlijkse_kosten_hu_zst_hoog_eur_jr + jaarlijkse_baten_hu_zst_eur_jr;
 
-						attribute<eur_yr> egk_vh_nat_eur_jr            := jaarlijkse_kosten_vh_nat_eur_jr - jaarlijkse_baten_vh_nat_eur_jr;
-						attribute<eur_yr> egk_vh_zst_eur_jr            := jaarlijkse_kosten_vh_zst_eur_jr - jaarlijkse_baten_vh_zst_eur_jr;
+						attribute<eur_yr> egk_vh_nat_eur_jr            := jaarlijkse_kosten_vh_nat_eur_jr + jaarlijkse_baten_vh_nat_eur_jr;
+						attribute<eur_yr> egk_vh_zst_eur_jr            := jaarlijkse_kosten_vh_zst_eur_jr + jaarlijkse_baten_vh_zst_eur_jr;
 
 
 					}
@@ -746,21 +746,21 @@ template StateNaAllocatieComponent
 
 						//Eindgebruikerskosten
 
-						attribute<eur_yr> egk_eb_nat_hy_laag_eur_jr		:= jaarlijkse_kosten_eb_nat_hy_laag_eur_jr	- jaarlijkse_baten_eb_nat_hy_eur_jr;	 
-						attribute<eur_yr> egk_eb_nat_hy_midden_eur_jr	:= jaarlijkse_kosten_eb_nat_hy_midden_eur_jr - jaarlijkse_baten_eb_nat_hy_eur_jr;
-						attribute<eur_yr> egk_eb_nat_hy_hoog_eur_jr		:= jaarlijkse_kosten_eb_nat_hy_hoog_eur_jr	- jaarlijkse_baten_eb_nat_hy_eur_jr;
+						attribute<eur_yr> egk_eb_nat_hy_laag_eur_jr		:= jaarlijkse_kosten_eb_nat_hy_laag_eur_jr	+ jaarlijkse_baten_eb_nat_hy_eur_jr;	 
+						attribute<eur_yr> egk_eb_nat_hy_midden_eur_jr	:= jaarlijkse_kosten_eb_nat_hy_midden_eur_jr + jaarlijkse_baten_eb_nat_hy_eur_jr;
+						attribute<eur_yr> egk_eb_nat_hy_hoog_eur_jr		:= jaarlijkse_kosten_eb_nat_hy_hoog_eur_jr	+ jaarlijkse_baten_eb_nat_hy_eur_jr;
 
-						attribute<eur_yr> egk_eb_zst_hy_laag_eur_jr		:= jaarlijkse_kosten_eb_zst_hy_laag_eur_jr	- jaarlijkse_baten_eb_zst_hy_eur_jr;
-						attribute<eur_yr> egk_eb_zst_hy_midden_eur_jr	:= jaarlijkse_kosten_eb_zst_hy_midden_eur_jr - jaarlijkse_baten_eb_zst_hy_eur_jr;
-						attribute<eur_yr> egk_eb_zst_hy_hoog_eur_jr		:= jaarlijkse_kosten_eb_zst_hy_hoog_eur_jr	- jaarlijkse_baten_eb_zst_hy_eur_jr;
+						attribute<eur_yr> egk_eb_zst_hy_laag_eur_jr		:= jaarlijkse_kosten_eb_zst_hy_laag_eur_jr	+ jaarlijkse_baten_eb_zst_hy_eur_jr;
+						attribute<eur_yr> egk_eb_zst_hy_midden_eur_jr	:= jaarlijkse_kosten_eb_zst_hy_midden_eur_jr + jaarlijkse_baten_eb_zst_hy_eur_jr;
+						attribute<eur_yr> egk_eb_zst_hy_hoog_eur_jr		:= jaarlijkse_kosten_eb_zst_hy_hoog_eur_jr	+ jaarlijkse_baten_eb_zst_hy_eur_jr;
 
-						attribute<eur_yr> egk_eb_nat_wf_laag_eur_jr		:= jaarlijkse_kosten_eb_nat_wf_laag_eur_jr	- jaarlijkse_baten_eb_nat_wf_eur_jr;
-						attribute<eur_yr> egk_eb_nat_wf_midden_eur_jr	:= jaarlijkse_kosten_eb_nat_wf_midden_eur_jr - jaarlijkse_baten_eb_nat_wf_eur_jr;
-						attribute<eur_yr> egk_eb_nat_wf_hoog_eur_jr		:= jaarlijkse_kosten_eb_nat_wf_hoog_eur_jr	- jaarlijkse_baten_eb_nat_wf_eur_jr;
+						attribute<eur_yr> egk_eb_nat_wf_laag_eur_jr		:= jaarlijkse_kosten_eb_nat_wf_laag_eur_jr	+ jaarlijkse_baten_eb_nat_wf_eur_jr;
+						attribute<eur_yr> egk_eb_nat_wf_midden_eur_jr	:= jaarlijkse_kosten_eb_nat_wf_midden_eur_jr + jaarlijkse_baten_eb_nat_wf_eur_jr;
+						attribute<eur_yr> egk_eb_nat_wf_hoog_eur_jr		:= jaarlijkse_kosten_eb_nat_wf_hoog_eur_jr	+ jaarlijkse_baten_eb_nat_wf_eur_jr;
 
-						attribute<eur_yr> egk_eb_zst_wf_laag_eur_jr		:= jaarlijkse_kosten_eb_zst_wf_laag_eur_jr	- jaarlijkse_baten_eb_zst_wf_eur_jr;
-						attribute<eur_yr> egk_eb_zst_wf_midden_eur_jr	:= jaarlijkse_kosten_eb_zst_wf_midden_eur_jr - jaarlijkse_baten_eb_zst_wf_eur_jr;
-						attribute<eur_yr> egk_eb_zst_wf_hoog_eur_jr		:= jaarlijkse_kosten_eb_zst_wf_hoog_eur_jr	- jaarlijkse_baten_eb_zst_wf_eur_jr;
+						attribute<eur_yr> egk_eb_zst_wf_laag_eur_jr		:= jaarlijkse_kosten_eb_zst_wf_laag_eur_jr	+ jaarlijkse_baten_eb_zst_wf_eur_jr;
+						attribute<eur_yr> egk_eb_zst_wf_midden_eur_jr	:= jaarlijkse_kosten_eb_zst_wf_midden_eur_jr + jaarlijkse_baten_eb_zst_wf_eur_jr;
+						attribute<eur_yr> egk_eb_zst_wf_hoog_eur_jr		:= jaarlijkse_kosten_eb_zst_wf_hoog_eur_jr	+ jaarlijkse_baten_eb_zst_wf_eur_jr;
 
 						attribute<eur_yr> egk_eb_nat_wf0_laag_eur_jr	:= jaarlijkse_kosten_eb_nat_wf0_laag_eur_jr;
 						attribute<eur_yr> egk_eb_nat_wf0_midden_eur_jr := jaarlijkse_kosten_eb_nat_wf0_midden_eur_jr;
@@ -770,16 +770,16 @@ template StateNaAllocatieComponent
 						attribute<eur_yr> egk_eb_zst_wf0_midden_eur_jr := jaarlijkse_kosten_eb_zst_wf0_midden_eur_jr;
 						attribute<eur_yr> egk_eb_zst_wf0_hoog_eur_jr   := jaarlijkse_kosten_eb_zst_wf0_hoog_eur_jr;
 
-						attribute<eur_yr> egk_hu_nat_laag_eur_jr       := jaarlijkse_kosten_hu_nat_laag_eur_jr - jaarlijkse_baten_hu_nat_eur_jr;
-						attribute<eur_yr> egk_hu_nat_midden_eur_jr     := jaarlijkse_kosten_hu_nat_midden_eur_jr - jaarlijkse_baten_hu_nat_eur_jr;
-						attribute<eur_yr> egk_hu_nat_hoog_eur_jr       := jaarlijkse_kosten_hu_nat_hoog_eur_jr - jaarlijkse_baten_hu_nat_eur_jr;
+						attribute<eur_yr> egk_hu_nat_laag_eur_jr       := jaarlijkse_kosten_hu_nat_laag_eur_jr + jaarlijkse_baten_hu_nat_eur_jr;
+						attribute<eur_yr> egk_hu_nat_midden_eur_jr     := jaarlijkse_kosten_hu_nat_midden_eur_jr + jaarlijkse_baten_hu_nat_eur_jr;
+						attribute<eur_yr> egk_hu_nat_hoog_eur_jr       := jaarlijkse_kosten_hu_nat_hoog_eur_jr + jaarlijkse_baten_hu_nat_eur_jr;
 
-						attribute<eur_yr> egk_hu_zst_laag_eur_jr       := jaarlijkse_kosten_hu_zst_laag_eur_jr - jaarlijkse_baten_hu_zst_eur_jr;
-						attribute<eur_yr> egk_hu_zst_midden_eur_jr     := jaarlijkse_kosten_hu_zst_midden_eur_jr - jaarlijkse_baten_hu_zst_eur_jr;
-						attribute<eur_yr> egk_hu_zst_hoog_eur_jr       := jaarlijkse_kosten_hu_zst_hoog_eur_jr - jaarlijkse_baten_hu_zst_eur_jr;
+						attribute<eur_yr> egk_hu_zst_laag_eur_jr       := jaarlijkse_kosten_hu_zst_laag_eur_jr + jaarlijkse_baten_hu_zst_eur_jr;
+						attribute<eur_yr> egk_hu_zst_midden_eur_jr     := jaarlijkse_kosten_hu_zst_midden_eur_jr + jaarlijkse_baten_hu_zst_eur_jr;
+						attribute<eur_yr> egk_hu_zst_hoog_eur_jr       := jaarlijkse_kosten_hu_zst_hoog_eur_jr + jaarlijkse_baten_hu_zst_eur_jr;
 
-						attribute<eur_yr> egk_vh_nat_eur_jr            := jaarlijkse_kosten_vh_nat_eur_jr - jaarlijkse_baten_vh_nat_eur_jr;
-						attribute<eur_yr> egk_vh_zst_eur_jr            := jaarlijkse_kosten_vh_zst_eur_jr - jaarlijkse_baten_vh_zst_eur_jr;
+						attribute<eur_yr> egk_vh_nat_eur_jr            := jaarlijkse_kosten_vh_nat_eur_jr + jaarlijkse_baten_vh_nat_eur_jr;
+						attribute<eur_yr> egk_vh_zst_eur_jr            := jaarlijkse_kosten_vh_zst_eur_jr + jaarlijkse_baten_vh_zst_eur_jr;
 					}
 					parameter<string> OutputFolder := '%localDataProjDir%/Results/Eindgebruikerskosten';
 					unit<uint32> variable := SubItem_PropValues(table,'name');
