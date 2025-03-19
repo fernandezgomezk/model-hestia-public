@@ -379,6 +379,7 @@ template StateNaAllocatieComponent
 						attribute<GJ_yr> temp_Functioneel_Tapwater_voor				:= BebouwingsComponenten/Woning/BO/Functioneel/TW[org_rel];
 						attribute<classifications/schillabel> temp_Energielabel_rel	:= BO/Energielabel_rel[org_rel];
 						attribute<UInt16> temp_bouwjaar								:= BO/bouwjaar[org_rel];
+						attribute<m2> temp_oppervlakte								:= BO/oppervlakte[org_rel];
 						attribute<string> temp_code_isolatie_voor	:= string(float64(temp_RB_m2 > 0[m2]) * float64(temp_RB_voor)) +
 																		string(float64(temp_RO_m2 > 0[m2]) * float64(temp_RO_voor)) +
 																		string(float64(temp_DR_m2 > 0[m2]) * float64(temp_DR_voor)) +
