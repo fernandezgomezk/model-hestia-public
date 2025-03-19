@@ -72,6 +72,8 @@ template StateNaAllocatieComponent
 					parameter<eur_GJ> warmteprijs 		  := 46.69[Eur_GJ] / 113.5d * 106.9d;  
 					parameter<Eur>    BAK 				  := 5250.24[Eur] / 113.5d * 106.9d; 
 					parameter<Eur_yr> meettarief	   	  := 31.68[Eur_yr] / 113.5d * 106.9d;
+					
+					parameter<eur> Ki_booster := 3000[eur] / 111.8d * 106.9d; // omgerekend van euro2023 naar euro2020, is hier subsidie voor?
 
 					attribute<Eur>   subsidie_BAK (Classifications/Eigendom)   : [3555.48, 1483.48, 1483.48]; //ISDE voor eigenaar-bewoner, SAH voor huur, omgerekend naar euro2020
 					attribute<float64> SPF_RV	  (Classifications/Schillabel) : [8.00, 4.20, 3.20, 3.20, 3.20, 1.00, 1.00, 1.00];
@@ -83,18 +85,18 @@ template StateNaAllocatieComponent
 					// inpandige kosten nemen we niet mee
 					
 					attribute<GJ_yr> metervraag_RV_W  (BO) := switch(
-																	case(warmtestrategie == 's2a' || warmtestrategie == 's2b' || warmtestrategie == 's3d', BO_Base/Functioneel/RV),
-																	case(warmtestrategie == 's3a' || warmtestrategie == 's3g', BO_Base/Functioneel/RV * (1d - AEO_ind_RV[BO/schillabel_rel])),
+																	case(lowercase(warmtestrategie) == 's2a' || lowercase(warmtestrategie) == 's2b' || lowercase(warmtestrategie) == 's3d', BO_Base/Functioneel/RV),
+																	case(lowercase(warmtestrategie) == 's3a' || lowercase(warmtestrategie) == 's3g', BO_Base/Functioneel/RV * (1d - AEO_ind_RV[BO/schillabel_rel])),
 																	float64(0/0));
-					attribute<GJ_yr> metervraag_RV_E  (BO) := warmtestrategie == 's3a' || warmtestrategie == 's3g' ? BO_Base/Functioneel/RV / SPF_RV[BO/schillabel_rel] * AEO_ind_RV[BO/schillabel_rel] : float64(0/0);
+					attribute<GJ_yr> metervraag_RV_E  (BO) := lowercase(warmtestrategie) == 's3a' || lowercase(warmtestrategie) == 's3g' ? BO_Base/Functioneel/RV / SPF_RV[BO/schillabel_rel] * AEO_ind_RV[BO/schillabel_rel] : float64(0/0);
 					attribute<GJ_yr> metervraag_TW_W  (BO) := switch(
-																	case(warmtestrategie == 's2a' || warmtestrategie == 's2b', BO_Base/Functioneel/TW),
-																	case(warmtestrategie == 's3a' || warmtestrategie == 's3g', BO_Base/Functioneel/TW * (1d - AEO_ind_TW_30)),
-																	case(warmtestrategie == 's3d', BO_Base/Functioneel/TW * (1d - AEO_ind_TW_50)),
+																	case(lowercase(warmtestrategie) == 's2a' || lowercase(warmtestrategie) == 's2b', BO_Base/Functioneel/TW),
+																	case(lowercase(warmtestrategie) == 's3a' || lowercase(warmtestrategie) == 's3g', BO_Base/Functioneel/TW * (1d - AEO_ind_TW_30)),
+																	case(lowercase(warmtestrategie) == 's3d', BO_Base/Functioneel/TW * (1d - AEO_ind_TW_50)),
 																	float64(0/0));	
 					attribute<GJ_yr> metervraag_TW_E  (BO) := switch(
-																	case(warmtestrategie == 's3a' || warmtestrategie == 's3g', BO_Base/Functioneel/TW / SPF_TW_30 * AEO_ind_TW_30),
-																	case(warmtestrategie == 's3d', BO_Base/Functioneel/TW / SPF_TW_50 * AEO_ind_TW_50),
+																	case(lowercase(warmtestrategie) == 's3a' || lowercase(warmtestrategie) == 's3g', BO_Base/Functioneel/TW / SPF_TW_30 * AEO_ind_TW_30),
+																	case(lowercase(warmtestrategie) == 's3d', BO_Base/Functioneel/TW / SPF_TW_50 * AEO_ind_TW_50),
 																	float64(0/0));
 																
 				}
@@ -103,11 +105,11 @@ template StateNaAllocatieComponent
 				attribute<Classifications/Eigendom>	Eigendom_rel	(BO) := BO/Eigendom_rel;
 				attribute<Eur> Ki_ventilatie		(BO) := lowercase(vervangingsmoment) == 'zst' ? eenmalig/Ki_VT -  eenmalig/Oi_VT : eenmalig/Ki_VT_nat - eenmalig/Oi_VT_nat;	
 				attribute<Eur> Ki_looptijd_inst 	(BO) := switch(
-																case(warmtestrategie == 's2a', Ki_ventilatie + eenmalig/Ki_KK / 2d),
-																case(warmtestrategie == 's2b', eenmalig/Ki_KK / 2d),
-																case(warmtestrategie == 's3a', Ki_ventilatie + eenmalig/Ki_LTAS + eenmalig/Ki_KK / 2d + eenmalig/Ki15_LO - eenmalig/Oi15_LO),
-																case(warmtestrategie == 's3d', Ki_ventilatie + eenmalig/Ki_LTAS + eenmalig/Ki_KK / 2d + 3000d / 111.8d * 106.9d), //3000 is Ki_booster, omgerekend van euro2023 naar euro2020, en check of daar subsidie voor is
-																case(warmtestrategie == 's3g', eenmalig/Ki_KK / 2d + eenmalig/Ki15_LO - eenmalig/Oi15_LO),
+																case(lowercase(warmtestrategie) == 's2a', Ki_ventilatie + eenmalig/Ki_KK / 2d),
+																case(lowercase(warmtestrategie) == 's2b', eenmalig/Ki_KK / 2d),
+																case(lowercase(warmtestrategie) == 's3a', Ki_ventilatie + eenmalig/Ki_LTAS + eenmalig/Ki_KK / 2d + eenmalig/Ki15_LO - eenmalig/Oi15_LO),
+																case(lowercase(warmtestrategie) == 's3d', Ki_ventilatie + eenmalig/Ki_LTAS + eenmalig/Ki_KK / 2d + warmtenetberekening/Ki_booster), 
+																case(lowercase(warmtestrategie) == 's3g', eenmalig/Ki_KK / 2d + eenmalig/Ki15_LO - eenmalig/Oi15_LO),
 																eenmalig/Ki15_LO + Ki_ventilatie + eenmalig/Ki30_LO + eenmalig/Ki_LTAS + eenmalig/Ki_KK / 2d - eenmalig/Oi15_LO - eenmalig/Oi30_LO); //check of LTAS hier ook bijhoort // voor koken alleen het deel voor woningaanpassing
 				attribute<Eur> Ki_isolatie			(BO) := lowercase(vervangingsmoment) == 'zst' ? eenmalig/Ki_gv -  eenmalig/Oi_gv : eenmalig/Ki_gv_nat - eenmalig/Oi_gv_nat;												
 				attribute<Eur> Ki_looptijd_iso		(BO) := Ki_isolatie + (strcount(lowercase(warmtestrategie), 's2') + strcount(lowercase(warmtestrategie), 's3') > 0 ? warmtenetberekening/BAK - warmtenetberekening/subsidie_BAK[Eigendom_rel]: 0d) ;
@@ -487,7 +489,7 @@ template StateNaAllocatieComponent
 						attribute<eur_yr> energiekosten_midden_eur_jr	 	:= gas_midden_eur_jr + elek_midden_eur_jr + warmte_midden_eur_jr;
 						attribute<eur_yr> energiekosten_hoog_eur_jr	 		:= gas_hoog_eur_jr + elek_hoog_eur_jr + warmte_hoog_eur_jr;
 						attribute<eur> ki_isolatie_zst_eur	 := vervangingsmoment == 'Zst' ? eenmalig/Ki_gv[org_rel] : (0/0)[eur];
-						attribute<eur> ki_warmtepomp_HR_eur	 := lowercase(strategie) == 's3d' ? 3000[eur] : eenmalig/Ki15_LO[org_rel]; 
+						attribute<eur> ki_warmtepomp_HR_eur	 := lowercase(strategie) == 's3d' ? warmtenetberekening/Ki_booster : eenmalig/Ki15_LO[org_rel]; 
 						attribute<eur> ki_BAK_eur			 := warmte_gj_jr > 0[gj_yr] ? const(warmtenetberekening/BAK, BO)[org_rel] : (0)[eur];
 						attribute<eur> ki_LTAS_eur 			 := eenmalig/Ki_LTAS[org_rel];
 						attribute<eur> ki_ventilatie_zst_eur 	 := vervangingsmoment == 'Zst' ? eenmalig/Ki_VT[org_rel] : (0/0)[eur];
