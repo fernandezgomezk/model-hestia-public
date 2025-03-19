@@ -355,8 +355,8 @@ container Beleid
 				attribute<bool> ZonB       (Subsidie) := All || (strcount(grondslag, 'zonneboile') > 0);
 				attribute<bool> ZonPV      (Subsidie) := All || (strcount(grondslag, 'zonnepanel') > 0);
 
-				attribute<bool> hHR        (Subsidie) := All || (strcount(grondslag, '(hybride)w') + strcount(grondslag, 'hybride warmtepomp') > 0);
-				attribute<bool> BasisHWP_w (Subsidie) := All || (strcount(grondslag, '(hybride)w') + strcount(grondslag, 'hybride warmtepomp') > 0);
+				attribute<bool> hHR        (Subsidie) := All || (strcount(grondslag, '(hybride) w') + strcount(grondslag, 'hybride warmtepomp') > 0);
+				attribute<bool> BasisHWP_w (Subsidie) := All || (strcount(grondslag, '(hybride) w') + strcount(grondslag, 'hybride warmtepomp') > 0);
 
 				attribute<bool> LTAS       (Subsidie) := All || (strcount(grondslag, 'ltas') > 0);
 			}
