@@ -89,7 +89,7 @@ template StateNaAllocatieComponent
 																case(lowercase(warmtestrategie) == 's3d' && eigendom_rel == 0, 0.3 * Ki_booster), 
 																case(lowercase(warmtestrategie) == 's3d' && eigendom_rel != 0, 0.4 * Ki_booster), //SAH check max bedrag
 																0[eur]);
-					attribute<eur> Oi_LTAS      (BO) := lowercase(warmtestrategie) == 's3a' || lowercase(warmtestrategie) == 's3d' && eigendom_rel != 0 ? 0.4 * eenmalig/Ki_LTAS : 0[eur]; //SAH check max bedrag
+					attribute<eur> Oi_LTAS      (BO) := (lowercase(warmtestrategie) == 's3a' || lowercase(warmtestrategie) == 's3d') && eigendom_rel != 0 ? 0.4 * eenmalig/Ki_LTAS : 0[eur]; //SAH check max bedrag
 					attribute<eur> Oi_KK        (BO) := strcount(lowercase(warmtestrategie), 's2') + strcount(lowercase(warmtestrategie), 's3') > 0 && eigendom_rel != 0 ? 0.4 * (eenmalig/Ki_KK / 2d) : 0[eur]; //SAH check max bedrag
 					attribute<Eur> Oi_BAK       (BO) := switch(
 																case(strcount(lowercase(warmtestrategie), 's2') + strcount(lowercase(warmtestrategie), 's3') > 0 && eigendom_rel == 0, 3775[eur] / 113.5d * 106.9d), //ISDE, omgerekend naar eur2020
