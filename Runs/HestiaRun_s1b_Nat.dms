@@ -10,14 +10,15 @@ container HestiaRun
 	#include <%projDir%/model/Units.dms>
 	#include <%projDir%/model/Geography.dms>
 	#include <%projDir%/model/Classifications.dms>
+	#include <%projDir%/Runs/RunInstellingen.dms>											  
 
 	//====== Invoer: over welke periode moet er worden gerekend?
-	parameter<uint16> eerste_jaar             := 2020[uint16], Descr = "Eerste zichtjaar";
-	parameter<uint8>  aantal_jaar             := 11[uint8]   , Descr = "Aantal zichtjaren";
+	parameter<uint16> eerste_jaar             := RunInstellingen/eerste_jaar, Descr = "Eerste zichtjaar";
+	parameter<uint8>  aantal_jaar             := RunInstellingen/aantal_jaar, Descr = "Aantal zichtjaren";
 	parameter<string> Studiegebied            := Invoer/StudieGebied;
+	parameter<units/yr_uint16> peiljaar		  := RunInstellingen/Peiljaar, Descr = "Zichtjaar eindgebruikerskosten";
 	parameter<string> warmtestrategie 		  := 'S1b';
-	parameter<string> vervangingsmoment 	  := 'Nat'; //Zst of Nat
-	parameter<units/yr_uint16> peiljaar		  := 2024[units/yr_uint16]; //zichtjaar eindgebruikerskosten
+	parameter<string> vervangingsmoment 	  := 'Nat', Descr = "Eindgebruikerskosten volgens natuurlijk of zelfstandig vervangingsmoment";
 
 	//====== Opbouw lijst van zichtjaren en rekenstappen
 	unit<uint8> all_rekenstap: nrofrows = 51, IsHidden = "True";
@@ -37,16 +38,19 @@ container HestiaRun
 	{
 		// Invoer: Geografische selectie welke gebied wordt onderzocht.
 
+		// Studiegebied volgens RunInstellingen.dms. Comment in om te gebruiken.
+		 parameter<string>   StudieGebied := RunInstellingen/Studiegebied, IsHidden = "True";
+		
 		// Volledig Nederland zonder selectie. Comment in om te gebruiken.
-		//parameter<string>   StudieGebied : ['NL'], IsHidden = "True";
+		// parameter<string>   StudieGebied : ['NL'], IsHidden = "True";
 
 		// Enkele gemeente als selectie. Comment in om te gebruiken.
 		//parameter<string>   StudieGebied : ['GM0050'], IsHidden = "True"; //GM0050 (Zeewolde) is handig om kleinschalig te testen OF GM0213 (meer oudere gebouwen)
 
 		// Meerdere gemeenten als studiegebied. Comment in om te gebruiken.
-		 parameter<string>   StudieGebied : ['GM0402,GM0344,GM1581,GM0439,GM0153,GM0599,GM0034,GM0050,GM0321'], IsHidden = "True";
-
-	    // RES-regio als selectie. Comment in om te gebruiken.
+		// parameter<string>   StudieGebied : ['GM0402,GM0344,GM1581,GM0439,GM0153,GM0599,GM0034,GM0050,GM0321'], IsHidden = "True";
+		
+		// RES-regio als selectie. Comment in om te gebruiken.
 		// parameter<string>   RES_Gebied   : ['RESTwente'], IsHidden = "True";
 		// parameter<string>   StudieGebied :=
 		// Geography/RegioIndelingen/Energieregio/GM_code_list[rlookup(RES_Gebied, Geography/RegioIndelingen/Energieregio/name)], IsHidden = "True";
@@ -59,7 +63,6 @@ container HestiaRun
 		parameter<bool> StartgegevensAan        := eerste_jaar >= 2020[uint16], Descr = "Worden invoer voor isolatieniveaus en gebouwopties meegenomen?", IsHidden = "True";
 		parameter<bool> HerberekenStartsituatie := false, IsHidden = "True";
 		parameter<units/yr_uint16> StartNieuwbouwJaar := right(/Invoer/RuimtelijkeData/BAG/datum,4)[units/yr_uint16], IsHidden = "True";
-
 
 		container DefaultInstellingen : IsHidden = "True"
 		{
