@@ -277,6 +277,8 @@ unit<uint32> ActieveWoning := select_with_org_rel(BO/Activatie/ProductActief || 
 			,BO
 			,GJ_yr){
 					attribute<GJ_yr> theoretisch_RV (BO) := VL + DP + DS + MG + MS + DR + PL + RO + RB + KR + Vrv_VT_asl - functioneel/Winst_RV;
+					attribute<GJ_yr> theoretisch_RV_ww_cor (BO) := functioneel/Winst_RV > 0.8 * (VL + DP + DS + MG + MS + DR + PL + RO + RB + KR + Vrv_VT_asl) ? 0.2 * (VL + DP + DS + MG + MS + DR + PL + RO + RB + KR + Vrv_VT_asl) :  VL + DP + DS + MG + MS + DR + PL + RO + RB + KR + Vrv_VT_asl - functioneel/Winst_RV;
+
 					attribute<GJ_yr>     Vrv_VT_asl (BO) := Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes/V_RV_asl[BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/VT] * nrAansluitingen_i, descr = "warmteverlies ventilatie vast per aansluiting";
 
 			}
