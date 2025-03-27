@@ -335,7 +335,7 @@ container Classifications: Using = "Units", KeepData = "True", IsHidden = "True"
 	unit<uint8> BouwjaarUtilBestaand: nrofrows = 9
 	{
 		attribute<yr_uint16> ClassBreak : [     0 ,  1920 ,  1975 ,  1990 ,  1995 , 2021, 2031, 2041, null];
-		attribute<string>   name       : ['v1920','v1975','v1990','v1995','v1995','v2030','v2040','v2050','onbekend'];
+		attribute<string>   name       : ['v1920','v1975','v1990','v1995','v2020','v2030','v2040','v2050','onbekend'];
 
 		attribute<string> Excel_code:
 		[

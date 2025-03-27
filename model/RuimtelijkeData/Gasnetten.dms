@@ -190,12 +190,17 @@ container Gasnetten
 			//panden worden omgezet naar serie punten
 			unit<uint32> points := sequence2points(Geometry)
 			{
+				attribute<Pand> pand_rel := SequenceNr;
+				
 				//voor elk pand-punt wordt gecheckt of er een distributieleiding ligt binnen [sqrt(2500)]=50 meter, zo ja dan wordt die geteld als 'connected'
 				attribute<float64> maxDist := const(2500d,.);
-				container          connect := connect_info(Leidingen/Geometry, Point, maxDist);
+				container          connect := connect_info(Leidingen/Geometry, Point, maxDist)
+				{
+					attribute<bool> is_connected(points) := isdefined(arcid);
+				}
 			}
 			//indicatie per pand of die geen gasaansluiting heeft
-			attribute<Bool> Gasloos := not(sum(uint8(isdefined(points/connect/arcid)), points/SequenceNr) > 0[uint8]);
+			attribute<Bool> Gasloos := not(any(points/connect/is_connected, points/SequenceNr));
 		}
 	}
 
@@ -219,12 +224,17 @@ container Gasnetten
 			//panden worden omgezet naar serie punten
 			unit<uint32> points := sequence2points(Geometry)
 			{
+				attribute<Pand>    pand_rel := SequenceNr;
+				
 				//voor elk pand-punt wordt gecheckt of er een distributieleiding ligt binnen [sqrt(2500)]=50 meter, zo ja dan wordt die geteld als 'connected'
 				attribute<float64> maxDist := const(2500d,.);
-				container          connect := connect_info(Leidingen/Geometry, Point, maxDist);
+				container          connect := connect_info(Leidingen/Geometry, Point, maxDist)
+				{
+					attribute<bool> is_connected(points) := isdefined(arcid);
+				}
 			}
 			//indicatie per pand of die geen gasaansluiting heeft
-			attribute<Bool> Gasloos := not(sum(uint8(isdefined(points/connect/arcid)), points/SequenceNr) > 0[uint8]);
+			attribute<Bool> Gasloos := not(any(points/connect/is_connected, points/pand_rel));
 		}
 	}	
 
