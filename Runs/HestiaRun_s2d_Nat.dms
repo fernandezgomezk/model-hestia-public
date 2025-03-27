@@ -17,7 +17,7 @@ container HestiaRun
 	parameter<uint8>  aantal_jaar             := RunInstellingen/aantal_jaar, Descr = "Aantal zichtjaren";
 	parameter<string> Studiegebied            := Invoer/StudieGebied;
 	parameter<units/yr_uint16> peiljaar		  := RunInstellingen/Peiljaar, Descr = "Zichtjaar eindgebruikerskosten";
-	parameter<string> warmtestrategie 		  := 'S2b';
+	parameter<string> warmtestrategie 		  := 'S2d';
 	parameter<string> vervangingsmoment 	  := 'Nat', Descr = "Eindgebruikerskosten volgens natuurlijk of zelfstandig vervangingsmoment";
 
 	//====== Opbouw lijst van zichtjaren en rekenstappen

@@ -94,9 +94,9 @@ template StateNaAllocatieComponent
 						
 				container warmtenetberekening
 				{
-					parameter<Eur_yr> vastrecht_warmte_HT := 582.82[Eur_yr] / 131.26d * 106.96d ; // maxprijzen 2024 volgens ACM, omgerekend naar eur 2020, is incl BTW
-					parameter<Eur_yr> vastrecht_warmte_LT := 310.52[Eur_yr]/ 131.26d * 106.96d ; 
-					parameter<Eur_yr> huur_afleverset 	  := 145.38[Eur_mo] * 12[mo / yr] / 131.26d * 106.96d;
+					parameter<Eur_yr> vastrecht_warmte_HT := 582.82[Eur_yr] / 131.26d * 106.96d; // maxprijzen 2024 volgens ACM, omgerekend naar eur 2020, is incl BTW
+					parameter<Eur_yr> vastrecht_warmte_LT := 310.52[Eur_yr] / 131.26d * 106.96d; 
+					parameter<Eur_yr> huur_afleverset 	  := 145.38[Eur_yr] / 131.26d * 106.96d;
 					parameter<eur_GJ> warmteprijs 		  := 46.69[Eur_GJ] / 131.26d * 106.96d;  
 					parameter<Eur_yr> meettarief	   	  := 31.68[Eur_yr] / 131.26d * 106.96d;
 					attribute<Eur>    BAK 			 (BO) := strcount(lowercase(warmtestrategie), 's2') + strcount(lowercase(warmtestrategie), 's3') > 0 ? const(5250.24[Eur], BO) / 131.26d * 106.96d : const(0[eur], BO); 
@@ -121,7 +121,7 @@ template StateNaAllocatieComponent
 					attribute<eur> Oi_KK        (BO) := strcount(lowercase(warmtestrategie), 's2') + strcount(lowercase(warmtestrategie), 's3') > 0 && eigendom_rel != 0 ? 0.4 * (eenmalig/incl_btw/Ki_KK / 2d) : 0[eur]; //SAH heeft nu geen max bedrag
 					attribute<Eur> Oi_BAK       (BO) := switch(
 																case(strcount(lowercase(warmtestrategie), 's2') + strcount(lowercase(warmtestrategie), 's3') > 0 && eigendom_rel == 0, 3775[eur] / 131.26d * 106.96d), //ISDE, omgerekend naar eur2020
-																case(strcount(lowercase(warmtestrategie), 's2') + strcount(lowercase(warmtestrategie), 's3') > 0 && eigendom_rel != 0, 0.3 * BAK), 
+																case(strcount(lowercase(warmtestrategie), 's2') + strcount(lowercase(warmtestrategie), 's3') > 0 && eigendom_rel != 0, 0.3 * BAK), //SAH
 																0[eur]);						
 		
 					
@@ -148,7 +148,7 @@ template StateNaAllocatieComponent
 				attribute<Eur> Ki_looptijd_inst 	(BO) := switch( // subsidie KK en LTAS van SAH toevoegen 
 																case(lowercase(warmtestrategie) == 's2a', Ki_ventilatie + eenmalig/incl_btw/Ki_KK / 2d - warmtenetberekening/Oi_KK),
 																case(lowercase(warmtestrategie) == 's2b', eenmalig/incl_btw/Ki_KK / 2d - warmtenetberekening/Oi_KK),
-																case(lowercase(warmtestrategie) == 's3a', Ki_ventilatie + eenmalig/incl_btw/Ki_LTAS - warmtenetberekening/Oi_LTAS + eenmalig/incl_btw/Ki_KK / 2d - warmtenetberekening/Oi_KK + eenmalig/incl_btw/Ki15_LO - eenmalig/incl_btw/Oi15_LO),
+																case(lowercase(warmtestrategie) == 's3a', Ki_ventilatie + eenmalig/incl_btw/Ki_LTAS - warmtenetberekening/Oi_LTAS + eenmalig/incl_btw/Ki_KK / 2d - warmtenetberekening/Oi_KK + eenmalig/incl_btw/Ki15_LO - eenmalig/incl_btw/Oi15_LO), //documenteer welke kosten voor warmtepompen we hier hebben gebruijkt
 																case(lowercase(warmtestrategie) == 's3d', Ki_ventilatie + eenmalig/incl_btw/Ki_LTAS - warmtenetberekening/Oi_LTAS + eenmalig/incl_btw/Ki_KK / 2d - warmtenetberekening/Oi_KK + warmtenetberekening/Ki_booster - warmtenetberekening/Oi_booster), 
 																case(lowercase(warmtestrategie) == 's3g', eenmalig/incl_btw/Ki_KK / 2d - warmtenetberekening/Oi_KK + eenmalig/incl_btw/Ki15_LO - eenmalig/incl_btw/Oi15_LO),
 																eenmalig/incl_btw/Ki15_LO + Ki_ventilatie + eenmalig/incl_btw/Ki30_LO + eenmalig/incl_btw/Ki_LTAS + eenmalig/incl_btw/Ki_KK / 2d - eenmalig/incl_btw/Oi15_LO - eenmalig/incl_btw/Oi30_LO); // voor koken alleen het deel voor woningaanpassing
@@ -245,7 +245,7 @@ template StateNaAllocatieComponent
 					attribute<Eur_yr>  inkomensgrens			(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/Inkomensgrens);	
 					attribute<eur_mo>  minimum_normhuur			(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/Minimum_normhuur);
 					attribute<eur_mo>  verhoging_normhuur		(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/verhoging_normhuur);
-					attribute<eur_mo>  minimum_basishuur		(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/Minimum_basishuur);
+					attribute<eur_mo>  minimum_basishuur		(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/Minimum_basishuur); // check of deze ergens voor gebruikt wordt, anders kan hij er uit
 					attribute<eur_mo>  aftoppingsgrens			(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/Aftoppingsgrens);
 					attribute<eur_mo>  kwaliteitskortinggrens	(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/Kwaliteitskortinggrens);
 					attribute<float64> factor_a					(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/factor_a);
@@ -257,7 +257,7 @@ template StateNaAllocatieComponent
 					
 					container Huidig
 					{
-						attribute<eur_mo>  rekenhuur				(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/KaleHuur[eur_mo]  / 122.78d * 131.26d; //omgerekend van eur2022 naar eur2024
+						attribute<eur_mo>  rekenhuur				(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/KaleHuur[eur_mo]  / 122.78d * 131.26d; //omgerekend van eur2022 naar eur2024, moet worden omgerekend naar eur2025
 						attribute<eur_mo>  normhuur					(BO) := reken_inkomen < inkomensgrens ? minimum_normhuur : factor_a * (reken_inkomen / 1[eur_yr]) ^ 2d + factor_b * reken_inkomen * 1[yr] / 1[mo]; 
 						attribute<eur_mo>  basishuur				(BO) := normhuur + verhoging_normhuur;
 						attribute<eur_mo>  onder_kkg				(BO) := basishuur < kwaliteitskortinggrens ? kwaliteitskortinggrens - basishuur : 0[eur_mo];
@@ -268,8 +268,8 @@ template StateNaAllocatieComponent
 																				(0/0)[eur_mo]);
 						attribute<eur_mo>  boven_aftopping			(BO) := rekenhuur > aftoppingsgrens ? rekenhuur - aftoppingsgrens : 0[eur_mo];
 						attribute<eur_mo>  huurtoeslag_maand		(BO) := (Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/Vermogen[eur] / 122.78d * 131.26d) > vermogensgrens ? 0[eur_mo] : 
-																			onder_kkg  + tussen_kkg_aftopping * ratio_kkg_aftopping + boven_aftopping + ratio_aftopping; // microdata vermogen huishoudens omgerekend van eur2022 naar eur2024 
-						attribute<eur_yr>  huurtoeslag				(BO) := huurtoeslag_maand * 12[mo] /1[yr] / 131.26d * 106.96d ; //omgerekend van euro2024 naar eur2020													
+																			onder_kkg  + tussen_kkg_aftopping * ratio_kkg_aftopping + boven_aftopping * ratio_aftopping; // microdata vermogen huishoudens omgerekend van eur2022 naar eur2024, moet worden omgerekend naar eur2025 
+						attribute<eur_yr>  huurtoeslag				(BO) := huurtoeslag_maand * 12[mo] /1[yr] / 131.26d * 106.96d ; //omgerekend van euro2024 naar eur2020, moet worden omgerekend vanuit eur2025													
 					}
 					
 					container Na_investering
@@ -277,7 +277,7 @@ template StateNaAllocatieComponent
 						attribute<eur_mo>  rekenhuur				(BO) := switch(
 																					case(Eigendom_rel == 1, Huurverhoging_huurcommissiemethode/Huurverhoging / 106.96d * 131.26d / 12[mo] * 1[yr] + Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/KaleHuur[eur_mo] / 122.78d * 131.26d),
 																					case(Eigendom_rel == 2, huurverhoging_menukaart/huurverhoging / 106.96d * 131.26d + Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/KaleHuur[eur_mo] / 122.78d * 131.26d),
-																					float64(0/0)); //huurverhoging omgerekend van eur2020 naar euro2024, kalehuur van eur2022 naar 2024
+																					float64(0/0)); //huurverhoging omgerekend van eur2020 naar euro2024, kalehuur van eur2022 naar 2024, moet worden omgerekend naar 2eur2025
 						attribute<eur_mo>  normhuur					(BO) := reken_inkomen < inkomensgrens ? minimum_normhuur : factor_a * (reken_inkomen / 1[eur_yr]) ^ 2d + factor_b * reken_inkomen * 1[yr] / 1[mo]; 
 						attribute<eur_mo>  basishuur				(BO) := normhuur + verhoging_normhuur;
 						attribute<eur_mo>  onder_kkg				(BO) := basishuur < kwaliteitskortinggrens ? kwaliteitskortinggrens - basishuur : 0[eur_mo];
@@ -288,8 +288,8 @@ template StateNaAllocatieComponent
 																				(0)[eur_mo]);
 						attribute<eur_mo>  boven_aftopping			(BO) := rekenhuur > aftoppingsgrens ? rekenhuur - aftoppingsgrens : 0[eur_mo];
 						attribute<eur_mo>  huurtoeslag_maand		(BO) := (Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/Vermogen[eur] / 122.78d * 131.26d) > vermogensgrens ? 0[eur_mo] : 
-																			onder_kkg  + tussen_kkg_aftopping * ratio_kkg_aftopping + boven_aftopping + ratio_aftopping; // microdata vermogen huishoudens omgerekend van eur2022 naar eur2024
-						attribute<eur_yr>  huurtoeslag				(BO) := huurtoeslag_maand * 12[mo] / 1[yr] / 131.26d * 106.96d ; //omgerekend van eur2024 naar eur2020																															
+																			onder_kkg  + tussen_kkg_aftopping * ratio_kkg_aftopping + boven_aftopping * ratio_aftopping; // microdata vermogen huishoudens omgerekend van eur2022 naar eur2024, moet worden omgerekend naar eur2025
+						attribute<eur_yr>  huurtoeslag				(BO) := huurtoeslag_maand * 12[mo] / 1[yr] / 131.26d * 106.96d ; //omgerekend van eur2024 naar eur2020, moet worden omgerekend vanuit eur2025																															
 					}
 					
 				}
@@ -309,37 +309,37 @@ template StateNaAllocatieComponent
 					{
 						attribute<ratio> BelastingSchijf	(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BrutoInkomen[Eur_yr] / 122.78d * 131.26d <= Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_laag[ratio]
 						: Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BrutoInkomen[Eur_yr]/ 122.78d * 131.26d > Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_hoog 
-						: (0/0)[ratio];
+						: (0/0)[ratio];// kan dit er uit?
 						
-						attribute<Eur_yr> Rentelasten_per_jaar 		(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/Hypotheekrentelasten * 12d [Eur_yr];
+						attribute<Eur_yr> Rentelasten_per_jaar 		(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/Hypotheekrentelasten / 122.78d * 131.26d * 12d [Eur_yr]; //omgerekend van eur2022 naar eurS2024
 						attribute<_yr> vermoedelijk_rentepercentage_hypotheek 					(BO) := Rentelasten_per_jaar[Eur_yr] / (Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/Hypotheekschuld[Eur] / 122.78d * 131.26d);
 						
 						attribute<Eur_yr> eigenwoningforfait 									(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/WOZwaarde[Eur] / 122.78d * 131.26d < WOZ_grens_eigenwoningforfait[Eur] ? (Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/WOZwaarde[Eur] / 122.78d * 131.26d) * eigenwoningforfait_laag[_yr]
 						: Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/WOZwaarde[Eur] / 122.78d * 131.26d >= WOZ_grens_eigenwoningforfait[Eur] ? eigenwoningforfait_hoog_vast[Eur_yr] + ((Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/WOZwaarde[Eur] / 122.78d * 131.26d) - WOZ_grens_eigenwoningforfait[Eur]) * eigenwoningforfait_hoog_variabel[_yr] :
 						(0/0)[Eur_yr];
 						
-						attribute<Eur_yr> Bruto_inkomen_na_rentelasten 							(BO) := (Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BrutoInkomen[Eur_yr] / 122.78d * 131.26d) - Rentelasten_per_jaar[Eur_yr] + Eigenwoningforfait[Eur_yr];
+						attribute<Eur_yr> Bruto_inkomen_incl_eigenwoningforfait				(BO) := (Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BrutoInkomen[Eur_yr] / 122.78d * 131.26d) + Eigenwoningforfait[Eur_yr];
 						
-						attribute<ratio> BelastingSchijf_na_rentelasten						(BO) := Bruto_inkomen_na_rentelasten[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_laag[ratio]
-						: Bruto_inkomen_na_rentelasten[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_hoog 
+						attribute<ratio> BelastingSchijf_incl_eigenwoningforfait			(BO) := Bruto_inkomen_incl_eigenwoningforfait[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_laag[ratio]
+						: Bruto_inkomen_incl_eigenwoningforfait[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_hoog 
 						: (0/0)[ratio];
 												
-						attribute<Eur_yr> Deel_inkomen_onder									(BO) := Bruto_inkomen_na_rentelasten[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? Bruto_inkomen_na_rentelasten[Eur_yr]
-						: Bruto_inkomen_na_rentelasten[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? Inkomensgrens_belastingschijf[Eur_yr]
+						attribute<Eur_yr> Deel_inkomen_onder									(BO) := Bruto_inkomen_incl_eigenwoningforfait[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? Bruto_inkomen_incl_eigenwoningforfait[Eur_yr]
+						: Bruto_inkomen_incl_eigenwoningforfait[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? Inkomensgrens_belastingschijf[Eur_yr]
 						: (0/0)[Eur_yr];
 						
-						attribute<Eur_yr> Deel_inkomen_boven									(BO) := Bruto_inkomen_na_rentelasten[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? 0[Eur_yr]
-						: Bruto_inkomen_na_rentelasten[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? Bruto_inkomen_na_rentelasten[Eur_yr] - Inkomensgrens_belastingschijf[Eur_yr]
+						attribute<Eur_yr> Deel_inkomen_boven									(BO) := Bruto_inkomen_incl_eigenwoningforfait[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? 0[Eur_yr]
+						: Bruto_inkomen_incl_eigenwoningforfait[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? Bruto_inkomen_incl_eigenwoningforfait[Eur_yr] - Inkomensgrens_belastingschijf[Eur_yr]
 						: (0/0)[Eur_yr];			
 					
-						attribute<Eur_yr> inkomstenbelasting					(BO) := BelastingSchijf_laag * Deel_inkomen_onder + BelastingSchijf_hoog * Deel_inkomen_boven;
+						attribute<Eur_yr> inkomstenbelasting					(BO) := BelastingSchijf_laag * Deel_inkomen_onder + BelastingSchijf_hoog * Deel_inkomen_boven - BelastingSchijf_laag * Rentelasten_per_jaar;
 					}
 					
 					container Na_investering
 					{
 						attribute<ratio> BelastingSchijf	(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BrutoInkomen[Eur_yr] / 122.78d * 131.26d <= Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_laag[ratio]
 						: Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BrutoInkomen[Eur_yr] / 122.78d * 131.26d > Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_hoog 
-						: (0/0)[ratio];
+						: (0/0)[ratio]; // kan dit er uit?
 						attribute<Eur> WOZwaarde									(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/WOZwaarde[Eur] / 122.78d * 131.26d + aandeel_investering_WOZ * (Ki_looptijd_iso + Ki_looptijd_inst) / 106.96d * 131.26d ; //investeringen omgerekend naar euro2024
 						attribute<Eur_yr> eigenwoningforfait						(BO) :=  WOZwaarde < WOZ_grens_eigenwoningforfait[Eur] ? WOZwaarde[Eur] * eigenwoningforfait_laag[_yr]
 						: WOZwaarde[Eur] >= WOZ_grens_eigenwoningforfait[Eur] ? eigenwoningforfait_hoog_vast[Eur_yr] + (WOZwaarde[Eur] - WOZ_grens_eigenwoningforfait[Eur]) * eigenwoningforfait_hoog_variabel[_yr]
@@ -348,46 +348,47 @@ template StateNaAllocatieComponent
 						container Hypothecaire_lening
 						{
 							attribute<Eur_yr> Bruto_rentelasten 				(BO) := Huidig/Rentelasten_per_jaar[Eur_yr] + (financieringslasten/rentepercentage[percent_yr]/100[percent])[_yr] * (Ki_looptijd_iso + Ki_looptijd_inst) / 106.96d * 131.26d; //investeringen omgerekend naar euro2024
-							attribute<Eur_yr> Bruto_inkomen_na_rentelasten 		(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BrutoInkomen[Eur_yr] / 122.78d * 131.26d - Bruto_rentelasten[Eur_yr] + Eigenwoningforfait[Eur_yr];
+							attribute<Eur_yr> Bruto_inkomen_incl_eigenwoningforfait 		(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BrutoInkomen[Eur_yr] / 122.78d * 131.26d + Eigenwoningforfait[Eur_yr];
 							
-							attribute<ratio> BelastingSchijf_na_rentelasten		(BO) := Bruto_inkomen_na_rentelasten[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_laag[ratio]
-							: Bruto_inkomen_na_rentelasten[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_hoog 
+							attribute<ratio> BelastingSchijf_incl_eigenwoningforfait			(BO) := Bruto_inkomen_incl_eigenwoningforfait[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_laag[ratio]
+							: Bruto_inkomen_incl_eigenwoningforfait[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_hoog 
 							: (0/0)[ratio];
 							
 							
-							attribute<Eur_yr> Deel_inkomen_onder									(BO) := Bruto_inkomen_na_rentelasten[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? Bruto_inkomen_na_rentelasten[Eur_yr]
-							: Bruto_inkomen_na_rentelasten[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? Inkomensgrens_belastingschijf[Eur_yr]
+							attribute<Eur_yr> Deel_inkomen_onder									(BO) := Bruto_inkomen_incl_eigenwoningforfait[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? Bruto_inkomen_incl_eigenwoningforfait[Eur_yr]
+							: Bruto_inkomen_incl_eigenwoningforfait[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? Inkomensgrens_belastingschijf[Eur_yr]
 							: (0/0)[Eur_yr];
 							
-							attribute<Eur_yr> Deel_inkomen_boven									(BO) := Bruto_inkomen_na_rentelasten[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? 0[Eur_yr]
-							: Bruto_inkomen_na_rentelasten[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? Bruto_inkomen_na_rentelasten[Eur_yr] - Inkomensgrens_belastingschijf[Eur_yr]
+							attribute<Eur_yr> Deel_inkomen_boven									(BO) := Bruto_inkomen_incl_eigenwoningforfait[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? 0[Eur_yr]
+							: Bruto_inkomen_incl_eigenwoningforfait[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? Bruto_inkomen_incl_eigenwoningforfait[Eur_yr] - Inkomensgrens_belastingschijf[Eur_yr]
 							: (0/0)[Eur_yr];			
 						
-							attribute<Eur_yr> inkomstenbelasting					(BO) := BelastingSchijf_laag * Deel_inkomen_onder + BelastingSchijf_hoog * Deel_inkomen_boven;
+							attribute<Eur_yr> inkomstenbelasting					(BO) := BelastingSchijf_laag * Deel_inkomen_onder + BelastingSchijf_hoog * Deel_inkomen_boven - BelastingSchijf_laag * Bruto_rentelasten;
 							
-							attribute<bool> Belastingschijfverschuivingen (BO) := Belastingschijf == Belastingschijf_na_rentelasten ? FALSE : TRUE;
+							attribute<bool> Belastingschijfverschuivingen (BO) := Belastingschijf == Belastingschijf_incl_eigenwoningforfait ? FALSE : TRUE; // kan dit er uit?
 						}
+						
 						container Warmtefondslening
 						{
 							attribute<Eur_yr> Bruto_rentelasten 				(BO) := Huidig/Rentelasten_per_jaar[Eur_yr] + (financieringslasten/Warmtefondslening/rentepercentage[percent_yr]/100[percent])[_yr] * (Ki_looptijd_iso + Ki_looptijd_inst) / 106.96d * 131.26d ; //investeringen omgerekend naar euro2024
-							attribute<Eur_yr> Bruto_inkomen_na_rentelasten 		(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BrutoInkomen[Eur_yr] / 122.78d * 131.26d - Bruto_rentelasten[Eur_yr] + Eigenwoningforfait[Eur_yr];
+							attribute<Eur_yr> Bruto_inkomen_incl_eigenwoningforfait 		(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BrutoInkomen[Eur_yr] / 122.78d * 131.26d + Eigenwoningforfait[Eur_yr];
 							
-							attribute<ratio> BelastingSchijf_na_rentelasten		(BO) := Bruto_inkomen_na_rentelasten[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_laag[ratio]
-							: Bruto_inkomen_na_rentelasten[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_hoog 
+							attribute<ratio> BelastingSchijf_incl_eigenwoningforfait		(BO) := Bruto_inkomen_incl_eigenwoningforfait[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_laag[ratio]
+							: Bruto_inkomen_incl_eigenwoningforfait[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_hoog 
 							: (0/0)[ratio];
 							
 							
-							attribute<Eur_yr> Deel_inkomen_onder									(BO) := Bruto_inkomen_na_rentelasten[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? Bruto_inkomen_na_rentelasten[Eur_yr]
-							: Bruto_inkomen_na_rentelasten[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? Inkomensgrens_belastingschijf[Eur_yr]
+							attribute<Eur_yr> Deel_inkomen_onder									(BO) := Bruto_inkomen_incl_eigenwoningforfait[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? Bruto_inkomen_incl_eigenwoningforfait[Eur_yr]
+							: Bruto_inkomen_incl_eigenwoningforfait[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? Inkomensgrens_belastingschijf[Eur_yr]
 							: (0/0)[Eur_yr];
 							
-							attribute<Eur_yr> Deel_inkomen_boven									(BO) := Bruto_inkomen_na_rentelasten[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? 0[Eur_yr]
-							: Bruto_inkomen_na_rentelasten[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? Bruto_inkomen_na_rentelasten[Eur_yr] - Inkomensgrens_belastingschijf[Eur_yr]
+							attribute<Eur_yr> Deel_inkomen_boven									(BO) := Bruto_inkomen_incl_eigenwoningforfait[Eur_yr] <= Inkomensgrens_belastingschijf[Eur_yr] ? 0[Eur_yr]
+							: Bruto_inkomen_incl_eigenwoningforfait[Eur_yr] > Inkomensgrens_belastingschijf[Eur_yr] ? Bruto_inkomen_incl_eigenwoningforfait[Eur_yr] - Inkomensgrens_belastingschijf[Eur_yr]
 							: (0/0)[Eur_yr];			
 						
-							attribute<Eur_yr> inkomstenbelasting					(BO) := BelastingSchijf_laag * Deel_inkomen_onder + BelastingSchijf_hoog * Deel_inkomen_boven;
+							attribute<Eur_yr> inkomstenbelasting					(BO) := BelastingSchijf_laag * Deel_inkomen_onder + BelastingSchijf_hoog * Deel_inkomen_boven - BelastingSchijf_laag * Bruto_rentelasten;
 							
-							attribute<bool> Belastingschijfverschuivingen (BO) := Belastingschijf == Belastingschijf_na_rentelasten ? FALSE : TRUE;
+							attribute<bool> Belastingschijfverschuivingen (BO) := Belastingschijf == Belastingschijf_incl_eigenwoningforfait ? FALSE : TRUE; // kan dit er uit?
 						}
 					}	
 					
@@ -508,7 +509,7 @@ template StateNaAllocatieComponent
 						attribute<string> woningtype 		 := strcount(classifications/woningtype/label[BO/woningtype_rel][org_rel], 'meergezin') > 0 ? 'meergezinswoning' : classifications/woningtype/label[BO/woningtype_rel][org_rel];
 						attribute<string> eigendomstype		 := classifications/eigendom/label[BO/eigendom_rel][org_rel];
 						attribute<m3_yr> gas_m3_jr 			 := AllocatieResultaten/Woning/metervraag/Gas[org_rel] / 0.03165[GJ_m3];
-						attribute<kWh_yr> elek_kWh_jr 		 := lowercase(strategie) == 's3a'|| lowercase(strategie) == 's3g' ? 
+						attribute<kWh_yr> elek_kWh_jr 		 := strcount(lowercase(warmtestrategie), 's2') + strcount(lowercase(warmtestrategie), 's3') > 0 ? 
 																(AllocatieResultaten/Woning/metervraag/E[org_rel] - BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/Metervraag/metervraag_elektriciteit_rv_basis[org_rel] 
 																												  - BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/Metervraag/metervraag_elektriciteit_rv_piek[org_rel] 
 																												  - BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/Metervraag/metervraag_elektriciteit_tw_basis[org_rel] 
@@ -523,7 +524,7 @@ template StateNaAllocatieComponent
 						attribute<eur_yr> elek_laag_eur_jr	 := 1.21 * ((BO/nrAansluitingen[org_rel] * float64(elek_kWh_jr != 0[kWh_yr]) * (prijzen/elektriciteit/VastRecht -  Prijzen/Elektriciteit/Staffel/Heffingskorting[classify(elek_kWh_jr * 0.0036[GJ / kWh], Prijzen/Elektriciteit/Staffel/ClassBreak )])) + elek_kWh_jr * 0.0036[GJ / kWh] * Prijzen/Elektriciteit/Staffel/KGJ_eindgebruik_excl [classify(elek_kWh_jr * 0.0036[GJ / kWh], Prijzen/Elektriciteit/Staffel/ClassBreak )] * (0.137043613220703d / 0.167386576674406d)), source = 'Scenario,s voor aardgas- en elektriciteitsprijzen voor kleinverbruikers in de periode 2025-2040, PBL 24 mei 2023'; //lagere prijzen t.o.v. centraal (2030)					
 						attribute<eur_yr> elek_midden_eur_jr := 1.21 * ((BO/nrAansluitingen[org_rel] * float64(elek_kWh_jr != 0[kWh_yr]) * (prijzen/elektriciteit/VastRecht -  Prijzen/Elektriciteit/Staffel/Heffingskorting[classify(elek_kWh_jr * 0.0036[GJ / kWh], Prijzen/Elektriciteit/Staffel/ClassBreak )])) + elek_kWh_jr * 0.0036[GJ / kWh] * Prijzen/Elektriciteit/Staffel/KGJ_eindgebruik_excl [classify(elek_kWh_jr * 0.0036[GJ / kWh], Prijzen/Elektriciteit/Staffel/ClassBreak )]);					
 						attribute<eur_yr> elek_hoog_eur_jr	 := 1.21 * ((BO/nrAansluitingen[org_rel] * float64(elek_kWh_jr != 0[kWh_yr]) * (prijzen/elektriciteit/VastRecht -  Prijzen/Elektriciteit/Staffel/Heffingskorting[classify(elek_kWh_jr * 0.0036[GJ / kWh], Prijzen/Elektriciteit/Staffel/ClassBreak )])) + elek_kWh_jr * 0.0036[GJ / kWh] * Prijzen/Elektriciteit/Staffel/KGJ_eindgebruik_excl [classify(elek_kWh_jr * 0.0036[GJ / kWh], Prijzen/Elektriciteit/Staffel/ClassBreak )] * (0.183922777938664d / 0.167386576674406d)), source = 'Scenario,s voor aardgas- en elektriciteitsprijzen voor kleinverbruikers in de periode 2025-2040, PBL 24 mei 2023'; //hogere prijzen t.o.v. centraal (2030)				
-						attribute<eur_yr> warmte_laag_eur_jr	 :=  warmte_gj_jr == 0[GJ_yr] ? (0)[eur_yr] : lowercase(strategie) == 's3a' || lowercase(strategie) == 's3g' ? warmtenetberekening/vastrecht_warmte_LT + warmtenetberekening/meettarief + warmtenetberekening/huur_afleverset : warmtenetberekening/vastrecht_warmte_HT + warmtenetberekening/meettarief + warmtenetberekening/huur_afleverset + warmte_gj_jr * warmtenetberekening/warmteprijs * (0.894855015456298d / 1.06901183439788d), source = 'Scenario,s voor aardgas- en elektriciteitsprijzen voor kleinverbruikers in de periode 2025-2040, PBL 24 mei 2023'; //lagere prijzen t.o.v. centraal (2030)
+						attribute<eur_yr> warmte_laag_eur_jr	 := warmte_gj_jr == 0[GJ_yr] ? (0)[eur_yr] : lowercase(strategie) == 's3a' || lowercase(strategie) == 's3g' ? warmtenetberekening/vastrecht_warmte_LT + warmtenetberekening/meettarief + warmtenetberekening/huur_afleverset : warmtenetberekening/vastrecht_warmte_HT + warmtenetberekening/meettarief + warmtenetberekening/huur_afleverset + warmte_gj_jr * warmtenetberekening/warmteprijs * (0.894855015456298d / 1.06901183439788d), source = 'Scenario,s voor aardgas- en elektriciteitsprijzen voor kleinverbruikers in de periode 2025-2040, PBL 24 mei 2023'; //lagere prijzen t.o.v. centraal (2030)
 						attribute<eur_yr> warmte_midden_eur_jr	 := warmte_gj_jr == 0[GJ_yr] ? (0)[eur_yr] : lowercase(strategie) == 's3a' || lowercase(strategie) == 's3g' ? warmtenetberekening/vastrecht_warmte_LT + warmtenetberekening/meettarief + warmtenetberekening/huur_afleverset : warmtenetberekening/vastrecht_warmte_HT + warmtenetberekening/meettarief + warmtenetberekening/huur_afleverset + warmte_gj_jr * warmtenetberekening/warmteprijs; 
 						attribute<eur_yr> warmte_hoog_eur_jr	 := warmte_gj_jr == 0[GJ_yr] ? (0)[eur_yr] : lowercase(strategie) == 's3a' || lowercase(strategie) == 's3g' ? warmtenetberekening/vastrecht_warmte_LT + warmtenetberekening/meettarief + warmtenetberekening/huur_afleverset : warmtenetberekening/vastrecht_warmte_HT + warmtenetberekening/meettarief + warmtenetberekening/huur_afleverset + warmte_gj_jr * warmtenetberekening/warmteprijs * (1.15790606201696d / 1.06901183439788d), source = 'Scenario,s voor aardgas- en elektriciteitsprijzen voor kleinverbruikers in de periode 2025-2040, PBL 24 mei 2023'; //hogere prijzen t.o.v. centraal (2030)
 						attribute<eur_yr> energiekosten_laag_eur_jr	 		:= gas_laag_eur_jr + elek_laag_eur_jr + warmte_laag_eur_jr;
@@ -536,12 +537,12 @@ template StateNaAllocatieComponent
 																		eenmalig/incl_btw/Ki15_LO[org_rel]); 
 						attribute<eur> ki_BAK_eur			 := warmtenetberekening/BAK[org_rel]; 
 						attribute<eur> ki_LTAS_eur 			 := strcount(lowercase(warmtestrategie), 's2') + strcount(lowercase(warmtestrategie), 's3g') > 0 ? 0[eur] : eenmalig/incl_btw/Ki_LTAS[org_rel];
-						attribute<eur> ki_ventilatie_zst_eur 	 := vervangingsmoment == 'Zst' ? eenmalig/incl_btw/Ki_VT[org_rel] : (0/0)[eur];
-						attribute<eur> ki_koken_eur 			 := (eenmalig/incl_btw/Ki_KK[org_rel])/2d;
-						attribute<eur> ki_inductie_eur 			 := (eenmalig/incl_btw/Ki_KK[org_rel])/2d;
+						attribute<eur> ki_ventilatie_zst_eur 	:= vervangingsmoment == 'Zst' ? eenmalig/incl_btw/Ki_VT[org_rel] : (0/0)[eur];
+						attribute<eur> ki_koken_eur 			:= (eenmalig/incl_btw/Ki_KK[org_rel])/2d;
+						attribute<eur> ki_inductie_eur 			:= (eenmalig/incl_btw/Ki_KK[org_rel])/2d;
 						attribute<eur> ki_isolatie_nat_eur 	 	:= vervangingsmoment == 'Nat' ? eenmalig/incl_btw/Ki_gv_nat[org_rel] : (0/0)[eur];
 						attribute<eur> ki_ventilatie_nat_eur 	:= vervangingsmoment == 'Nat' ? eenmalig/incl_btw/Ki_VT_nat[org_rel] : (0/0)[eur];
-						attribute<eur> subsidies_eur 	 		:= -1 * ((strcount(lowercase(warmtestrategie), 's2') + strcount(lowercase(warmtestrategie), 's3d') > 0 ? 0[eur] : eenmalig/incl_btw/Oi15_LO[org_rel]) + warmtenetberekening/Oi_BAK[org_rel] + warmtenetberekening/Oi_booster[org_rel] + warmtenetberekening/Oi_KK[org_rel] + warmtenetberekening/Oi_LTAS[org_rel] + eenmalig/incl_btw/Oi_gv[org_rel]);
+						attribute<eur> subsidies_eur 	 		:= (strcount(lowercase(warmtestrategie), 's2') + strcount(lowercase(warmtestrategie), 's3d') > 0 ? 0[eur] : -1d * eenmalig/incl_btw/Oi15_LO[org_rel]) - (warmtenetberekening/Oi_BAK[org_rel] + warmtenetberekening/Oi_booster[org_rel] + warmtenetberekening/Oi_KK[org_rel] + warmtenetberekening/Oi_LTAS[org_rel] + eenmalig/incl_btw/Oi_gv[org_rel]);
 						attribute<eur> ki_tot_zst_eur 	 		:= subsidies_eur + ki_isolatie_zst_eur + Ki_warmtepomp_HR_eur + ki_BAK_eur + Ki_LTAS_eur + ki_ventilatie_zst_eur + ki_koken_eur + ki_inductie_eur;
 						attribute<eur> ki_tot_nat_eur 	 		:= subsidies_eur + ki_isolatie_nat_eur + Ki_warmtepomp_HR_eur + ki_BAK_eur + Ki_LTAS_eur + ki_ventilatie_nat_eur + ki_koken_eur + ki_inductie_eur;
 
@@ -695,12 +696,12 @@ template StateNaAllocatieComponent
 						attribute<m3_yr> gas_m3_jr 			 := BebouwingsComponenten/Woning/BO/MetervraagBerekening/result/Gas[org_rel] / 0.03165[GJ_m3];
 						attribute<kWh_yr> elek_kWh_jr 		 := BebouwingsComponenten/Woning/BO/MetervraagBerekening/result/E[org_rel]  / 0.0036[GJ / kWh];
 						attribute<GJ_yr> warmte_gj_jr		 := const(0[GJ_yr], BO)[org_rel];
-						attribute<eur_yr> gas_laag_eur_jr	 := Kj_vastrecht_G[org_rel] + BebouwingsComponenten/Woning/BO/Jaarlijks/Kj_gas[org_rel] * (0.894855015456298d / 1.06901183439788d), source = 'Scenario,s voor aardgas- en elektriciteitsprijzen voor kleinverbruikers in de periode 2025-2040, PBL 24 mei 2023'; //lagere prijzen t.o.v. centraal (2030)
-						attribute<eur_yr> gas_midden_eur_jr	 := Kj_vastrecht_G[org_rel] + BebouwingsComponenten/Woning/BO/Jaarlijks/Kj_gas[org_rel];
-						attribute<eur_yr> gas_hoog_eur_jr	 := Kj_vastrecht_G[org_rel] + BebouwingsComponenten/Woning/BO/Jaarlijks/Kj_gas[org_rel] * (1.15790606201696d / 1.06901183439788d), source = 'Scenario,s voor aardgas- en elektriciteitsprijzen voor kleinverbruikers in de periode 2025-2040, PBL 24 mei 2023'; //hogere prijzen t.o.v. centraal (2030)	
-						attribute<eur_yr> elek_laag_eur_jr	 := (BO/nrAansluitingen[org_rel] * float64(elek_kWh_jr != 0[kWh_yr]) * (prijzen/elektriciteit/VastRecht -  Prijzen/Elektriciteit/Staffel/Heffingskorting[classify(elek_kWh_jr * 0.0036[GJ / kWh], Prijzen/Elektriciteit/Staffel/ClassBreak )])) + elek_kWh_jr * 0.0036[GJ / kWh] * Prijzen/Elektriciteit/Staffel/KGJ_eindgebruik_excl [classify(elek_kWh_jr * 0.0036[GJ / kWh], Prijzen/Elektriciteit/Staffel/ClassBreak )] * (0.137043613220703d / 0.167386576674406d), source = 'Scenario,s voor aardgas- en elektriciteitsprijzen voor kleinverbruikers in de periode 2025-2040, PBL 24 mei 2023'; //lagere prijzen t.o.v. centraal (2030)					
-						attribute<eur_yr> elek_midden_eur_jr := (BO/nrAansluitingen[org_rel] * float64(elek_kWh_jr != 0[kWh_yr]) * (prijzen/elektriciteit/VastRecht -  Prijzen/Elektriciteit/Staffel/Heffingskorting[classify(elek_kWh_jr * 0.0036[GJ / kWh], Prijzen/Elektriciteit/Staffel/ClassBreak )])) + elek_kWh_jr * 0.0036[GJ / kWh] * Prijzen/Elektriciteit/Staffel/KGJ_eindgebruik_excl [classify(elek_kWh_jr * 0.0036[GJ / kWh], Prijzen/Elektriciteit/Staffel/ClassBreak )];					
-						attribute<eur_yr> elek_hoog_eur_jr	 := (BO/nrAansluitingen[org_rel] * float64(elek_kWh_jr != 0[kWh_yr]) * (prijzen/elektriciteit/VastRecht -  Prijzen/Elektriciteit/Staffel/Heffingskorting[classify(elek_kWh_jr * 0.0036[GJ / kWh], Prijzen/Elektriciteit/Staffel/ClassBreak )])) + elek_kWh_jr * 0.0036[GJ / kWh] * Prijzen/Elektriciteit/Staffel/KGJ_eindgebruik_excl [classify(elek_kWh_jr * 0.0036[GJ / kWh], Prijzen/Elektriciteit/Staffel/ClassBreak )] * (0.183922777938664d / 0.167386576674406d), source = 'Scenario,s voor aardgas- en elektriciteitsprijzen voor kleinverbruikers in de periode 2025-2040, PBL 24 mei 2023'; //hogere prijzen t.o.v. centraal (2030)														
+						attribute<eur_yr> gas_laag_eur_jr	 := 1.21d *(Kj_vastrecht_G[org_rel] + BebouwingsComponenten/Woning/BO/Jaarlijks/Kj_gas[org_rel] * (0.894855015456298d / 1.06901183439788d)), source = 'Scenario,s voor aardgas- en elektriciteitsprijzen voor kleinverbruikers in de periode 2025-2040, PBL 24 mei 2023'; //lagere prijzen t.o.v. centraal (2030)
+						attribute<eur_yr> gas_midden_eur_jr	 := 1.21d *(Kj_vastrecht_G[org_rel] + BebouwingsComponenten/Woning/BO/Jaarlijks/Kj_gas[org_rel]);
+						attribute<eur_yr> gas_hoog_eur_jr	 := 1.21d *(Kj_vastrecht_G[org_rel] + BebouwingsComponenten/Woning/BO/Jaarlijks/Kj_gas[org_rel] * (1.15790606201696d / 1.06901183439788d)), source = 'Scenario,s voor aardgas- en elektriciteitsprijzen voor kleinverbruikers in de periode 2025-2040, PBL 24 mei 2023'; //hogere prijzen t.o.v. centraal (2030)	
+						attribute<eur_yr> elek_laag_eur_jr	 := 1.21d *((BO/nrAansluitingen[org_rel] * float64(elek_kWh_jr != 0[kWh_yr]) * (prijzen/elektriciteit/VastRecht -  Prijzen/Elektriciteit/Staffel/Heffingskorting[classify(elek_kWh_jr * 0.0036[GJ / kWh], Prijzen/Elektriciteit/Staffel/ClassBreak )])) + elek_kWh_jr * 0.0036[GJ / kWh] * Prijzen/Elektriciteit/Staffel/KGJ_eindgebruik_excl [classify(elek_kWh_jr * 0.0036[GJ / kWh], Prijzen/Elektriciteit/Staffel/ClassBreak )] * (0.137043613220703d / 0.167386576674406d)), source = 'Scenario,s voor aardgas- en elektriciteitsprijzen voor kleinverbruikers in de periode 2025-2040, PBL 24 mei 2023'; //lagere prijzen t.o.v. centraal (2030)					
+						attribute<eur_yr> elek_midden_eur_jr := 1.21d *((BO/nrAansluitingen[org_rel] * float64(elek_kWh_jr != 0[kWh_yr]) * (prijzen/elektriciteit/VastRecht -  Prijzen/Elektriciteit/Staffel/Heffingskorting[classify(elek_kWh_jr * 0.0036[GJ / kWh], Prijzen/Elektriciteit/Staffel/ClassBreak )])) + elek_kWh_jr * 0.0036[GJ / kWh] * Prijzen/Elektriciteit/Staffel/KGJ_eindgebruik_excl [classify(elek_kWh_jr * 0.0036[GJ / kWh], Prijzen/Elektriciteit/Staffel/ClassBreak )]);					
+						attribute<eur_yr> elek_hoog_eur_jr	 := 1.21d *((BO/nrAansluitingen[org_rel] * float64(elek_kWh_jr != 0[kWh_yr]) * (prijzen/elektriciteit/VastRecht -  Prijzen/Elektriciteit/Staffel/Heffingskorting[classify(elek_kWh_jr * 0.0036[GJ / kWh], Prijzen/Elektriciteit/Staffel/ClassBreak )])) + elek_kWh_jr * 0.0036[GJ / kWh] * Prijzen/Elektriciteit/Staffel/KGJ_eindgebruik_excl [classify(elek_kWh_jr * 0.0036[GJ / kWh], Prijzen/Elektriciteit/Staffel/ClassBreak )] * (0.183922777938664d / 0.167386576674406d)), source = 'Scenario,s voor aardgas- en elektriciteitsprijzen voor kleinverbruikers in de periode 2025-2040, PBL 24 mei 2023'; //hogere prijzen t.o.v. centraal (2030)														
 						attribute<eur_yr> warmte_laag_eur_jr	 := const(0[eur_yr], BO)[org_rel];
 						attribute<eur_yr> warmte_midden_eur_jr	 := const(0[eur_yr], BO)[org_rel];
 						attribute<eur_yr> warmte_hoog_eur_jr	 := const(0[eur_yr], BO)[org_rel];
@@ -709,7 +710,7 @@ template StateNaAllocatieComponent
 						attribute<eur_yr> energiekosten_hoog_eur_jr	 		:= gas_hoog_eur_jr + elek_hoog_eur_jr + warmte_hoog_eur_jr;
 						
 						attribute<eur> ki_isolatie_zst_eur	 := const(0[eur], BO)[org_rel];
-						attribute<eur> ki_warmtepomp_HR_eur	 := BebouwingsComponenten/Woning/VerbruiksOpties/Installatie/ki_asl[rlookup('HR', Classifications/Installatie_imp/name)] * BO/nrAansluitingen[org_rel] * leerCurves/hr/Curve; // referentiescenario: een nieuwe HR ketel
+						attribute<eur> ki_warmtepomp_HR_eur	 := 1.21d * (BebouwingsComponenten/Woning/VerbruiksOpties/Installatie/ki_asl[rlookup('HR', Classifications/Installatie_imp/name)] * BO/nrAansluitingen[org_rel] * leerCurves/hr/Curve); // referentiescenario: een nieuwe HR ketel
 						attribute<eur> ki_BAK_eur			 := const(0[eur], BO)[org_rel];
 						attribute<eur> ki_LTAS_eur 			 := const(0[eur], BO)[org_rel];
 						attribute<eur> ki_ventilatie_zst_eur := const(0[eur], BO)[org_rel];

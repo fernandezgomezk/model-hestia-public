@@ -11,6 +11,6 @@ container RunInstellingen
 	parameter<uint8>  aantal_jaar            := 5[uint8], 				Descr = "Aantal zichtjaren";
 	parameter<string> Studiegebied      : ['NL'];
 	//parameter<string> StudieGebied 		: ['GM0402,GM0344,GM1581,GM0439,GM0153,GM0599,GM0034,GM0050,GM0321'];
-	//parameter<string>   StudieGebied 	: ['GM0050'];
+	parameter<string>   StudieGebied 	: ['GM0050'];
 
 }
