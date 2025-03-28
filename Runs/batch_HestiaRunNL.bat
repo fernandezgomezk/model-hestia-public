@@ -7,19 +7,9 @@ REM Bij nogmaals runnen worden bestanden gewoon overschreven
 REM aanpassingen voor machine specifieke paden
 Call path/set.bat
 
+set HESTIA_STUDIEGEBIED=NL
+set HESTIA_OUTPUT=NL
 
-set HESTIA_RES=0
-set HESTIA_OUTPUT=0
-START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt"  "%prj_dir%\Runs\HestiaRun.dms" /Resultaten/Exports/GenerateAllIndicatoren
-if ErrorLEvel 1 goto :error	
-
-set HESTIA_RES=1
-set HESTIA_OUTPUT=1
-START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt"  "%prj_dir%\Runs\HestiaRun.dms" /Resultaten/Exports/GenerateAllIndicatoren
-if ErrorLEvel 1 goto :error	
-
-set HESTIA_RES=2
-set HESTIA_OUTPUT=2
 START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt"  "%prj_dir%\Runs\HestiaRun.dms" /Resultaten/Exports/GenerateAllIndicatoren
 if ErrorLEvel 1 goto :error	
 
