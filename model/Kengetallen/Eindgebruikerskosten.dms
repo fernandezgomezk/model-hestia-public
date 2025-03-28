@@ -82,8 +82,9 @@
 			attribute<eur_mo> kwaliteitskortinggrens;
 			attribute<float64> factor_a;				
 			attribute<float64> factor_b;
-			attribute<ratio>   ratio_kkg_aftopping 	:= percentage_kwaliteit_aftopping[ratio];
-			attribute<ratio>   ratio_aftopping 		:= percentage_aftopping[ratio];
+			attribute<ratio> afbouwratio	 	 := Afbouwpercentage[percent] / 100[percent / ratio];
+			attribute<ratio> ratio_kkg_aftopping := percentage_kwaliteit_aftopping[percent] / 100[percent / ratio];
+			attribute<ratio> ratio_aftopping	 := percentage_aftopping[percent] / 100[percent / ratio];
 
 		}
 
@@ -482,7 +483,7 @@
 					attribute<Class/y_categorien_discreet/AantPersHH> 		AantPersHH 	(..)		:= buurt_discreet_per_vbo/AantPersHH/AantPersHH > 0[Class/y_categorien_discreet/AantPersHH] ? buurt_discreet_per_vbo/AantPersHH/AantPersHH : gemeente_discreet_per_vbo/AantPersHH/AantPersHH;
 					attribute<Class/y_categorien_discreet/LeeftijdRefPers> 	LeeftijdRefPers (..)	:= buurt_discreet_per_vbo/LeeftijdRefPers/LeeftijdRefPers > 0[Class/y_categorien_discreet/LeeftijdRefPers] ? buurt_discreet_per_vbo/LeeftijdRefPers/LeeftijdRefPers : gemeente_discreet_per_vbo/LeeftijdRefPers/LeeftijdRefPers;
 					attribute<Class/y_categorien_discreet/TypeHH> 			TypeHH 		(..)		:= buurt_discreet_per_vbo/TypeHH/TypeHH > 0[Class/y_categorien_discreet/TypeHH] ? buurt_discreet_per_vbo/TypeHH/TypeHH : gemeente_discreet_per_vbo/TypeHH/TypeHH;
-					attribute<float64> TweedeBrutoInkomen (VBO) := AantPersHH > 1[Class/y_categorien_discreet/AantPersHH] ? (0.37d / (1d - 0.37d)) * BrutoInkomen : BrutoInkomen, source = 'https://www.cbs.nl/nl-nl/nieuws/2023/28/ongelijk-inkomen-voor-meeste-tweeverdieners-niet-echt-een-probleem';
+					attribute<float64> TweedeBrutoInkomen (VBO) := AantPersHH > 1[Class/y_categorien_discreet/AantPersHH] ? (0.37d / (1d - 0.37d)) * BrutoInkomen : 0d, source = 'https://www.cbs.nl/nl-nl/nieuws/2023/28/ongelijk-inkomen-voor-meeste-tweeverdieners-niet-echt-een-probleem';
 				}
 				
 				/*container huishoudenskenmerken_zonder_spreiding := for_each_nedv(

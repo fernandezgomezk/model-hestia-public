@@ -250,16 +250,16 @@ template StateNaAllocatieComponent
 					attribute<eur_mo>  kwaliteitskortinggrens	(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/Kwaliteitskortinggrens);
 					attribute<float64> factor_a					(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/factor_a);
 					attribute<float64> factor_b					(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/factor_b);
+					attribute<ratio>   afbouwratio				(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/afbouwratio);					
 					attribute<ratio>   ratio_kkg_aftopping		(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/ratio_kkg_aftopping);
 					attribute<ratio>   ratio_aftopping			(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/ratio_aftopping);
 					
-					attribute<eur_yr>  reken_inkomen 			(BO) := (Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BrutoInkomen[Eur_yr] + Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/TweedeBrutoInkomen[Eur_yr])  / 122.78d * 131.26d; //omgerekend van eur2022 naar eur2024
+					attribute<eur_yr>  reken_inkomen 			(BO) := (Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BrutoInkomen[Eur_yr] + Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/TweedeBrutoInkomen[Eur_yr])  / 122.78d * 134.54d; //omgerekend van eur2022 naar eur2025
 					
 					container Huidig
 					{
-						attribute<eur_mo>  rekenhuur				(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/KaleHuur[eur_mo]  / 122.78d * 131.26d; //omgerekend van eur2022 naar eur2024, moet worden omgerekend naar eur2025
-						attribute<eur_mo>  normhuur					(BO) := reken_inkomen < inkomensgrens ? minimum_normhuur : factor_a * (reken_inkomen / 1[eur_yr]) ^ 2d + factor_b * reken_inkomen * 1[yr] / 1[mo]; 
-						attribute<eur_mo>  basishuur				(BO) := normhuur + verhoging_normhuur;
+						attribute<eur_mo>  rekenhuur				(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/KaleHuur[eur_mo]  / 122.78d * 134.54d; //omgerekend van eur2022 naar eur2025
+						attribute<eur_mo>  basishuur				(BO) := minimum_normhuur + verhoging_normhuur;
 						attribute<eur_mo>  onder_kkg				(BO) := basishuur < kwaliteitskortinggrens ? kwaliteitskortinggrens - basishuur : 0[eur_mo];
 						attribute<eur_mo>  tussen_kkg_aftopping		(BO) := switch(
 																				case(rekenhuur < aftoppingsgrens && rekenhuur > kwaliteitskortinggrens, rekenhuur - kwaliteitskortinggrens),
@@ -267,19 +267,20 @@ template StateNaAllocatieComponent
 																				case(rekenhuur < kwaliteitskortinggrens, 0[eur_mo]),
 																				(0/0)[eur_mo]);
 						attribute<eur_mo>  boven_aftopping			(BO) := rekenhuur > aftoppingsgrens ? rekenhuur - aftoppingsgrens : 0[eur_mo];
-						attribute<eur_mo>  huurtoeslag_maand		(BO) := (Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/Vermogen[eur] / 122.78d * 131.26d) > vermogensgrens ? 0[eur_mo] : 
-																			onder_kkg  + tussen_kkg_aftopping * ratio_kkg_aftopping + boven_aftopping * ratio_aftopping; // microdata vermogen huishoudens omgerekend van eur2022 naar eur2024, moet worden omgerekend naar eur2025 
-						attribute<eur_yr>  huurtoeslag				(BO) := huurtoeslag_maand * 12[mo] /1[yr] / 131.26d * 106.96d ; //omgerekend van euro2024 naar eur2020, moet worden omgerekend vanuit eur2025													
-					}
+						attribute<eur_mo>  inkomensafhankelijk_eb   (BO) := reken_inkomen < inkomensgrens ? 0d : (reken_inkomen - inkomensgrens) * (afbouwratio / 12[mo / yr]);
+						attribute<eur_mo>  huurtoeslag_maand_temp	(BO) := (Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/Vermogen[eur] / 122.78d * 134.54d) > vermogensgrens ? 0[eur_mo] : 
+																			onder_kkg  + tussen_kkg_aftopping * ratio_kkg_aftopping + boven_aftopping * ratio_aftopping - inkomensafhankelijk_eb; // microdata vermogen huishoudens omgerekend van eur2022 naar eur2025 
+						attribute<eur_mo>  huurtoeslag_maand	    (BO) :=	huurtoeslag_maand_temp > 0d ? huurtoeslag_maand_temp : 0d; 												
+						attribute<eur_yr>  huurtoeslag				(BO) := huurtoeslag_maand * 12[mo / yr] / 134.54d * 106.96d ; //omgerekend van euro2025 naar eur2020	
+					} 
 					
 					container Na_investering
 					{				
 						attribute<eur_mo>  rekenhuur				(BO) := switch(
-																					case(Eigendom_rel == 1, Huurverhoging_huurcommissiemethode/Huurverhoging / 106.96d * 131.26d / 12[mo] * 1[yr] + Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/KaleHuur[eur_mo] / 122.78d * 131.26d),
-																					case(Eigendom_rel == 2, huurverhoging_menukaart/huurverhoging / 106.96d * 131.26d + Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/KaleHuur[eur_mo] / 122.78d * 131.26d),
-																					float64(0/0)); //huurverhoging omgerekend van eur2020 naar euro2024, kalehuur van eur2022 naar 2024, moet worden omgerekend naar 2eur2025
-						attribute<eur_mo>  normhuur					(BO) := reken_inkomen < inkomensgrens ? minimum_normhuur : factor_a * (reken_inkomen / 1[eur_yr]) ^ 2d + factor_b * reken_inkomen * 1[yr] / 1[mo]; 
-						attribute<eur_mo>  basishuur				(BO) := normhuur + verhoging_normhuur;
+																					case(Eigendom_rel == 1, Huurverhoging_huurcommissiemethode/Huurverhoging / 106.96d * 134.54d / 12[mo] * 1[yr] + Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/KaleHuur[eur_mo] / 122.78d * 134.54d),
+																					case(Eigendom_rel == 2, huurverhoging_menukaart/huurverhoging / 106.96d * 134.54d + Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/KaleHuur[eur_mo] / 122.78d * 134.54d),
+																					float64(0/0)); //huurverhoging omgerekend van eur2020 naar euro2025, kalehuur van eur2022 naar 2025
+						attribute<eur_mo>  basishuur				(BO) := minimum_normhuur + verhoging_normhuur;
 						attribute<eur_mo>  onder_kkg				(BO) := basishuur < kwaliteitskortinggrens ? kwaliteitskortinggrens - basishuur : 0[eur_mo];
 						attribute<eur_mo>  tussen_kkg_aftopping		(BO) := switch(
 																				case(rekenhuur < aftoppingsgrens && rekenhuur > kwaliteitskortinggrens, rekenhuur - kwaliteitskortinggrens),
@@ -287,12 +288,14 @@ template StateNaAllocatieComponent
 																				case(rekenhuur < kwaliteitskortinggrens, 0[eur_mo]),
 																				(0)[eur_mo]);
 						attribute<eur_mo>  boven_aftopping			(BO) := rekenhuur > aftoppingsgrens ? rekenhuur - aftoppingsgrens : 0[eur_mo];
-						attribute<eur_mo>  huurtoeslag_maand		(BO) := (Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/Vermogen[eur] / 122.78d * 131.26d) > vermogensgrens ? 0[eur_mo] : 
-																			onder_kkg  + tussen_kkg_aftopping * ratio_kkg_aftopping + boven_aftopping * ratio_aftopping; // microdata vermogen huishoudens omgerekend van eur2022 naar eur2024, moet worden omgerekend naar eur2025
-						attribute<eur_yr>  huurtoeslag				(BO) := huurtoeslag_maand * 12[mo] / 1[yr] / 131.26d * 106.96d ; //omgerekend van eur2024 naar eur2020, moet worden omgerekend vanuit eur2025																															
+						attribute<eur_mo>  inkomensafhankelijk_eb   (BO) := reken_inkomen < inkomensgrens ? 0d : (reken_inkomen - inkomensgrens) * (afbouwratio / 12[mo / yr]);
+						attribute<eur_mo>  huurtoeslag_maand_temp	(BO) := (Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/Vermogen[eur] / 122.78d * 134.54d) > vermogensgrens ? 0[eur_mo] : 
+																			onder_kkg  + tussen_kkg_aftopping * ratio_kkg_aftopping + boven_aftopping * ratio_aftopping - inkomensafhankelijk_eb; // microdata vermogen huishoudens omgerekend van eur2022 naar eur2025 
+						attribute<eur_mo>  huurtoeslag_maand	    (BO) :=	huurtoeslag_maand_temp > 0d ? huurtoeslag_maand_temp : 0d; 	 
+						attribute<eur_yr>  huurtoeslag				(BO) := huurtoeslag_maand * 12[mo / yr] / 134.54d * 106.96d ; //omgerekend van eur2025 naar eur2020																														
 					}
-					
 				}
+				
 				//====== Placeholder Hypotheekrenteaftrek
 				container Hypotheekrenteaftrek
 				{
