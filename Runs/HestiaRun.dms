@@ -46,8 +46,8 @@ container HestiaRun
 		parameter<string>   StudieGebied := replace(Expand(., '%env:HESTIA_STUDIEGEBIED%'), 'env:HESTIA_STUDIEGEBIED', StudieGebied_GUI);
 
 	    // RES-regio als selectie. Comment in om te gebruiken.
-		 parameter<int>   RES_Gebied_rel_GUI   : [ 24 ], IsHidden = "True";
-		 parameter<int>   RES_Gebied_rel := int(replace(Expand(., '%env:HESTIA_RES%'), 'env:HESTIA_RES', string(RES_Gebied_rel_GUI)));
+		 parameter<Geography/RegioIndelingen/Energieregio>   RES_Gebied_rel_GUI   : [ 24 ], IsHidden = "True";
+		 parameter<Geography/RegioIndelingen/Energieregio>   RES_Gebied_rel := value(replace(Expand(., '%env:HESTIA_RES%'), 'env:HESTIA_RES', string(RES_Gebied_rel_GUI)), Geography/RegioIndelingen/Energieregio);
 		 parameter<string>   StudieGebied_GUI := Geography/RegioIndelingen/Energieregio/GM_code_list[RES_Gebied_rel];
 
 		// Provincie als selectie. Comment in om te gebruiken.
