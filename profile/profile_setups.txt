@@ -1,0 +1,5 @@
+cfg;
+item;
+storage_fldr;E:/experiments/HestiaPerRES/
+hestiaPerRES;;CMD.exe;;/K "batch_HestiaRun_Per_RES.bat C:/LocalData/Hestia/log/HestiaRun.txt";
+hestia_no_fence;;CMD.exe;;/K "batch_HestiaRunNL.bat C:/LocalData/Hestia/log/HestiaRun.txt";
