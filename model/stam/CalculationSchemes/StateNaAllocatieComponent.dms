@@ -125,6 +125,7 @@ template StateNaAllocatieComponent
 																				case(Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/AantPersHH > 2b, "3plus"),
 																				"NULL"); 
 					attribute<string> label						(BO) := leeftijdsgroep + "_" + huishoudgrootte;
+/* mitigate for missing huurtoeslag_input					
 					attribute<Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input> huurtoeslag_rel	(BO) := rlookup(label, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/Label);
 				
 					attribute<Eur> 	   vermogensgrens			(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/Vermogensgrens);
@@ -138,7 +139,7 @@ template StateNaAllocatieComponent
 					attribute<float64> factor_b					(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/factor_b);
 					attribute<ratio>   ratio_kkg_aftopping		(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/ratio_kkg_aftopping);
 					attribute<ratio>   ratio_aftopping			(BO) := lookup(huurtoeslag_rel, Invoer/Kengetallen/Eindgebruikerskosten/huurtoeslag_input/ratio_aftopping);
-					
+*/					
 					attribute<eur_yr>  reken_inkomen 			(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BelastbaarInkomen[Eur_yr]; //weet niet zeker of dit het goede inkomen is
 					
 					container Huidig
