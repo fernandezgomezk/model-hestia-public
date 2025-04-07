@@ -514,6 +514,11 @@ container Beleid
 			}
 			container V := for_each_nedv(name, 'value('+string(id(.))+', ..)', void, .), isHidden = "True";
 		}
+		
+		unit<uint32> ISDE := select_with_attr_by_cond(Subsidie, strcount(Subsidie/label, 'isde') == 1u);
+		
+				attribute<string>  name (ISDE) :=  collect_by_cond(., strcount(ISDE, Subsidie/label, 'isde') == 1u, Subsidie/Name);
+				
 
 		unit<uint32> NieuwbouwNorm := select_with_org_rel(/Invoer/Beleid/Normering/NieuwbouwNorm/StartJaar <= Zichtjaar && /Invoer/Beleid/Normering/NieuwbouwNorm/EindJaar >= Zichtjaar)
 		{

@@ -395,6 +395,7 @@ template select_with_org_relGebouwOptieT
 		attribute<Eur>     Oi_VT       (GeschiktObject)          := const(0.0[eur], GeschiktObject);
 		attribute<Eur>     Oi_enet     (GeschiktObject)          := const(0.0[eur], GeschiktObject);
 
+		attribute<Eur> 	   LO 		   (GeschiktObject) 		 := sum(add(Oi30_LO, Oi20_LO, Oi15_LO),  GeschiktObject/xProduct/GeschiktObject_rel);
 		attribute<Eur>     Totaal      (GeschiktObject)          := add(Oi_LTAS, Oi_Gnet, Oi_Enet, Oi_DK, Oi_KK, Oi_VT, Oi_GV, sum(add(Oi30_LO, Oi20_LO, Oi15_LO),  GeschiktObject/xProduct/GeschiktObject_rel));
 		
 	}
@@ -410,6 +411,11 @@ template select_with_org_relGebouwOptieT
 	attribute<Eur>    Oi_Gnet  (GeschiktObject)          := = count(ZBS/subsidiebedrag) > 0u ? 'add('+AsItemList('Subsidieberekening/'+ZBS/name+'/Oi_Gnet')+')' : 'const(0.0[Eur],GeschiktObject)';
 	attribute<Eur>    Oi_Enet  (GeschiktObject)          := = count(ZBS/subsidiebedrag) > 0u ? 'add('+AsItemList('Subsidieberekening/'+ZBS/name+'/Oi_Enet')+')' : 'const(0.0[Eur],GeschiktObject)';
 	attribute<Eur>    Oi_LTAS  (GeschiktObject)          := = count(ZBS/subsidiebedrag) > 0u ? 'add('+AsItemList('Subsidieberekening/'+ZBS/name+'/Oi_LTAS')+')' : 'const(0.0[Eur],GeschiktObject)';
+	
+	attribute<Eur> LO_ISDE (GeschiktObject)          	 := = count(ZBS/subsidiebedrag) > 0u ? 'add('+AsItemList('Subsidieberekening/'+ZichtjaarBeleid/ISDE/name+'/LO')+')' : 'const(0.0[Eur],GeschiktObject)';
+	attribute<Eur> GV_ISDE (GeschiktObject)          	 := = count(ZBS/subsidiebedrag) > 0u ? 'add('+AsItemList('Subsidieberekening/'+ZichtjaarBeleid/ISDE/name+'/Oi_GV')+')' : 'const(0.0[Eur],GeschiktObject)';
+	attribute<Eur> tot_ISDE (GeschiktObject)          	 := = count(ZBS/subsidiebedrag) > 0u ? 'add('+AsItemList('Subsidieberekening/'+ZichtjaarBeleid/ISDE/name+'/Totaal')+')' : 'const(0.0[Eur],GeschiktObject)';	
+	
 	
 	//====== Annualiseren subsidies tot jaarlijkse opbrengsten
 	attribute<Eur_yr> Oji30_LO (GeschiktObject/xProduct) := Oi30_LO * NcwRefs/AF_30[GeschiktObject/BO_rel[GeschiktObject/xProduct/GeschiktObject_rel]];
@@ -577,6 +583,10 @@ template select_with_org_relGebouwOptieT
 			attribute<Eur> Oi_VT   (GeschiktObject) := .../Oi_VT;
 			attribute<Eur> Oi_LTAS (GeschiktObject) := .../Oi_LTAS;
 			attribute<Eur> Oi_Gnet (GeschiktObject) := .../Oi_Gnet;
+			attribute<Eur> Oi_GV_ISDE (GeschiktObject) := .../GV_ISDE; 
+			attribute<Eur> Oi_LO_ISDE (GeschiktObject) := .../LO_ISDE; 
+			attribute<Eur> Oi_tot_ISDE (GeschiktObject) := .../tot_ISDE; 
+			
 		}
 		container jaarlijks
 		{
