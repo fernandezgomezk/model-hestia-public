@@ -399,8 +399,8 @@ container Beleid
 
 			container Doelgroep := for_each_nedv(Classifications/Eigendom/label,'/Invoer/Beleid/Verbod/ParseDoelgroep/'+Classifications/Eigendom/label+'[org_rel]',Verbod,bool)
 			{
-				attribute<bool> EGW (Verbod) := /Invoer/Beleid/Verbod/ParseDoelgroep/EGW[nr_orgentity];
-				attribute<bool> MGW (Verbod) := /Invoer/Beleid/Verbod/ParseDoelgroep/MGW[nr_orgentity];
+				attribute<bool> EGW (Verbod) := /Invoer/Beleid/Verbod/ParseDoelgroep/EGW[org_rel];
+				attribute<bool> MGW (Verbod) := /Invoer/Beleid/Verbod/ParseDoelgroep/MGW[org_rel];
 			}
 
 			container Grondslag := for_each_nedv(
