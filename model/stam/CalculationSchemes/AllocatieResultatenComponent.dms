@@ -129,7 +129,7 @@ template AllocatieResultatenComponent
 		}
 		parameter<string> OutputFolder := '%localDataProjDir%/Results/KEV2025output/';
         unit<uint32> variable := SubItem_PropValues(table,'name');
-        container export_csv := Model/CalculationSchemes/Rapportage/WriteTable32ToCSV(table, AsList(variable/name, ';'), OutputFolder+studiegebied+'_'+rekenstapname+'KEV2025_export.csv');
+        container export_csv := Model/CalculationSchemes/Rapportage/WriteTable32ToCSV(table, AsList(variable/name, ';'), 'D:/Thije/Output_kev_nieuw/'+studiegebied+'_'+rekenstapname+'_export.csv');
         }
 		
 		container Metervraag := BO_Base/Metervraag
