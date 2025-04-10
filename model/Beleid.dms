@@ -481,7 +481,11 @@ container Beleid
 
 			attribute<SubsidieBudget> SubsidieBudget_rel  := /Invoer/Beleid/subsidie/SubsidieBudget_rel[org_rel];
 
-			container Doelgroep := for_each_nedv(Classifications/Eigendom/label,'/Invoer/Beleid/subsidie/ParseDoelgroep/'+Classifications/Eigendom/label+'[org_rel]',Subsidie,bool);
+			container Doelgroep := for_each_nedv(Classifications/Eigendom/label,'/Invoer/Beleid/subsidie/ParseDoelgroep/'+Classifications/Eigendom/label+'[org_rel]',Subsidie,bool)
+			{
+				attribute<bool> EGW (Subsidie) := /Invoer/Beleid/Subsidie/ParseDoelgroep/EGW[org_rel];
+				attribute<bool> MGW (Subsidie) := /Invoer/Beleid/Subsidie/ParseDoelgroep/MGW[org_rel];
+			}
 
 			container Maatregel
 			{
