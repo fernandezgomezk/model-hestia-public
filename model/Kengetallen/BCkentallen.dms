@@ -7,10 +7,10 @@
 container BCkentallen : IsHidden = "True"
 {
 	//============== Invoerwaardes voor investeringskosten van Laagtemperatuur afgiftesystemen
-	parameter<Eur_asl> Ki_LTAS_wl_min   :=  957.2098    [Eur_asl] , Descr = "minimale investeringskosten laag-temperatuur afgiftesysteem woningen eengezins";
-	parameter<Eur_asl> Ki_LTAS_wh_min   :=  401.3392    [Eur_asl] , Descr = "minimale investeringskosten laag-temperatuur afgiftesysteem woningen meergezins";
-	parameter<Eur_asl> Ki_LTAS_wl_max   := 3221.919     [Eur_asl] , Descr = "maximale investeringskosten laag-temperatuur afgiftesysteem woningen eengezins";
-	parameter<Eur_asl> Ki_LTAS_wh_max   := 2014.845     [Eur_asl] , Descr = "maximale investeringskosten laag-temperatuur afgiftesysteem woningen meergezins";
+	parameter<Eur_asl> Ki_LTAS_wl_min   := 1077.88    [Eur_asl] , Descr = "minimale investeringskosten laag-temperatuur afgiftesysteem woningen eengezins";
+	parameter<Eur_asl> Ki_LTAS_wh_min   :=  934.78    [Eur_asl] , Descr = "minimale investeringskosten laag-temperatuur afgiftesysteem woningen meergezins";
+	parameter<Eur_asl> Ki_LTAS_wl_max   := 2677.14    [Eur_asl] , Descr = "maximale investeringskosten laag-temperatuur afgiftesysteem woningen eengezins";
+	parameter<Eur_asl> Ki_LTAS_wh_max   := 1552.39    [Eur_asl] , Descr = "maximale investeringskosten laag-temperatuur afgiftesysteem woningen meergezins";
 	parameter<Eur_m2>  Ki_LTAS_u_min    :=    9.057688979[Eur_m2] , Descr = "maximale investeringskosten laag-temperatuur afgiftesysteem utiliteit";
 	parameter<Eur_m2>  Ki_LTAS_u_max    :=    9.057688979[Eur_m2] , Descr = "maximale investeringskosten laag-temperatuur afgiftesysteem utiliteit";
 
