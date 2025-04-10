@@ -305,9 +305,11 @@ container Beleid
 		container Doel_false  := for_each_nedv(Classifications/Eigendom/Label,'const(false,Subsidie)',Subsidie,bool), IsHidden = "True";
 		container ParseDoelgroep := Doel_false
 		{
-			attribute<bool>      Koop         (Subsidie) := strcount(doelgroep, 'koopw') + strcount(doelgroep, 'alle') > 0;
-			attribute<bool>      Parthuur     (Subsidie) := strcount(doelgroep, 'parti') + strcount(doelgroep, 'alle') > 0;
-			attribute<bool>      Wooncorp     (Subsidie) := strcount(doelgroep, 'socia') + strcount(doelgroep, 'alle') > 0;
+			attribute<bool>     Koop         (Subsidie) := strcount(doelgroep, 'koopw') + strcount(doelgroep, 'alle') > 0;
+			attribute<bool>     Parthuur     (Subsidie) := strcount(doelgroep, 'parti') + strcount(doelgroep, 'alle') > 0;
+			attribute<bool>     Wooncorp     (Subsidie) := strcount(doelgroep, 'socia') + strcount(doelgroep, 'alle') > 0;
+			attribute<bool> 	EGW      	 (Subsidie) := strcount(doelgroep, 'meerg') == 0;
+			attribute<bool> 	MGW      	 (Subsidie) := strcount(doelgroep, 'engez') == 0;
 		}
 
 		//====== Bepalen welke technische maatregelen onder het subsidieinstrument vallen
@@ -319,7 +321,7 @@ container Beleid
 				attribute<bool> All        (Subsidie) := strcount(grondslag, 'installaties') > 0;
 				attribute<bool> eWP_lw     (Subsidie) := All || (strcount(grondslag, 'warmtepomp') > 0 && strcount(grondslag, 'hybride warmtepomp') == 0);
 				attribute<bool> eWP_bw     (Subsidie) := All || (strcount(grondslag, 'warmtepomp') > 0 && strcount(grondslag, 'hybride warmtepomp') == 0);
-				attribute<bool> eWP_ll     (Subsidie) := All || (strcount(grondslag, 'warmtepomp') > 0 && strcount(grondslag, 'hybride warmtepomp') == 0);
+				attribute<bool> eWP_ll     (Subsidie) := All || (strcount(grondslag, 'airco') > 0);
 
 				attribute<bool> Pellet     (Subsidie) := All || (strcount(grondslag, 'pelletkach') > 0);
 				attribute<bool> Bioketel   (Subsidie) := All || (strcount(grondslag, 'biomassake') > 0);
@@ -327,8 +329,8 @@ container Beleid
 				attribute<bool> ZonB       (Subsidie) := All || (strcount(grondslag, 'zonneboile') > 0);
 				attribute<bool> ZonPV      (Subsidie) := All || (strcount(grondslag, 'zonnepanel') > 0);
 
-				attribute<bool> hHR        (Subsidie) := All || (strcount(grondslag, '(hybride)w') + strcount(grondslag, 'hybride warmtepomp') > 0);
-				attribute<bool> BasisHWP_w (Subsidie) := All || (strcount(grondslag, '(hybride)w') + strcount(grondslag, 'hybride warmtepomp') > 0);
+			//	attribute<bool> hHR        (Subsidie) := All || (strcount(grondslag, '(hybride) w') + strcount(grondslag, 'hybride warmtepomp') > 0);
+				attribute<bool> BasisHWP_w (Subsidie) := All || (strcount(grondslag, '(hybride) w') + strcount(grondslag, 'hybride warmtepomp') > 0);
 
 				attribute<bool> LTAS       (Subsidie) := All || (strcount(grondslag, 'ltas') > 0);
 			}
@@ -516,9 +518,7 @@ container Beleid
 		}
 		
 		unit<uint32> ISDE := select_with_attr_by_cond(Subsidie, strcount(Subsidie/label, 'isde') == 1u);
-		
-				attribute<string>  name (ISDE) :=  collect_by_cond(., strcount(ISDE, Subsidie/label, 'isde') == 1u, Subsidie/Name);
-				
+						
 
 		unit<uint32> NieuwbouwNorm := select_with_org_rel(/Invoer/Beleid/Normering/NieuwbouwNorm/StartJaar <= Zichtjaar && /Invoer/Beleid/Normering/NieuwbouwNorm/EindJaar >= Zichtjaar)
 		{

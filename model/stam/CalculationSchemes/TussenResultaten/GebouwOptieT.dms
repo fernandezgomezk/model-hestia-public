@@ -378,7 +378,10 @@ template select_with_org_relGebouwOptieT
 		}
 
 		//===== check aantal maatregelen
-		attribute<float64> nrMaatregelen     (GeschiktObject)          := ='add('+AsItemList(replace('float64(GeschiktObject/Bouwdelen/Isolatie/@BD != BO/Bouwdelen/Isolatie/@BD[GeschiktObject/BO_rel])','@BD',Classifications/Bouwdeel/name))+')';
+		attribute<float64> nrMaatregelen_iso (GeschiktObject)          := ='add('+AsItemList(replace('float64(GeschiktObject/Bouwdelen/Isolatie/@BD != BO/Bouwdelen/Isolatie/@BD[GeschiktObject/BO_rel])','@BD',Classifications/Bouwdeel/name))+')';
+		attribute<float64> nrMaatregelen_inst(GeschiktObject)		   := float64((GeschiktObject/InstallatiePerProduct/RVb != BO/InstallatiePerProduct/RVb[GeschikteOptie/BO_rel]) && (strcount(lowercase(Classifications/Installatie/Label[GeschiktObject/InstallatiePerProduct/RVb]), 'wp') > 0) && (strcount(lowercase(Classifications/Installatie/Label[GeschiktObject/InstallatiePerProduct/RVb]), 'll') < 1))  + 
+																		  float64((GeschiktObject/InstallatiePerProduct/DK  != BO/InstallatiePerProduct/DK[GeschikteOptie/BO_rel])  && (strcount(lowercase(Invoer/Kengetallen/OverigeInstallaties/DK/Installatietypes/Label[GeschiktObject/InstallatiePerProduct/DK]), 'zonneboiler') > 0));
+		attribute<float64> nrMaatregelen	 (GeschiktObject)          := nrMaatregelen_iso + nrMaatregelen_inst;																		  
 		attribute<bool>    nrMaatregelen_ok  (GeschiktObject)          := nrMaatregelen >= MinMaatregelen && nrMaatregelen <= MaxMaatregelen;
 		attribute<bool>    Naleving          (GeschiktObject)          := first(rnd_uniform(JaarSeed * 103u, GeschiktObject, range(float64, 0d, 1d)), Geschiktobject/BO_rel)[Geschiktobject/BO_rel] <= ZBS/Naleving[ZBS_rel];
 		attribute<bool>    Geldig            (GeschiktObject)          := InDoelgroep && nrMaatregelen_ok && nrStappenOk && Naleving;
