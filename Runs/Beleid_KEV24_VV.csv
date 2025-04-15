@@ -74,4 +74,4 @@ sub_SVOH5	Subsidieregeling Verduurzaming en Onderhoud Huurwoningen (SVOH) huidig
 sub_SVVE1	Subsidieregeling verduurzaming verenigingen van eigenaren	2023	2027	subsidie	koopwoning,meergezins	isolatie	0.15	0	0	Minimaal aantal maatregelen: 1	Maximaal aantal maatregelen: 1	0.03	2022:9.15mln,2023:9.15mln,2024:9.15mln,2025:9.15mln,2026:9.15mln,2027:9.15mln	
 sub_SVVE2	Subsidieregeling verduurzaming verenigingen van eigenaren	2023	2027	subsidie	koopwoning,meergezins	isolatie 	0.3	0	0	Minimaal aantal maatregelen: 2		0.03	hoort bij sub_SVVE1	
 sub_SVVE3	Subsidieregeling verduurzaming verenigingen van eigenaren	2023	2027	subsidie	koopwoning,meergezins	(hybride) warmtepomp,zonneboiler	0.3	0	0			0.03	hoort bij sub_SVVE1	
-sub_SVVE4	Subsidieregeling verduurzaming verenigingen van eigenaren	2023	2027	subsidie	koopwoning,meergezins	warmtenetaansluiting	0	0	2683				hoort bij sub_SVVE1	
+sub_SVVE4	Subsidieregeling verduurzaming verenigingen van eigenaren	2023	2027	subsidie	koopwoning,meergezins	warmtenetaansluiting	0	0	2683			0.03	hoort bij sub_SVVE1	
