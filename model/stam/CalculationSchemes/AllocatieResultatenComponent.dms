@@ -59,7 +59,7 @@ template AllocatieResultatenComponent
 	    {
         unit<uint32> table := select_with_org_rel(isdefined(BO/code))
 		{
-
+		attribute<float64> nrAansluitingen 						:= BO/nrAansluitingen[org_rel];
 		attribute<GJ_yr> metervraag_elektriciteit_ea        	:= Woning/Metervraag/Vj_e_EA[org_rel];		
 		attribute<string> Energielabel 							:= lookup(BO/Energielabel_rel[org_rel], Classifications/Schillabel/Label);
 		attribute<Eur> ISDE_GV :=BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/eenmalig/Oi_GV_ISDE[org_rel]; //Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/Subsidie/sub_ISDE1
