@@ -62,11 +62,25 @@ template AllocatieResultatenComponent
 		attribute<float64> nrAansluitingen 						:= BO/nrAansluitingen[org_rel];
 		attribute<GJ_yr> metervraag_elektriciteit_ea        	:= Woning/Metervraag/Vj_e_EA[org_rel];		
 		attribute<string> Energielabel 							:= lookup(BO/Energielabel_rel[org_rel], Classifications/Schillabel/Label);
-		attribute<Eur> ISDE_GV :=BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/eenmalig/Oi_GV_ISDE[org_rel]; //Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/Subsidie/sub_ISDE1
-		attribute<Eur> ISDE_LO :=BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/eenmalig/Oi_LO_ISDE[org_rel]; //Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/Subsidie/sub_ISDE1
-		attribute<Eur> ISDE_tot :=BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/eenmalig/Oi_tot_ISDE[org_rel]; //Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/Subsidie/sub_ISDE1
+		attribute<Eur> ISDE_GV               					:= BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/eenmalig/Oi_GV_ISDE[org_rel];
+		attribute<Eur> ISDE_LO                := BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/eenmalig/Oi_LO_ISDE[org_rel];
+		attribute<Eur> ISDE_tot               := BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/eenmalig/Oi_tot_ISDE[org_rel];
+		attribute<Eur> Ki_GV                  := eenmalig/Ki_GV[org_rel];
+		attribute<Eur> Ki30_LO                := eenmalig/Ki30_LO[org_rel];
+		attribute<Eur> Ki20_LO                := eenmalig/Ki20_LO[org_rel];
+		attribute<Eur> Ki15_LO                := eenmalig/Ki15_LO[org_rel];
+		attribute<Eur> Ki_LTAS                := eenmalig/Ki_LTAS[org_rel];
+		attribute<Eur> Ki_DK                  := eenmalig/Ki_DK[org_rel];
+		attribute<Eur> Ki_VT                  := eenmalig/Ki_VT[org_rel];
+		attribute<Eur> Ki_KK                  := eenmalig/Ki_KK[org_rel];
+		attribute<Eur> Oi_GV                  := eenmalig/Oi_GV[org_rel];
+		attribute<Eur> Oi30_LO                := eenmalig/Oi30_LO[org_rel];
+		attribute<Eur> Oi20_LO                := eenmalig/Oi20_LO[org_rel];
+		attribute<Eur> Oi15_LO                := eenmalig/Oi15_LO[org_rel];
+		attribute<Eur> Oi_DK                  := eenmalig/Oi_DK[org_rel];
+		attribute<Eur> Oi_KK                  := eenmalig/Oi_KK[org_rel];
+		attribute<Eur> Oi_VT                  := eenmalig/Oi_VT[org_rel];
 		
-
 		attribute<String> VBO_id								:= BO/code[org_rel];
 		attribute<string> Woningtype							:= lookup(BO/BebouwingsType[org_rel], Classifications/WoningType/Label);
 		attribute<string> Eigendom								:= lookup(BO/Eigendom_rel[org_rel], Classifications/Eigendom/Label);
