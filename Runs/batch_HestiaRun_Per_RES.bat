@@ -11,8 +11,7 @@ FOR /L %%i IN (0,1,29) DO (
     CALL :oneRes %%i
 )
 
-echo 30 RESSEN klaar, druk op een toets om af te sluiten
-pause
+echo 30 RESSEN klaar
 GOTO :EOF
 
 :error
