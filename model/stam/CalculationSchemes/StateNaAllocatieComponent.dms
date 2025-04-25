@@ -128,17 +128,17 @@ template StateNaAllocatieComponent
 					attribute<GJ_yr> metervraag_RV_W  (BO) := switch(
 																	case(lowercase(warmtestrategie) == 's2a' || lowercase(warmtestrategie) == 's2d' || lowercase(warmtestrategie) == 's3d', BO_Base/Functioneel/RV),
 																	case(lowercase(warmtestrategie) == 's3a' || lowercase(warmtestrategie) == 's3g', BO_Base/Functioneel/RV * (1d - AEO_ind_RV[BO/schillabel_rel])),
-																	float64(0/0));
-					attribute<GJ_yr> metervraag_RV_E  (BO) := lowercase(warmtestrategie) == 's3a' || lowercase(warmtestrategie) == 's3g' ? BO_Base/Functioneel/RV / SPF_RV[BO/schillabel_rel] * AEO_ind_RV[BO/schillabel_rel] : float64(0/0);
+																	float64(0));
+					attribute<GJ_yr> metervraag_RV_E  (BO) := lowercase(warmtestrategie) == 's3a' || lowercase(warmtestrategie) == 's3g' ? BO_Base/Functioneel/RV / SPF_RV[BO/schillabel_rel] * AEO_ind_RV[BO/schillabel_rel] : float64(0);
 					attribute<GJ_yr> metervraag_TW_W  (BO) := switch(
 																	case(lowercase(warmtestrategie) == 's2a' || lowercase(warmtestrategie) == 's2d', BO_Base/Functioneel/TW),
 																	case(lowercase(warmtestrategie) == 's3a' || lowercase(warmtestrategie) == 's3g', BO_Base/Functioneel/TW * (1d - AEO_ind_TW_30)),
 																	case(lowercase(warmtestrategie) == 's3d', BO_Base/Functioneel/TW * (1d - AEO_ind_TW_50)),
-																	float64(0/0));	
+																	float64(0));	
 					attribute<GJ_yr> metervraag_TW_E  (BO) := switch(
 																	case(lowercase(warmtestrategie) == 's3a' || lowercase(warmtestrategie) == 's3g', BO_Base/Functioneel/TW / SPF_TW_30 * AEO_ind_TW_30),
 																	case(lowercase(warmtestrategie) == 's3d', BO_Base/Functioneel/TW / SPF_TW_50 * AEO_ind_TW_50),
-																	float64(0/0));
+																	float64(0));
 																
 				}
 				
