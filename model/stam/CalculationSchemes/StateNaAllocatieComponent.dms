@@ -126,12 +126,12 @@ template StateNaAllocatieComponent
 		
 					
 					attribute<GJ_yr> metervraag_RV_W  (BO) := switch(
-																	case(lowercase(warmtestrategie) == 's2a' || lowercase(warmtestrategie) == 's2b' || lowercase(warmtestrategie) == 's3d', BO_Base/Functioneel/RV),
+																	case(lowercase(warmtestrategie) == 's2a' || lowercase(warmtestrategie) == 's2d' || lowercase(warmtestrategie) == 's3d', BO_Base/Functioneel/RV),
 																	case(lowercase(warmtestrategie) == 's3a' || lowercase(warmtestrategie) == 's3g', BO_Base/Functioneel/RV * (1d - AEO_ind_RV[BO/schillabel_rel])),
 																	float64(0/0));
 					attribute<GJ_yr> metervraag_RV_E  (BO) := lowercase(warmtestrategie) == 's3a' || lowercase(warmtestrategie) == 's3g' ? BO_Base/Functioneel/RV / SPF_RV[BO/schillabel_rel] * AEO_ind_RV[BO/schillabel_rel] : float64(0/0);
 					attribute<GJ_yr> metervraag_TW_W  (BO) := switch(
-																	case(lowercase(warmtestrategie) == 's2a' || lowercase(warmtestrategie) == 's2b', BO_Base/Functioneel/TW),
+																	case(lowercase(warmtestrategie) == 's2a' || lowercase(warmtestrategie) == 's2d', BO_Base/Functioneel/TW),
 																	case(lowercase(warmtestrategie) == 's3a' || lowercase(warmtestrategie) == 's3g', BO_Base/Functioneel/TW * (1d - AEO_ind_TW_30)),
 																	case(lowercase(warmtestrategie) == 's3d', BO_Base/Functioneel/TW * (1d - AEO_ind_TW_50)),
 																	float64(0/0));	
@@ -147,7 +147,7 @@ template StateNaAllocatieComponent
 				attribute<Eur> Ki_ventilatie		(BO) := lowercase(vervangingsmoment) == 'zst' ? eenmalig/incl_btw/Ki_VT -  eenmalig/incl_btw/Oi_VT : eenmalig/incl_btw/Ki_VT_nat - eenmalig/incl_btw/Oi_VT_nat;	
 				attribute<Eur> Ki_looptijd_inst 	(BO) := switch( // subsidie KK en LTAS van SAH toevoegen 
 																case(lowercase(warmtestrategie) == 's2a', Ki_ventilatie + eenmalig/incl_btw/Ki_KK / 2d - warmtenetberekening/Oi_KK),
-																case(lowercase(warmtestrategie) == 's2b', eenmalig/incl_btw/Ki_KK / 2d - warmtenetberekening/Oi_KK),
+																case(lowercase(warmtestrategie) == 's2d', eenmalig/incl_btw/Ki_KK / 2d - warmtenetberekening/Oi_KK),
 																case(lowercase(warmtestrategie) == 's3a', Ki_ventilatie + eenmalig/incl_btw/Ki_LTAS - warmtenetberekening/Oi_LTAS + eenmalig/incl_btw/Ki_KK / 2d - warmtenetberekening/Oi_KK + eenmalig/incl_btw/Ki15_LO - eenmalig/incl_btw/Oi15_LO), //documenteer welke kosten voor warmtepompen we hier hebben gebruijkt
 																case(lowercase(warmtestrategie) == 's3d', Ki_ventilatie + eenmalig/incl_btw/Ki_LTAS - warmtenetberekening/Oi_LTAS + eenmalig/incl_btw/Ki_KK / 2d - warmtenetberekening/Oi_KK + warmtenetberekening/Ki_booster - warmtenetberekening/Oi_booster), 
 																case(lowercase(warmtestrategie) == 's3g', eenmalig/incl_btw/Ki_KK / 2d - warmtenetberekening/Oi_KK + eenmalig/incl_btw/Ki15_LO - eenmalig/incl_btw/Oi15_LO),
