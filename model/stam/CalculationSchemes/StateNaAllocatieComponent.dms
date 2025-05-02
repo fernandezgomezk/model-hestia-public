@@ -144,7 +144,7 @@ template StateNaAllocatieComponent
 				
 				
 				attribute<Classifications/Eigendom>	Eigendom_rel	(BO) := BO/Eigendom_rel;
-				attribute<Eur> Ki_ventilatie		(BO) := lowercase(vervangingsmoment) == 'zst' ? eenmalig/incl_btw/Ki_VT -  eenmalig/incl_btw/Oi_VT : eenmalig/incl_btw/Ki_VT_nat - eenmalig/incl_btw/Oi_VT_nat;	
+				attribute<Eur> Ki_ventilatie		(BO) := switch(
 				attribute<Eur> Ki_looptijd_inst 	(BO) := switch( // subsidie KK en LTAS van SAH toevoegen 
 																case(lowercase(warmtestrategie) == 's2a', Ki_ventilatie + eenmalig/incl_btw/Ki_KK / 2d - warmtenetberekening/Oi_KK),
 																case(lowercase(warmtestrategie) == 's2d', eenmalig/incl_btw/Ki_KK / 2d - warmtenetberekening/Oi_KK),
