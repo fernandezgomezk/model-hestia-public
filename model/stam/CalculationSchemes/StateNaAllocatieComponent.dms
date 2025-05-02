@@ -145,6 +145,9 @@ template StateNaAllocatieComponent
 				
 				attribute<Classifications/Eigendom>	Eigendom_rel	(BO) := BO/Eigendom_rel;
 				attribute<Eur> Ki_ventilatie		(BO) := switch(
+																	case(lowercase(vervangingsmoment) == 'zst' && (lowercase(warmtestrategie) != 's2d' && lowercase(warmtestrategie) != 's3g' && lowercase(warmtestrategie) != 's4b'), eenmalig/incl_btw/Ki_VT - eenmalig/incl_btw/Oi_VT),
+																	case(lowercase(vervangingsmoment) == 'nat' && (lowercase(warmtestrategie) != 's2d' && lowercase(warmtestrategie) != 's3g' && lowercase(warmtestrategie) != 's4b'), eenmalig/incl_btw/Ki_VT_nat - eenmalig/incl_btw/Oi_VT_nat),
+																	float64(0));	
 				attribute<Eur> Ki_looptijd_inst 	(BO) := switch( // subsidie KK en LTAS van SAH toevoegen 
 																case(lowercase(warmtestrategie) == 's2a', Ki_ventilatie + eenmalig/incl_btw/Ki_KK / 2d - warmtenetberekening/Oi_KK),
 																case(lowercase(warmtestrategie) == 's2d', eenmalig/incl_btw/Ki_KK / 2d - warmtenetberekening/Oi_KK),
@@ -680,6 +683,13 @@ template StateNaAllocatieComponent
 				{
 					unit<uint32> table := select_with_org_rel(BO/bouwjaar < 2023[uint16])
 					{
+						attribute<Classifications/Installatie> temp_RVb_voor		:= Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/RVb[org_rel];
+						attribute<Classifications/Installatie> temp_RVp_voor		:= Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/RVp[org_rel]; //toegevoegd op 11/07/2023
+						attribute<Classifications/Installatie> temp_TWb_voor		:= Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/TWb[org_rel];//toegevoegd op 11/07/2023
+						attribute<Classifications/Installatie> temp_TWp_voor		:= Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/TWp[org_rel];//toegevoegd op 11/07/2023
+						attribute<Classifications/Installatie> temp_KDb_voor		:= Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/KDb[org_rel];
+						attribute<Classifications/Installatie> temp_KDp_voor		:= Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/KDp[org_rel];
+
 						attribute<string> vbo_BAG_ID		 := BO/code[org_rel];
 						attribute<string> strategie			 := const('Aardgas(referentie)', BO)[org_rel];
 						attribute<string> provincie			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/PROV_NAAM[buurt_rel][org_rel];
