@@ -25,5 +25,5 @@ set HESTIA_RES=%1
 set HESTIA_OUTPUT=%1
 REM START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt"  "%prj_dir%\Runs\HestiaRun.dms" /Resultaten/Exports/GenerateAllIndicatoren
 "%exe_path%" "/L%log_dir%\HestiaRun.txt"  "%prj_dir%\Runs\HestiaRun.dms" /Resultaten/Exports/GenerateAllIndicatoren
-if ERRORLEVEL 1 goto error
+if %ERRORLEVEL% neq 0 goto error
 exit /B
