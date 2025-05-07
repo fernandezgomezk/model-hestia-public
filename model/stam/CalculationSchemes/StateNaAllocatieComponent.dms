@@ -546,8 +546,8 @@ template StateNaAllocatieComponent
 						attribute<eur> ki_ventilatie_zst_eur 	:= vervangingsmoment == 'Zst' ? eenmalig/incl_btw/Ki_VT[org_rel] : (0/0)[eur];
 						attribute<eur> ki_koken_eur 			:= (eenmalig/incl_btw/Ki_KK[org_rel])/2d;
 						attribute<eur> ki_inductie_eur 			:= (eenmalig/incl_btw/Ki_KK[org_rel])/2d;
-						attribute<eur> ki_isolatie_nat_eur 	 	:= vervangingsmoment == 'Nat' ? eenmalig/incl_btw/Ki_gv_nat[org_rel] : (0/0)[eur];
-						attribute<eur> ki_ventilatie_nat_eur 	:= vervangingsmoment == 'Nat' ? eenmalig/incl_btw/Ki_VT_nat[org_rel] : (0/0)[eur];
+						attribute<eur> ki_isolatie_nat_eur 	 	:= vervangingsmoment == 'Nat' ? Ki_ventilatie[org_rel] : (0/0)[eur];
+						attribute<eur> ki_ventilatie_nat_eur 	:= vervangingsmoment == 'Nat' ? Ki_ventilatie[org_rel] : (0/0)[eur];
 						attribute<eur> subsidies_eur 	 		:= (strcount(lowercase(warmtestrategie), 's2') + strcount(lowercase(warmtestrategie), 's3d') > 0 ? 0[eur] : -1d * (eenmalig/incl_btw/Oi15_LO[org_rel] + eenmalig/incl_btw/Oi30_LO[org_rel])) - (warmtenetberekening/Oi_BAK[org_rel] + warmtenetberekening/Oi_booster[org_rel] + warmtenetberekening/Oi_KK[org_rel] + warmtenetberekening/Oi_LTAS[org_rel] + eenmalig/incl_btw/Oi_gv[org_rel]);
 						attribute<eur> ki_tot_zst_eur 	 		:= subsidies_eur + ki_isolatie_zst_eur + Ki_warmtepomp_HR_eur + ki_BAK_eur + Ki_LTAS_eur + ki_ventilatie_zst_eur + ki_koken_eur + ki_inductie_eur;
 						attribute<eur> ki_tot_nat_eur 	 		:= subsidies_eur + ki_isolatie_nat_eur + Ki_warmtepomp_HR_eur + ki_BAK_eur + Ki_LTAS_eur + ki_ventilatie_nat_eur + ki_koken_eur + ki_inductie_eur;
