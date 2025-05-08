@@ -1,0 +1,3 @@
+name;command,experiment_folder;environment_variables;cwd;geodms_logfile;binary_experiment_file
+hestiaPerRES;../Runs/batch_HestiaRun_Per_RES.bat;C:/LocalData/Hestia/experiments/;;../Runs;C:/LocalData/Hestia/log/HestiaRun.txt;
+hestiaNL;../Runs/batch_HestiaRunNL.bat;C:/LocalData/Hestia/experiments/;;../Runs;C:/LocalData/Hestia/log/HestiaRun.txt;
