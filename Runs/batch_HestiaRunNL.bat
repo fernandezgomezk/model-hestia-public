@@ -11,7 +11,7 @@ set HESTIA_STUDIEGEBIED=NL
 set HESTIA_OUTPUT=NL
 
 "%exe_path%" "/L%log_dir%\HestiaRun.txt"  "%prj_dir%\Runs\HestiaRun.dms" /Resultaten/Exports/GenerateAllIndicatoren
-if ErrorLEvel 1 goto :error	
+if %ERRORLEVEL% NEQ 0 goto :error	
 
 echo NL klaar
 GOTO :EOF
