@@ -162,7 +162,8 @@ template RekenstapT
 
 	#include<StateNaAllocatie.dms>
 	
-	container StateNaAllocatie := FenceContainer(StateNaAllocatie_CALC, 'FENCED RESULT FOR '+ZichtjaarName);
+	container StateNaAllocatie_Fenced := FenceContainer(StateNaAllocatie_CALC, 'FENCED RESULT FOR '+ZichtjaarName);
+	container StateNaAllocatie := =Invoer/TechnischeInstellingen/RekenPerStap_cond ? 'StateNaAllocatie_Fenced' : 'StateNaAllocatie_CALC';
 	
 	container AllocatieResultaten :=
 		for_each_ne(Classifications/BebouwingsSector/name,

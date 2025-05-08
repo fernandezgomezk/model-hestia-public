@@ -545,7 +545,7 @@ def InitExperimentsFromCsvFile(fn):
 
         experiments = []
         for row_index, csv_row in enumerate(csv_reader):
-            assert len(csv_row)==7, f"Unexpected number of csv fields ({len(csv_row)}) in experiment file row {row_index}, should be semicolonseparated with fields: name;command;experiment_folder;environment_variables(optional);cwd(optional);geodms_logfile(optional);binary_experiment_file(optional), skipping"
+            assert len(csv_row)==7, f"Unexpected number of csv fields ({len(csv_row)}) in experiment file row {row_index}, should be semicolon separated with fields: name;command;experiment_folder;environment_variables(optional);cwd(optional);geodms_logfile(optional);binary_experiment_file(optional), skipping"
             # experiment fields
             name,command,experiment_folder,environment_variables,cwd,geodms_logfile,binary_experiment_file = csv_row 
             experiments.append(Experiment(name=name, command=command, experiment_folder=experiment_folder, environment_variables=environment_variables,cwd=cwd,geodms_logfile=geodms_logfile,binary_experiment_file=binary_experiment_file))

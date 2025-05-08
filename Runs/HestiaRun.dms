@@ -36,7 +36,7 @@ container HestiaRun
 		// Invoer: Geografische selectie welke gebied wordt onderzocht.
 
 		// Volledig Nederland zonder selectie. Comment in om te gebruiken.
-		parameter<string>   StudieGebied : ['NL'], IsHidden = "True";
+//		parameter<string>   StudieGebied_GUI : ['NL'], IsHidden = "True";
 
 		// Enkele gemeente als selectie. Comment in om te gebruiken.
 		// parameter<string>   StudieGebied : ['GM0050'], IsHidden = "True"; //GM0050 (Zeewolde) is handig om kleinschalig te testen OF GM0213 (meer oudere gebouwen)
@@ -93,7 +93,10 @@ container HestiaRun
 		container TechnischeInstellingen: IsHidden = "True" {
 			parameter<uint32> RandomSeed := 1;
 			parameter<uint32> NrProcessors := 20;
-			parameter<uint32> ThisProcessor := 3;			
+			parameter<uint32> ThisProcessor := 3;
+
+			parameter<string>   RekenPerStap := replace(Expand(., '%env:HESTIA_PER_REKENSTAP%'), 'env:HESTIA_PER_REKENSTAP', 'Nee');
+			parameter<bool>     RekenPerStap_cond := RekenPerStap != 'Nee';
 		}
 	}
 
