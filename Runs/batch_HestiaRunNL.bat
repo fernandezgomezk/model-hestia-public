@@ -10,7 +10,7 @@ Call path/set.bat
 set HESTIA_STUDIEGEBIED=NL
 set HESTIA_OUTPUT=NL
 
-"%exe_path%" "/L%log_dir%\HestiaRun.txt"  "%prj_dir%\Runs\HestiaRun.dms" /Resultaten/Exports/GenerateAllIndicatoren
+"%exe_path%" "/L%log_dir%\HestiaRun.txt"  "%prj_dir%\Runs\HestiaRun_s0.dms" /Resultaten/Exports/GenerateAllIndicatoren
 if %ERRORLEVEL% NEQ 0 goto :error	
 
 echo NL klaar
