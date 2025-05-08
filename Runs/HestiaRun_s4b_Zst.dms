@@ -10,12 +10,15 @@ container HestiaRun
 	#include <%projDir%/model/Units.dms>
 	#include <%projDir%/model/Geography.dms>
 	#include <%projDir%/model/Classifications.dms>
+	#include <%projDir%/Runs/RunInstellingen.dms>											  
 
 	//====== Invoer: over welke periode moet er worden gerekend?
-	parameter<uint16> eerste_jaar             := 2020[uint16], Descr = "Eerste zichtjaar";
-	parameter<uint8>  aantal_jaar             := 11[uint8]   , Descr = "Aantal zichtjaren";
+	parameter<uint16> eerste_jaar             := RunInstellingen/eerste_jaar, Descr = "Eerste zichtjaar";
+	parameter<uint8>  aantal_jaar             := RunInstellingen/aantal_jaar, Descr = "Aantal zichtjaren";
 	parameter<string> Studiegebied            := Invoer/StudieGebied;
-	parameter<string> warmtestrategie 		  := 's1a';
+	parameter<units/yr_uint16> peiljaar		  := RunInstellingen/Peiljaar, Descr = "Zichtjaar eindgebruikerskosten";
+	parameter<string> warmtestrategie 		  := 'S4b';
+	parameter<string> vervangingsmoment 	  := 'Zst', Descr = "Eindgebruikerskosten volgens natuurlijk of zelfstandig vervangingsmoment";
 
 	//====== Opbouw lijst van zichtjaren en rekenstappen
 	unit<uint8> all_rekenstap: nrofrows = 51, IsHidden = "True";
@@ -35,20 +38,22 @@ container HestiaRun
 	{
 		// Invoer: Geografische selectie welke gebied wordt onderzocht.
 
+		// Studiegebied volgens RunInstellingen.dms. Comment in om te gebruiken.
+		 parameter<string>   StudieGebied := RunInstellingen/Studiegebied, IsHidden = "True";
+		
 		// Volledig Nederland zonder selectie. Comment in om te gebruiken.
-//		parameter<string>   StudieGebied_GUI : ['NL'], IsHidden = "True";
+		// parameter<string>   StudieGebied : ['NL'], IsHidden = "True";
 
 		// Enkele gemeente als selectie. Comment in om te gebruiken.
-		// parameter<string>   StudieGebied : ['GM0050'], IsHidden = "True"; //GM0050 (Zeewolde) is handig om kleinschalig te testen OF GM0213 (meer oudere gebouwen)
+		//parameter<string>   StudieGebied : ['GM0050'], IsHidden = "True"; //GM0050 (Zeewolde) is handig om kleinschalig te testen OF GM0213 (meer oudere gebouwen)
 
 		// Meerdere gemeenten als studiegebied. Comment in om te gebruiken.
-//		parameter<string>   StudieGebied_GUI : ['GM0402,GM0344,GM1581,GM0439,GM0153,GM0599,GM0034,GM0050,GM0321'], IsHidden = "True";
-		parameter<string>   StudieGebied := replace(Expand(., '%env:HESTIA_STUDIEGEBIED%'), 'env:HESTIA_STUDIEGEBIED', StudieGebied_GUI);
-
-	    // RES-regio als selectie. Comment in om te gebruiken.
-		 parameter<Geography/RegioIndelingen/Energieregio>   RES_Gebied_rel_GUI   : [ 24 ], IsHidden = "True";
-		 parameter<Geography/RegioIndelingen/Energieregio>   RES_Gebied_rel := value(replace(Expand(., '%env:HESTIA_RES%'), 'env:HESTIA_RES', string(RES_Gebied_rel_GUI)), Geography/RegioIndelingen/Energieregio);
-		 parameter<string>   StudieGebied_GUI := Geography/RegioIndelingen/Energieregio/GM_code_list[RES_Gebied_rel];
+		// parameter<string>   StudieGebied : ['GM0402,GM0344,GM1581,GM0439,GM0153,GM0599,GM0034,GM0050,GM0321'], IsHidden = "True";
+		
+		// RES-regio als selectie. Comment in om te gebruiken.
+		// parameter<string>   RES_Gebied   : ['RESTwente'], IsHidden = "True";
+		// parameter<string>   StudieGebied :=
+		// Geography/RegioIndelingen/Energieregio/GM_code_list[rlookup(RES_Gebied, Geography/RegioIndelingen/Energieregio/name)], IsHidden = "True";
 
 		// Provincie als selectie. Comment in om te gebruiken.
 		// parameter<string> Provincie := 'ZuidHolland';
@@ -63,10 +68,11 @@ container HestiaRun
 		{
 			// Ophalen opties voor instellingen die per rekenstap gebruikt kunnen worden.
 			#include <%projDir%/Runs/DefaultSettings/Basis.dms>
+			#include <%projDir%/Runs/DefaultSettings/Rekenstap_2024_hWP.dms>
 			#include <%projDir%/Runs/DefaultSettings/Rekenstap.dms>		
 		}
 
-		parameter<string> EnergieprijsScenario := '20220709_VV_Euro2020';
+		parameter<string> EnergieprijsScenario := '20240701_KEV24_VV_Euro2020';
 		
 		container SpecifiekeInstellingen := DefaultInstellingen/Basis, IsHidden = "True"
 		{
@@ -76,11 +82,24 @@ container HestiaRun
 			// Invoer: Per rekenstap worden specifieke instellingen gebruikt.
 			// De lijst van rekenstappen wordt gedefinieerd bij rekenstap.
 			
-			container RekenStappen := for_each_nt(rekenstap/repeats/name, rekenstap/Rx_xxxx)
+		/*	container RekenStappen := for_each_nt(rekenstap/repeats/name, rekenstap/Rx_xxxx)
 			{
 				container StartJaar := DefaultInstellingen/Basis;
 				container Overige   := DefaultInstellingen/Rekenstap/Specifiek;
 			}
+			*/
+			container RekenStappen
+			{
+				container StartJaar := DefaultInstellingen/Basis;
+				container R4_2024 := DefaultInstellingen/R4_2024/Specifiek;
+				container R1_2021 := DefaultInstellingen/Rekenstap/Specifiek;
+				container R2_2022 := DefaultInstellingen/Rekenstap/Specifiek;
+				container R3_2023 := DefaultInstellingen/Rekenstap/Specifiek;
+
+			}
+			
+			
+
 		}
 		// Ophalen ruimtelijke invoerbestanden, kengetallen en energieprijzen.
 		#include <%projDir%/model/Beleid.dms>
@@ -93,10 +112,7 @@ container HestiaRun
 		container TechnischeInstellingen: IsHidden = "True" {
 			parameter<uint32> RandomSeed := 1;
 			parameter<uint32> NrProcessors := 20;
-			parameter<uint32> ThisProcessor := 3;
-
-			parameter<string>   RekenPerStap := replace(Expand(., '%env:HESTIA_PER_REKENSTAP%'), 'env:HESTIA_PER_REKENSTAP', 'Nee');
-			parameter<bool>     RekenPerStap_cond := RekenPerStap != 'Nee';
+			parameter<uint32> ThisProcessor := 3;			
 		}
 	}
 

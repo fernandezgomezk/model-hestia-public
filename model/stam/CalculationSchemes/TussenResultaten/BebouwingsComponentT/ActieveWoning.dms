@@ -95,9 +95,10 @@ unit<uint32> ActieveWoning := select_with_org_rel(BO/Activatie/ProductActief || 
 				attribute<GJ_yr> Winst_RV      (xGebouwOptie) := union_data( xGebouwOptie , ProductActieveWoning/xIsolatieAmbitie/xGebouwOptie/functioneel/Winst_RV, BouwdeelActieveWoning/ProductInactieveAmbitie/functioneel/Winst_RV);
 				attribute<ratio> Correction_RV (xGebouwOptie) := union_data( xGebouwOptie , ProductActieveWoning/xIsolatieAmbitie/xGebouwOptie/functioneel/Correction_RV, BouwdeelActieveWoning/ProductInactieveAmbitie/functioneel/Correction_RV);
 			}
-			attribute<EUR>    Ki_gv  := =replace(constr_expr2, '@A', 'Ki_gv');
-			attribute<EUR_yr> Kji_gv := =replace(constr_expr2, '@A', 'Kji_gv');
-			attribute<EUR_yr> Kmi_gv := =replace(constr_expr2, '@A', 'Kmi_gv');
+			attribute<EUR>    Ki_gv  	:= =replace(constr_expr2, '@A', 'Ki_gv');
+			attribute<EUR>    Ki_gv_nat	:= =replace(constr_expr2, '@A', 'Ki_gv_nat');			
+			attribute<EUR_yr> Kji_gv 	:= =replace(constr_expr2, '@A', 'Kji_gv');
+			attribute<EUR_yr> Kmi_gv 	:= =replace(constr_expr2, '@A', 'Kmi_gv');
 	}
 
 	container GeschikteOptieBerekening := select_with_org_relGebouwOptieT(xGebouwOptie, BO);
@@ -253,6 +254,10 @@ unit<uint32> ActieveWoning := select_with_org_rel(BO/Activatie/ProductActief || 
 															+ GeschikteOptie/Upref/Func2Meter/eEffect/capaciteit/Vj_elek [ Choice_per_BO/GeschikteOptie_rel ]
 															, BO/metervraagBerekening/eEffect/volume/Vj_elek        
 															+ BO/metervraagBerekening/eEffect/capaciteit/Vj_elek) ;
+			attribute<GJ_yr> metervraag_elektriciteit_rv_basis 	(BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_elektriciteit_rv_basis [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_elektriciteit_rv_basis);
+			attribute<GJ_yr> metervraag_elektriciteit_rv_piek 	(BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_elektriciteit_rv_piek [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_elektriciteit_rv_piek);
+			attribute<GJ_yr> metervraag_elektriciteit_tw_basis 	(BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_elektriciteit_tw_basis [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_elektriciteit_tw_basis);
+			attribute<GJ_yr> metervraag_elektriciteit_tw_piek 	(BO) := makedefined( GeschikteOptieBerekening/Func2Meter/metervraag_per_product_per_input/metervraag_elektriciteit_tw_piek [ Choice_per_BO/GeschikteOptie_rel ], BO/MetervraagBerekening/metervraag_per_product_per_input/metervraag_elektriciteit_tw_piek);
 
 		} 
 
@@ -266,6 +271,17 @@ unit<uint32> ActieveWoning := select_with_org_rel(BO/Activatie/ProductActief || 
 				attribute<GJ_yr> Verlies_RV    (BO) := makedefined( GeschikteOptie/functioneel/Verlies_RV [ Choice_per_BO/GeschikteOptie_rel ], BO/functioneel/Verlies_RV );
 				attribute<GJ_yr> Winst_RV      (BO) := makedefined( GeschikteOptie/functioneel/Winst_RV   [ Choice_per_BO/GeschikteOptie_rel ], BO/functioneel/warmtewinst/Totaal   );
 				attribute<ratio> Correction_RV (BO) := makedefined( GeschikteOptie/functioneel/Correction_RV [ Choice_per_BO/GeschikteOptie_rel ], BO/functioneel/Correction_RV );
+				container warmteverlies_theoretisch := for_each_nedv(
+			Classifications/Bouwdeel/name
+			,replace('BebouwingsComponenten/Woning/BO/Bouwdelen/@BD@ * merge(uint8(BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/Bouwdelen/Isolatie/@BD@), GJ_yr_m2,' + AsItemList('Invoer/Kengetallen/WarmteVraag/Vrv_opp_'+Classifications/IsolatieNiveau/name+'[Classifications/Bouwdeel/V/@BD@]')+')','@BD@',Classifications/Bouwdeel/name)
+			,BO
+			,GJ_yr){
+					attribute<GJ_yr> theoretisch_RV (BO) := VL + DP + DS + MG + MS + DR + PL + RO + RB + KR + Vrv_VT_asl - functioneel/Winst_RV;
+					attribute<GJ_yr> theoretisch_RV_ww_cor (BO) := functioneel/Winst_RV > 0.8 * (VL + DP + DS + MG + MS + DR + PL + RO + RB + KR + Vrv_VT_asl) ? 0.2 * (VL + DP + DS + MG + MS + DR + PL + RO + RB + KR + Vrv_VT_asl) :  VL + DP + DS + MG + MS + DR + PL + RO + RB + KR + Vrv_VT_asl - functioneel/Winst_RV;
+
+					attribute<GJ_yr>     Vrv_VT_asl (BO) := Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes/V_RV_asl[BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/VT] * nrAansluitingen_i, descr = "warmteverlies ventilatie vast per aansluiting";
+
+			}
 			}
 
 			container kapitaallasten := for_each_nedv(
