@@ -383,7 +383,7 @@ template select_with_org_relGebouwOptieT
 																		  float64((GeschiktObject/InstallatiePerProduct/DK  != BO/InstallatiePerProduct/DK[GeschikteOptie/BO_rel])  && (strcount(lowercase(Invoer/Kengetallen/OverigeInstallaties/DK/Installatietypes/Label[GeschiktObject/InstallatiePerProduct/DK]), 'zonneboiler') > 0));
 		attribute<float64> nrMaatregelen	 (GeschiktObject)          := nrMaatregelen_iso + nrMaatregelen_inst;																		  
 		attribute<bool>    nrMaatregelen_ok  (GeschiktObject)          := nrMaatregelen >= MinMaatregelen && nrMaatregelen <= MaxMaatregelen;
-		attribute<bool>    Naleving          (GeschiktObject)          := first(rnd_uniform(JaarSeed * 103u, GeschiktObject, range(float64, 0d, 1d)), Geschiktobject/BO_rel)[Geschiktobject/BO_rel] <= ZBS/Naleving[ZBS_rel];
+		attribute<bool>    Naleving          (GeschiktObject)          := rnd_uniform(JaarSeed * 103u, BO , range(float64, 0d, 1d))[ GeschikteOptie/BO_rel] <= ZBS/Naleving [ZBS_rel];
 		attribute<bool>    Geldig            (GeschiktObject)          := InDoelgroep && nrMaatregelen_ok && nrStappenOk && Naleving;
 		attribute<bool>    Geldig_xPrd       (GeschiktObject/xProduct) := Geldig[GeschiktObject/xProduct/GeschiktObject_rel];
 
