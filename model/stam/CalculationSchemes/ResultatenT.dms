@@ -500,7 +500,7 @@ template ResultatenT
 	container FolderInfo: isHidden = "True"
 	{
 		parameter<string> configName := Expand(., '%configName%');
-		parameter<string> outputFolderName := replace(Expand(., '%env:HESTIA_OUTPUT%'), 'HESTIA_OUTPUT', configName);
+		parameter<string> outputFolderName := replace(Expand(., '%env:HESTIA_OUTPUT%'), 'env:HESTIA_OUTPUT', configName);
 		parameter<string> OutputFolder := '%localDataProjDir%/Results/' + outputFolderName + '/'+ ZichtjaarName;
 	}
 }

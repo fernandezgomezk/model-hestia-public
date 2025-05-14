@@ -131,7 +131,8 @@ def getProcessCurrentStatistics(process:psutil.Process, experiment_start_time):
             cpu_p_raw = process.cpu_percent()
             num_cpus = psutil.cpu_count()
             cpu_p = cpu_p_raw / num_cpus
-            print(f"{process.name()} {num_cpus} {cpu_p_raw} {cpu_p}")
+            if cpu_p_raw > 0.0:
+                print(f"{process.name()} {num_cpus} {cpu_p_raw} {cpu_p}")
             mem_p = process.memory_percent()
             memory_info = process.memory_info()
             rss = memory_info.rss * 10.0**-9.0 # GB
@@ -157,23 +158,37 @@ def getPerformance(exp:Experiment, sampling_rate=1.0):
         parts = shlex.split(command_with_args)  # splits respecting quotes
         parts[0] = os.path.abspath(os.path.join(cwd, parts[0]))  # make sure script path is absolute
 
+        title = exp.name.replace('"', "'")  # zorg dat er geen quotes inzitten
+        print(f"Running subprocess: {parts}, cwd={cwd}, title={title}")
+
         # Bouw custom_env, en vertaal environment_string
         custom_env = os.environ.copy()  # behoud bestaande omgeving
         for pair in environment_string.split(';'):
             if '=' in pair:
                 key, value = pair.split('=', 1)
                 custom_env[key.strip()] = value.strip()
-        print(f"Running subprocess: {parts}, cwd={cwd}, env={custom_env}\n")
 
-        full_command = f'cmd /k "{parts[0]} {" ".join(parts[1:])}"'
-        print(f"curr_command: {full_command}\n")
+        # Construct a single command that sets the title, calls the batch, and optionally pauses (if needed to detect command-line syntax errors)
+        cmd_parts = [
+            "cmd", "/k",  # new console, keep open on error
+            "title", title, "&&",  # set title
+            "call",  # call the batch file
+        ] + parts  # add the rest of the command
+        # + ["&&", "pause"]  # keep the console open
 
-        parent_process_open_handle = subprocess.Popen(full_command, cwd=cwd, env=custom_env, creationflags=subprocess.CREATE_NEW_CONSOLE)
+        print(f"Full command: {cmd_parts}\n")
+
+        # Launch this in a new console window (not via start!)
+        parent_process_open_handle = subprocess.Popen(
+            cmd_parts,
+            cwd=cwd, env=custom_env, 
+            creationflags=subprocess.CREATE_NEW_CONSOLE, 
+            shell=False
+        )
         parent_process = psutil.Process(parent_process_open_handle.pid)
         experiment_start_time = datetime.fromtimestamp(parent_process.create_time())
         cpu_ct = 0
         while (psutil.pid_exists(parent_process.pid)):
-            print("BEGIN\n")
             time_measurement_start = datetime.now()
         
             try: # dry run cpu_p for every child, first time cpu_percent() always returns 0.0, see
@@ -218,7 +233,6 @@ def getPerformance(exp:Experiment, sampling_rate=1.0):
             cpu_ct += profile_log["cpu_percent"][-1] / 100.0
             profile_log["cpu_curr_time"].append(cpu_ct)
 
-            print("END\n")
             time_measurement_end = datetime.now()
             dtimestamp = (time_measurement_end-time_measurement_start).total_seconds()
             sleep_time = sampling_rate-dtimestamp        

@@ -2,7 +2,7 @@ name;command;experiment_folder;environment_variables;cwd;geodms_logfile;binary_e
 hestiaPerRES_Fenced_17_5_0;batch_HestiaRun_Per_RES.bat 17.5.0;C:/LocalData/Hestia/experiments/;HESTIA_PER_REKENSTAP=Ja;..\Runs;C:/LocalData/Hestia/log/HestiaRun.txt;
 hestiaNL_Fenced_17_5_0;batch_HestiaRunNL.bat 17.5.0;C:/LocalData/Hestia/experiments/;HESTIA_PER_REKENSTAP=Ja;..\Runs;C:/LocalData/Hestia/log/HestiaRun.txt;
 hestiaPerRES_17_5_0;batch_HestiaRun_Per_RES.bat 17.5.0;C:/LocalData/Hestia/experiments/;;..\Runs;C:/LocalData/Hestia/log/HestiaRun.txt;
-hestiaNL_17_4_6;batch_HestiaRunNL.bat;C:/LocalData/Hestia/experiments/;;..\Runs;C:/LocalData/Hestia/log/HestiaRun.txt;
+hestiaNL_17_5_0;batch_HestiaRunNL.bat;C:/LocalData/Hestia/experiments/;;..\Runs;C:/LocalData/Hestia/log/HestiaRun.txt;
 hestiaPerRES_Fenced_17_4_6;batch_HestiaRun_Per_RES.bat 17.4.6;C:/LocalData/Hestia/experiments/;HESTIA_PER_REKENSTAP=Ja;..\Runs;C:/LocalData/Hestia/log/HestiaRun.txt;
 hestiaNL_Fenced_17_4_6;batch_HestiaRunNL.bat 17.4.6;C:/LocalData/Hestia/experiments/;HESTIA_PER_REKENSTAP=Ja;../Runs;C:/LocalData/Hestia/log/HestiaRun.txt;
 hestiaPerRES_17_4_6;batch_HestiaRun_Per_RES.bat 17.4.6;C:/LocalData/Hestia/experiments/;;..\Runs;C:/LocalData/Hestia/log/HestiaRun.txt;
