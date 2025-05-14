@@ -1,11 +1,14 @@
 REM GeoDmsRun.exe [/PProjName] [/LLogFileName] ConfigFileName ItemNames
 REM [] betekent optioneel
-REM Sluit GUI-variant(GeoDmsGui.exe) af bij aanroepen van GeoDmsRun.exe (indien dit dezelfde is)
+REM Sluit GUI-variant(GeoDmsGuiQt.exe) af bij aanroepen van GeoDmsRun.exe (indien dit dezelfde is)
 REM Resultaten worden weggeschreven in: n:/LD/%confignaam%/results/...
 REM Bij nogmaals runnen worden bestanden gewoon overschreven
 
 REM aanpassingen voor machine specifieke paden
-Call path/set.bat
+echo HestiaRuns NL: voor 2024 eindgebruikerskosten (tussenresultaten) voor stratiegie S1a .... S4b voor zowel NAT als ZST
+if (%1) NEQ () echo met Geodms versie %1
+
+Call path/set.bat %1
 
 REM s0: referentiescenario
 START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt"  "%prj_dir%\Runs\HestiaRun_s0.dms" /TussenResultaten/R4_2024/StateNaAllocatie/bebouwingImpl/Woning/BO/Jaarlijks/Eindgebruikerskosten/export_ref/export_csv/Export

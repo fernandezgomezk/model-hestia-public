@@ -8,6 +8,7 @@ import pickle
 import hashlib
 import difflib
 import subprocess
+import shlex
 import argparse
 import csv
 
@@ -146,70 +147,94 @@ def getProcessCurrentStatistics(process:psutil.Process, experiment_start_time):
 
 def getPerformance(exp:Experiment, sampling_rate=1.0):
     profile_log = {"time":[], "dtime":[], "cpu_percent":[], "cpu_curr_time":[], "memory_percent":[], "rss":[], "vms":[], "num_threads":[], "total_read_bytes":[], "total_write_bytes":[], "net_connections":[], "processes":[]} # rss=resident set size (aka physical non swapped memory in use by process), vms virtual memory ize
-    command = exp.command
-    env = exp.environment_variables
+    command_with_args = exp.command
+    environment_string = exp.environment_variables
     cwd = exp.cwd
-    
-    absolute_command = os.path.abspath(command)
-    parent_process_open_handle = subprocess.Popen(absolute_command, cwd=cwd, creationflags=subprocess.CREATE_NEW_CONSOLE) # shell=True 
-    parent_process = psutil.Process(parent_process_open_handle.pid)
-    experiment_start_time = datetime.fromtimestamp(parent_process.create_time())
-    cpu_ct = 0
-    while (psutil.pid_exists(parent_process.pid)):
-        print("BEGIN\n")
-        time_measurement_start = datetime.now()
+
+    try:
+        # If command_with_args is a full string like "path\\to\\script.bat arg1 arg2"
+        # and the first part is a relative path, resolve it:
+        parts = shlex.split(command_with_args)  # splits respecting quotes
+        parts[0] = os.path.abspath(os.path.join(cwd, parts[0]))  # make sure script path is absolute
+
+        # Bouw custom_env, en vertaal environment_string
+        custom_env = os.environ.copy()  # behoud bestaande omgeving
+        for pair in environment_string.split(';'):
+            if '=' in pair:
+                key, value = pair.split('=', 1)
+                custom_env[key.strip()] = value.strip()
+        print(f"Running subprocess: {parts}, cwd={cwd}, env={custom_env}\n")
+
+        full_command = f'cmd /k "{parts[0]} {" ".join(parts[1:])}"'
+        print(f"curr_command: {full_command}\n")
+
+        parent_process_open_handle = subprocess.Popen(full_command, cwd=cwd, env=custom_env, creationflags=subprocess.CREATE_NEW_CONSOLE)
+        parent_process = psutil.Process(parent_process_open_handle.pid)
+        experiment_start_time = datetime.fromtimestamp(parent_process.create_time())
+        cpu_ct = 0
+        while (psutil.pid_exists(parent_process.pid)):
+            print("BEGIN\n")
+            time_measurement_start = datetime.now()
         
-        try: # dry run cpu_p for every child, first time cpu_percent() always returns 0.0, see
+            try: # dry run cpu_p for every child, first time cpu_percent() always returns 0.0, see
             
-            child_processes = parent_process.children(recursive=True)
-            dummy_parent_cpu_p = parent_process.cpu_percent()
-            for child_process in child_processes:
-                dummy_child_cpu_p = child_process.cpu_percent()
-        except:
-            pass
-        time.sleep(0.1)
+                child_processes = parent_process.children(recursive=True)
+                dummy_parent_cpu_p = parent_process.cpu_percent()
+                for child_process in child_processes:
+                    dummy_child_cpu_p = child_process.cpu_percent()
+            except:
+                pass
+            time.sleep(0.1)
 
-        t, dt, cpu_p, mem_p, rss, vms, num_threads, rb, wb, net_c = getProcessCurrentStatistics(parent_process, experiment_start_time)
-        if not t:
-            continue
-
-        profile_log["time"].append(t)
-        profile_log["dtime"].append(dt)
-        profile_log["cpu_percent"].append(cpu_p)
-        profile_log["memory_percent"].append(mem_p)
-        profile_log["rss"].append(rss)
-        profile_log["vms"].append(vms)
-        profile_log["num_threads"].append(num_threads)
-        profile_log["total_read_bytes"].append(rb)
-        profile_log["total_write_bytes"].append(wb)
-        profile_log["net_connections"].append(net_c)
-        
-        profile_log["processes"].append(len(child_processes)+1)
-
-        for child_process in child_processes:
-            t, _, cpu_p, mem_p, rss, vms, num_threads, rb, wb, net_c = getProcessCurrentStatistics(child_process, experiment_start_time)
+            t, dt, cpu_p, mem_p, rss, vms, num_threads, rb, wb, net_c = getProcessCurrentStatistics(parent_process, experiment_start_time)
             if not t:
                 continue
-            profile_log["cpu_percent"][-1]       += cpu_p
-            profile_log["memory_percent"][-1]    += mem_p
-            profile_log["rss"][-1]               += rss
-            profile_log["vms"][-1]               += vms
-            profile_log["num_threads"][-1]       += num_threads
-            profile_log["total_read_bytes"][-1]  += rb
-            profile_log["total_write_bytes"][-1] += wb
-            profile_log["net_connections"][-1]   += net_c
-        cpu_ct += profile_log["cpu_percent"][-1] / 100.0
-        profile_log["cpu_curr_time"].append(cpu_ct)
 
-        print("END\n")
-        time_measurement_end = datetime.now()
-        dtimestamp = (time_measurement_end-time_measurement_start).total_seconds()
-        sleep_time = sampling_rate-dtimestamp        
-        if sleep_time > 0.0:
-            time.sleep(sleep_time)
-        else:
-            print(f"Warning: measurements of calculation process took {dtimestamp} seconds, and is longer than sampling rate: {sampling_rate}")
+            profile_log["time"].append(t)
+            profile_log["dtime"].append(dt)
+            profile_log["cpu_percent"].append(cpu_p)
+            profile_log["memory_percent"].append(mem_p)
+            profile_log["rss"].append(rss)
+            profile_log["vms"].append(vms)
+            profile_log["num_threads"].append(num_threads)
+            profile_log["total_read_bytes"].append(rb)
+            profile_log["total_write_bytes"].append(wb)
+            profile_log["net_connections"].append(net_c)
+        
+            profile_log["processes"].append(len(child_processes)+1)
 
+            for child_process in child_processes:
+                t, _, cpu_p, mem_p, rss, vms, num_threads, rb, wb, net_c = getProcessCurrentStatistics(child_process, experiment_start_time)
+                if not t:
+                    continue
+                profile_log["cpu_percent"][-1]       += cpu_p
+                profile_log["memory_percent"][-1]    += mem_p
+                profile_log["rss"][-1]               += rss
+                profile_log["vms"][-1]               += vms
+                profile_log["num_threads"][-1]       += num_threads
+                profile_log["total_read_bytes"][-1]  += rb
+                profile_log["total_write_bytes"][-1] += wb
+                profile_log["net_connections"][-1]   += net_c
+            cpu_ct += profile_log["cpu_percent"][-1] / 100.0
+            profile_log["cpu_curr_time"].append(cpu_ct)
+
+            print("END\n")
+            time_measurement_end = datetime.now()
+            dtimestamp = (time_measurement_end-time_measurement_start).total_seconds()
+            sleep_time = sampling_rate-dtimestamp        
+            if sleep_time > 0.0:
+                time.sleep(sleep_time)
+            else:
+                print(f"Warning: measurements of calculation process took {dtimestamp} seconds, and is longer than sampling rate: {sampling_rate}")
+
+    except FileNotFoundError as e:
+        print(f"FileNotFoundError: {e}")
+        print("Check if the batch, command, or executable file exists at the specified location:")
+        print(f"  Resolved command path: {parts[0]}")
+        print(f"  Working directory: {cwd}")
+
+    except Exception as e:
+        print(f"Unexpected error occurred: {e}")
     return profile_log, experiment_start_time
 
 def getClosestLog(dms_log_t, profile_log, param, current_ind):
@@ -328,7 +353,7 @@ def loadExperimentFromPickleFile(experiment, exp_fn=None):
 
 def RunExperiments(experiments:list[Experiment], sampling_rate=1.0):
     for exp_index, exp in enumerate(experiments):
-        print(f"Running experiment: {experiments[exp_index]}\n")
+        print(f"Running experiment: {experiments[exp_index].__dict__}\n")
         bin_exp_fn = exp.binary_experiment_file
         if bin_exp_fn:
             if not os.path.exists(bin_exp_fn): # check if experiment exists
@@ -341,8 +366,11 @@ def RunExperiments(experiments:list[Experiment], sampling_rate=1.0):
         
         fldrname, filename = getExperimentFileName(exp)
         exp_fn = fldrname + filename
+
+        print(f"experiment file: {exp_fn}")
         
         if os.path.exists(exp_fn): # Experiment is calculated before, do not recalculate
+            print(f"already exists; results are reused and not recalculated!\n")
             experiments[exp_index] = loadExperimentFromPickleFile(None, exp_fn)
             continue
 
