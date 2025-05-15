@@ -4,7 +4,7 @@
 //                                                                                      //
 //////////////////////////////////////////////////////////////////////////////////////////
 
-container StateNaAllocatie_CALC := GebiedsAllocatie/ResultState, IsHidden = "True"
+container StateNaAllocatie := GebiedsAllocatie/ResultState, IsHidden = "True"
 {
 	parameter<bool> IsBeginSituatie := false;
 
