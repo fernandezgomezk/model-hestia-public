@@ -19,6 +19,25 @@ unit<uint32> BouwdeelActieveWoning := select_with_org_rel(BO/Activatie/BouwdeelA
 	container IsolatieNiveau_rel := for_each_nedv(classifications/bouwdeel/name, 'BO/Bouwdelen/Isolatie/'+classifications/bouwdeel/name+'[BO_rel]', ., Classifications/IsolatieNiveau), ishidden = "True";
 	
 	attribute<m2> TotalArea := ='add('+AsItemList('BO/Bouwdelen/'+Classifications/bouwdeel/name+'[BO_rel]')+')', ishidden = "True";
+	
+	unit<uint32> ZBS := ZichtjaarBeleid/subsidie, ishidden = "True";
+	container subsidies := for_each_ne(ZBS/name, 'subs(ZBS/V/'+ZBS/name+')');
+	template subs : ishidden = "True"
+	{
+	//case parameters
+	parameter<ZBS> ZBS_rel;
+	//end case parameters
+	parameter<bool>    Isolatiesubsidie	                      := makedefined(ZBS/Maatregel/Isolatie/Alle[ZBS_rel],0[bool]);
+	attribute<bool>    InDoelgroepED  (BouwdeelActieveWoning) := ='OR('+AsItemList(replace('ZBS/doelgroep/@ED[ZBS_rel] && BO/Eigendom_rel[BO_rel] == Classifications/Eigendom/V/@ED','@ED',Classifications/Eigendom/label))+')', ishidden = "True";
+	attribute<bool>    InDoelgroepWT  (BouwdeelActieveWoning) := (ZBS/doelgroep/EGW[ZBS_rel] && not(BO/IsMeergezins[BO_rel])) || (ZBS/doelgroep/MGW[ZBS_rel] && BO/IsMeergezins[BO_rel]);
+	attribute<bool>    InDoelgroep    (BouwdeelActieveWoning) := InDoelgroepED && InDoelgroepWT;
+	attribute<bool>    Naleving       (BouwdeelActieveWoning) := rnd_uniform(JaarSeed * 103u, BO , range(float64, 0d, 1d))[BO_rel] <= ZBS/Naleving[ZBS_rel];
+	attribute<bool>    Geldig         (BouwdeelActieveWoning) := InDoelgroep && Naleving && Isolatiesubsidie;
+	attribute<ratio>   Rs_gv          (BouwdeelActieveWoning) := Geldig ? makedefined(ZBS/Subsidieaandeel[ZBS_rel],0.0[ratio]) : 0d;
+	}
+		
+	attribute<ratio>   Rs_gv             (BouwdeelActieveWoning) := = 'max_elem('+AsItemList('subsidies/'+ZBS/name+'/Rs_gv')+')'; 
+	    //attribute<ratio>   Rs           (BouwdeelActieveWoning) := const(0d,BouwdeelActieveWoning);
 
 	unit<uint8> IV := classifications/IsolatieVerbetering, ishidden = "True";
 	
@@ -56,24 +75,7 @@ unit<uint32> BouwdeelActieveWoning := select_with_org_rel(BO/Activatie/BouwdeelA
 		,	AmbitieBerekening, float64
 		);
 		
-		unit<uint32> ZBS := ZichtjaarBeleid/subsidie, ishidden = "True";
-		container subsidies := for_each_ne(ZBS/name, 'subs(ZBS/V/'+ZBS/name+')');
-		template subs : ishidden = "True"
-		{
-		//case parameters
-		parameter<ZBS> ZBS_rel;
-		//end case parameters
-		parameter<bool>    Isolatiesubsidie	                      := makedefined(ZBS/Maatregel/Isolatie/Alle[ZBS_rel],0[bool]);
-		attribute<bool>    InDoelgroepED  (BouwdeelActieveWoning) := ='OR('+AsItemList(replace('ZBS/doelgroep/@ED[ZBS_rel] && BO/Eigendom_rel[BouwdeelActieveWoning/BO_rel] == Classifications/Eigendom/V/@ED','@ED',Classifications/Eigendom/label))+')', ishidden = "True";
-		attribute<bool>    InDoelgroepWT  (BouwdeelActieveWoning) := (ZBS/doelgroep/EGW[ZBS_rel] && not(BO/IsMeergezins[BouwdeelActieveWoning/BO_rel])) || (ZBS/doelgroep/MGW[ZBS_rel] && BO/IsMeergezins[BouwdeelActieveWoning/BO_rel]);
-		attribute<bool>    InDoelgroep    (BouwdeelActieveWoning) := InDoelgroepED && InDoelgroepWT;
-		attribute<bool>    Naleving       (BouwdeelActieveWoning) := rnd_uniform(JaarSeed * 103u, BO , range(float64, 0d, 1d))[BouwdeelActieveWoning/BO_rel] <= ZBS/Naleving[ZBS_rel];
-		attribute<bool>    Geldig         (BouwdeelActieveWoning) := InDoelgroep && Naleving && Isolatiesubsidie;
-		attribute<ratio>   Rs             (BouwdeelActieveWoning) := Geldig ? makedefined(ZBS/Subsidieaandeel[ZBS_rel],0.0[ratio]) : 0d;
-		}
-		
-		attribute<ratio>   Rs             (BouwdeelActieveWoning) := = 'max_elem('+AsItemList('subsidies/'+ZBS/name+'/Rs')+')';
-		
+	
 		// IsolatieScore: xx_N1 behoeft geen afweging, geen besparing en ook 0 kosten; 
 		// huidig niveau's (indien > N1) behoeven wel afweging teneinde tegenwicht te bieden voor besparingen bij volgended IsolatieNiveau's
 		container IsolatieScore := for_each_nedv(classifications/IsolatieMaatregel/name
@@ -81,7 +83,7 @@ unit<uint32> BouwdeelActieveWoning := select_with_org_rel(BO/Activatie/BouwdeelA
 				'iif(IsolatieNiveau_rel/@BD[BouwdeelActieveWoning_rel] <=  @IN'
 				',	BO/Bouwdelen/@BD[BO_rel]'
 					'*	( ( Combifactor * BesparingsFactor[@IM] * beta[IsolatieVerbetering_rel]  )'
-					'/	TotalArea[BouwdeelActieveWoning_rel] - iif(IsolatieNiveau_rel/@BD[BouwdeelActieveWoning_rel] < @IN, IMxUV/kosten[@IMxUV] * @LC * @BTW * @Rs * SpecificP50P/@IBD, 0[EUR_m2]))'
+					'/	TotalArea[BouwdeelActieveWoning_rel] - iif(IsolatieNiveau_rel/@BD[BouwdeelActieveWoning_rel] < @IN, IMxUV/kosten[@IMxUV] * @LC * @BTW * (1d-@Rs_gv) * SpecificP50P/@IBD, 0[EUR_m2]))'
 				',	(0.0 / 0.0)'
 				')'
 			,	'@BD',    classifications/IsolatieMaatregel/bouwdeel_name
@@ -90,7 +92,7 @@ unit<uint32> BouwdeelActieveWoning := select_with_org_rel(BO/Activatie/BouwdeelA
 			,	'@IMxUV', 'combine_data(IMxUV, @IM, BO/Activatie/Uitvoering[BO_rel])'
 			,	'@IM',    'classifications/IsolatieMaatregel/V/'+classifications/IsolatieMaatregel/name
 			,	'@BTW',   '(1.0[ratio] + Invoer/Kengetallen/BTW/BTW_gv[Zichtjaar_rel] / 100[percent])'
-			,	'@Rs',    'Rs[BouwdeelActieveWoning_rel]' 
+			,	'@Rs_gv', 'Rs_gv[BouwdeelActieveWoning_rel]' 
 			,	'@LC',    'leerCurves/Isolatie/Curve'
 			)
 		, 	AmbitieBerekening, float64
@@ -104,7 +106,7 @@ unit<uint32> BouwdeelActieveWoning := select_with_org_rel(BO/Activatie/BouwdeelA
 		);
 
 		container Geschiktheid := for_each_nedv(classifications/IsolatieMaatregel/name
-			, replace('IsolatieScore/@BDI - Min_elem('+ AsItemList('IsolatieScore/@BDN_'+/Classifications/IsolatieDoel/name) +')' 
+			, replace('IsolatieScore/@BDI - Max_elem('+ AsItemList('IsolatieScore/@BDN_'+/Classifications/IsolatieDoel/name) +')' 
 				,	'@BDI', classifications/IsolatieMaatregel/name
 				,	'@BDN', classifications/IsolatieMaatregel/bouwdeel_name
 				)
