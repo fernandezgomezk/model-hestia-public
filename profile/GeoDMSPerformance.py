@@ -174,7 +174,7 @@ def getPerformance(exp:Experiment, sampling_rate=1.0):
             "title", title, "&&",  # set title
             "call",  # call the batch file
         ] + parts  # add the rest of the command
-        # + ["&&", "pause"]  # keep the console open
+        # + ["&&", "pause"]  # keep the console open, uncomment for debugging non-waiting failures
 
         print(f"Full command: {cmd_parts}\n")
 
@@ -188,9 +188,9 @@ def getPerformance(exp:Experiment, sampling_rate=1.0):
         parent_process = psutil.Process(parent_process_open_handle.pid)
         experiment_start_time = datetime.fromtimestamp(parent_process.create_time())
         cpu_ct = 0
+        time_measurement_start = datetime.now()
         while (psutil.pid_exists(parent_process.pid)):
-            time_measurement_start = datetime.now()
-        
+       
             try: # dry run cpu_p for every child, first time cpu_percent() always returns 0.0, see
             
                 child_processes = parent_process.children(recursive=True)
@@ -205,6 +205,7 @@ def getPerformance(exp:Experiment, sampling_rate=1.0):
             if not t:
                 continue
 
+            # add a log row to each attribute
             profile_log["time"].append(t)
             profile_log["dtime"].append(dt)
             profile_log["cpu_percent"].append(cpu_p)
@@ -236,6 +237,7 @@ def getPerformance(exp:Experiment, sampling_rate=1.0):
             time_measurement_end = datetime.now()
             dtimestamp = (time_measurement_end-time_measurement_start).total_seconds()
             sleep_time = sampling_rate-dtimestamp        
+            time_measurement_start = time_measurement_end
             if sleep_time > 0.0:
                 time.sleep(sleep_time)
             else:
