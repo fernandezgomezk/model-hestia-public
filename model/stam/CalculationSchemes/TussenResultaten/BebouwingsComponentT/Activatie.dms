@@ -77,7 +77,7 @@ container Activatie
 		}
 	}
 
-	attribute<bool>    Verhuismoment (..) := rnd_uniform(JaarSeed * 2u, .., range(float32, 0d, 1d)) < Classifications/WoningType/Verhuiskans[BO/WoningType_rel];
+	attribute<bool>    Verhuismoment (..) := Zichtjaar_jaar == Peiljaar ? const(false,BO) : rnd_uniform(JaarSeed * 2u, .., range(float32, 0d, 1d)) < Classifications/WoningType/Verhuiskans[BO/WoningType_rel];
 	
 	attribute<float64> KoudeKans     (..) := rnd_uniform(JaarSeed * 3u, .., range(float32, 0d, 1d)), isHidden = "True";
 	attribute<bool>    KoudemomentB  (..) := KoudeKans   > 1.0[ratio] - StartKoudeBasis  , Descr = "Jaarlijkse kans dat een gebouweigenaar besluit te starten met de basisvraag naar koude in te vullen" , isHidden = "True";
@@ -87,7 +87,7 @@ container Activatie
 
 	container Bouwdeel_odds := for_each_nedv(
 		 classifications/bouwdeel/name
-		,'BO/Bouwdelen/Isolatie/'+ classifications/bouwdeel/name +' == Classifications/IsolatieNiveau/V/N4 ? 0.0[ratio] : Verhuismoment ? 1.0[ratio] :
+		,'Zichtjaar_jaar == Peiljaar ? const(0d,BO): BO/Bouwdelen/Isolatie/'+ classifications/bouwdeel/name +' == Classifications/IsolatieNiveau/V/N4 ? 0.0[ratio] : Verhuismoment ? 1.0[ratio] :
 		 max_elem(min_elem(increment * 
 		 ((float64(sub_or_null(Zichtjaar_jaar, BO/Bouwdelen/LastVervanging/' + classifications/bouwdeel/name + ')) / float64(Classifications/Bouwdeel/Levensduur[Classifications/Bouwdeel/V/'+ classifications/bouwdeel/name +'])) - SpreidingsFactor), 1.0[ratio]),0.0[ratio])'
 		,(..)
@@ -103,7 +103,7 @@ container Activatie
 
 	container Product_odds := for_each_nedv(
 		 classifications/product/name
-		,'max_elem(min_elem(increment * ('
+		,'Zichtjaar_jaar == Peiljaar ? const(false,BO): max_elem(min_elem(increment * ('
 			'(float64(sub_or_null(Zichtjaar_jaar, InstallatiePerProduct/LastVervanging/' + classifications/product/name + ')) '
 				'/ float64(Classifications/Installatie/Levensduur[InstallatiePerProduct/'+ classifications/product/name +']))'
 			'- SpreidingsFactor), 1.0[ratio]),0.0[ratio]) '
@@ -134,13 +134,13 @@ container Activatie
 		attribute<bool> KDb (...) := InstallatiePerProduct/KDb == Classifications/Installatie/V/gebiedsOptie ? false : Beleid/BeleidsActivatie/KD || (InstallatiePerProduct/KDb == InstallatiePerProduct/RVb) ? RVb : (Verhuismoment || Producten_EOL/KDb || (InstallatiePerProduct/KDb == Classifications/Installatie/V/geen && KoudemomentB));
 		attribute<bool> KDp (...) := Beleid/BeleidsActivatie/KD || ((InstallatiePerProduct/KDb == InstallatiePerProduct/KDp) && (InstallatiePerProduct/KDp != Classifications/Installatie/V/geen)) ? KDb : (Verhuismoment || Producten_EOL/KDb || (InstallatiePerProduct/KDp == Classifications/Installatie/V/geen && KoudemomentP && KDb));	
 
-		attribute<bool> VT  (...) := Beleid/BeleidsActivatie/VT || Bouwdelen/RenovatieMoment || Zichtjaar_jaar - InstallatiePerProduct/LastVervanging/VT >= Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes/Levensduur [ InstallatiePerProduct/VT ] 	;
+		attribute<bool> VT  (...) := Beleid/BeleidsActivatie/VT || Bouwdelen/RenovatieMoment || (Zichtjaar_jaar == Peiljaar ? const(false,BO): Zichtjaar_jaar - InstallatiePerProduct/LastVervanging/VT >= Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes/Levensduur [ InstallatiePerProduct/VT ]) 	;
 	//	attribute<bool> VT  (...) := Beleid/BeleidsActivatie/VT || Zichtjaar_jaar - InstallatiePerProduct/LastVervanging/VT >= Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes/Levensduur [ InstallatiePerProduct/VT ] 	;
 	}
 
 	container Bouwdelen := Bouwdelen_base
 	{
-		attribute<Bool> RenovatieMoment (...) := add(
+		attribute<Bool> RenovatieMoment (...) := Zichtjaar_jaar == Peiljaar ? const(false,BO) : add(
 			uint8( Bouwdelen_base/RB || Bouwdelen_base/RO || Bouwdelen_base/DR ),
 			uint8( Bouwdelen_base/VL ),
 			uint8( Bouwdelen_base/MG || Bouwdelen_base/MS || Bouwdelen_base/PL ),
