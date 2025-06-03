@@ -289,7 +289,7 @@ template StartingStateComponent
 			attribute<eur_yr> oh_KD   (results)  := const(0[Eur_yr], results);
 			attribute<eur_yr> adm_KD  (results)  := const(0[Eur_yr], results);
 		}
-
+/*
 		unit<uint32> VIVETexports := /Invoer/RuimtelijkeData/BAG/vbo_woonfunctie_studiegebied
 		{
 			attribute<string> BAG_id := Results/identificatie;
@@ -371,6 +371,7 @@ template StartingStateComponent
         	parameter<string> ExportAll    := 'Ready', ExplicitSuppliers = "= supplierlist";
 
 		}
+*/		
 	}
 	
 

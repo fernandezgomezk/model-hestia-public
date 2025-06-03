@@ -45,6 +45,8 @@ container EnergiePrijzen
 			  Classifications/GebruiksgrootteKlasse/name
 			, 'GebruiksSectie(table, '+quote(Classifications/GebruiksgrootteKlasse/code)+')' )
 		{
+			container GrootGebruik := KleinMiddelGebruik;
+			
 			attribute<yr_uint16>  Jaar            (table) := table/Jaar[yr_uint16 ];
 			attribute<kg_GJ>      CO2_GJ          (table) := table/RAT_CO2_GJ[KG_GJ];
 						

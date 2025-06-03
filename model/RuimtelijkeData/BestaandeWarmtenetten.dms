@@ -86,13 +86,12 @@ container BestaandeWarmtenetten
 	unit<uint32> Puntbronnen_data
 	:   StorageName     = "%HestiaDataDir%/infra/BestaandeWarmtenetten/shapefiles/puntbronnen.shp"
 	,   StorageType     = "gdal.vect"
-	,	DialogData      = "geometry"
-	,	DialogType      = "Map"
 	,	StorageReadOnly = "True"
 	,	IsHidden        = "True"
 	{
 		
-	   attribute<rdc_meter> geometry   ;
+	   attribute<wgs84_base> geometry_base   ;
+	   attribute<rdc_meter> geometry  := geometry_base[rdc_meter];
 	   attribute<rdc_mm   > geometry_mm := geometry[rdc_mm];
 	   attribute<string>    label        := Eigenaar + ' ' + Warmtenet;
 	   attribute<percent>   P_vol_2021; 
