@@ -91,7 +91,40 @@ unit<uint32> BouwdeelActieveWoning := select_with_org_rel(BO/Activatie/BouwdeelA
 			
 		}
 	}
-	
+
+	container Bouwdoel
+	{
+		unit<uint8> KeuzeGroottePerNiveau := Classifications/IsolatieNiveau
+		{
+			attribute<uint8> all     : [ 5, 5, 4, 3, 2]; // bij N0 is investeren naar N0 geen optie, niets doen wel.
+			attribute<uint8> eol     : [ 5, 4, 3, 2, 1]; // einde levensduur, niets doen is geen optie.
+		
+			attribute<uint8> NN1     : [ 4, 4, 4, 3, 2]; // bij N0 is investeren naar N0 geen optie, niets doen wel.
+			attribute<uint8> NN1_eol : [ 3, 3, 3, 2, 1]; // einde levensduur, niets doen is geen optie.
+			
+			attribute<uint8> NN2     : [ 3, 3, 3, 3, 2]; // als N2 geen optie is (Niet Niveau 2).
+			attribute<uint8> NN2_eol : [ 2, 2, 2, 2, 1]; // einde levensduur, niets doen is geen optie en N2 ook niet.
+			attribute<uint8> N1N4    : [ 2, 3, 1, 1, 2]; // alleen N1 en N4 zijn opties, en niets doen, indien al N1 of N4
+			attribute<uint8> N1N4_eol: [ 2, 2, 1, 1, 1]; // alleen N1 en N4 zijn opties
+		}
+		
+		attribute<uint8> RB(BouwdeelActieveWoning) := BO/Bouwdelen/RB[BO_rel] > 4[m2] ? BO/Activatie/Bouwdelen/RB[BO_rel] ? KeuzeGroottePerNiveau/NN2_eol [ BO/Bouwdelen/Isolatie/RB[BO_rel] ]: KeuzeGroottePerNiveau/NN2 [ BO/Bouwdelen/Isolatie/RB[BO_rel] ] : 1b;
+		attribute<uint8> RO(BouwdeelActieveWoning) := BO/Bouwdelen/RO[BO_rel] > 4[m2] ? BO/Activatie/Bouwdelen/RO[BO_rel] ? KeuzeGroottePerNiveau/NN2_eol [ BO/Bouwdelen/Isolatie/RO[BO_rel] ]: KeuzeGroottePerNiveau/NN2 [ BO/Bouwdelen/Isolatie/RO[BO_rel] ] : 1b;
+		attribute<uint8> DR(BouwdeelActieveWoning) := BO/Bouwdelen/DR[BO_rel] > 4[m2] ? BO/Activatie/Bouwdelen/DR[BO_rel] ? KeuzeGroottePerNiveau/N1N4_eol[ BO/Bouwdelen/Isolatie/DR[BO_rel] ]: KeuzeGroottePerNiveau/N1N4[ BO/Bouwdelen/Isolatie/DR[BO_rel] ] : 1b;
+		attribute<uint8> PL(BouwdeelActieveWoning) := BO/Bouwdelen/PL[BO_rel] > 4[m2] ? BO/Activatie/Bouwdelen/PL[BO_rel] ? KeuzeGroottePerNiveau/N1N4_eol[ BO/Bouwdelen/Isolatie/PL[BO_rel] ]: KeuzeGroottePerNiveau/N1N4[ BO/Bouwdelen/Isolatie/PL[BO_rel] ] : 1b;
+		attribute<uint8> VL(BouwdeelActieveWoning) := BO/Bouwdelen/VL[BO_rel] > 4[m2] ? BO/Activatie/Bouwdelen/VL[BO_rel] ? KeuzeGroottePerNiveau/N1N4_eol[ BO/Bouwdelen/Isolatie/VL[BO_rel] ]: KeuzeGroottePerNiveau/N1N4[ BO/Bouwdelen/Isolatie/VL[BO_rel] ] : 1b;
+		attribute<uint8> MG(BouwdeelActieveWoning) := BO/Bouwdelen/MG[BO_rel] > 4[m2] ? BO/Activatie/Bouwdelen/MG[BO_rel] ? KeuzeGroottePerNiveau/NN1_eol [ BO/Bouwdelen/Isolatie/MG[BO_rel] ]: KeuzeGroottePerNiveau/NN1 [ BO/Bouwdelen/Isolatie/MG[BO_rel] ] : 1b;
+		attribute<uint8> MS(BouwdeelActieveWoning) := BO/Bouwdelen/MS[BO_rel] > 4[m2] ? BO/Activatie/Bouwdelen/MS[BO_rel] ? KeuzeGroottePerNiveau/N1N4_eol[ BO/Bouwdelen/Isolatie/MS[BO_rel] ]: KeuzeGroottePerNiveau/N1N4[ BO/Bouwdelen/Isolatie/MS[BO_rel] ] : 1b;
+		attribute<uint8> DP(BouwdeelActieveWoning) := BO/Bouwdelen/DP[BO_rel] > 4[m2] ? BO/Activatie/Bouwdelen/DP[BO_rel] ? KeuzeGroottePerNiveau/N1N4_eol[ BO/Bouwdelen/Isolatie/DP[BO_rel] ]: KeuzeGroottePerNiveau/N1N4[ BO/Bouwdelen/Isolatie/DP[BO_rel] ] : 1b;
+		attribute<uint8> DS(BouwdeelActieveWoning) := BO/Bouwdelen/DS[BO_rel] > 4[m2] ? BO/Activatie/Bouwdelen/DS[BO_rel] ? KeuzeGroottePerNiveau/N1N4_eol[ BO/Bouwdelen/Isolatie/DS[BO_rel] ]: KeuzeGroottePerNiveau/N1N4[ BO/Bouwdelen/Isolatie/DS[BO_rel] ] : 1b;
+		attribute<uint8> KR(BouwdeelActieveWoning) := BO/Bouwdelen/KR[BO_rel] > 4[m2] ? BO/Activatie/Bouwdelen/KR[BO_rel] ? KeuzeGroottePerNiveau/N1N4_eol[ BO/Bouwdelen/Isolatie/KR[BO_rel] ]: KeuzeGroottePerNiveau/N1N4[ BO/Bouwdelen/Isolatie/KR[BO_rel] ] : 1b;
+		
+		attribute<uint16> NrCombinatiesA(BouwdeelActieveWoning) := uint16(RB)*uint16(RO)*uint16(DR)*uint16(PL)*uint16(VL);
+		attribute<uint16> NrCombinatiesB(BouwdeelActieveWoning) := uint16(MG)*uint16(MS)*uint16(DP)*uint16(DS)*uint16(KR);
+		attribute<uint32> NrCombinaties (BouwdeelActieveWoning) := uint32(NrCombinatiesA) * uint32(NrCombinatiesB);
+		
+		parameter<uint64> TotaalAantalCombinaties := sum_uint64(NrCombinaties);
+	}
 	// ================ END   Berekening t.b.v. minimum score
 
 
