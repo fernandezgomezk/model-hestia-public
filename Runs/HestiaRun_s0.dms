@@ -102,7 +102,7 @@ container HestiaRun
 			parameter<uint32> NrProcessors := 20;
 			parameter<uint32> ThisProcessor := 3;
 
-			parameter<string>   RekenPerStap := replace(Expand(., '%env:HESTIA_PER_REKENSTAP%'), 'env:HESTIA_PER_REKENSTAP', 'Ja');
+			parameter<string>   RekenPerStap := replace(Expand(., '%env:HESTIA_PER_REKENSTAP%'), 'env:HESTIA_PER_REKENSTAP', 'Nee');
 			parameter<bool>     RekenPerStap_cond := RekenPerStap != 'Nee';
 		}
 	}
