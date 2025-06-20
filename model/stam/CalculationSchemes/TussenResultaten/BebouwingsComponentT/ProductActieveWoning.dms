@@ -54,7 +54,6 @@ unit<uint32> ProductActieveWoning := select_with_org_rel(BO/Activatie/ProductAct
 			
 			attribute<Classifications/SchilLabel> SchilLabel_rel := collect_by_cond(xIsolatieAmbitie, BouwdeelActieveWoning/UniekAmbitie/schillabel_rel);
 			attribute<Eur   > Ki_gv  := collect_by_cond(xIsolatieAmbitie, BouwdeelActieveWoning/UniekAmbitie/Ki_gv );
-			attribute<Eur   > Ki_gv_nat  := collect_by_cond(xIsolatieAmbitie, BouwdeelActieveWoning/UniekAmbitie/Ki_gv_nat );			
 			attribute<Eur_yr> Kji_gv := collect_by_cond(xIsolatieAmbitie, BouwdeelActieveWoning/UniekAmbitie/Kji_gv);
 			attribute<Eur_yr> Kmi_gv := collect_by_cond(xIsolatieAmbitie, BouwdeelActieveWoning/UniekAmbitie/Kmi_gv);
 			
@@ -91,7 +90,6 @@ unit<uint32> ProductActieveWoning := select_with_org_rel(BO/Activatie/ProductAct
 		
 		attribute<Classifications/SchilLabel> SchilLabel_rel := union_data(., sub_BouwdeelActief/xIsolatieAmbitie/SchilLabel_rel, BO/SchilLabel_rel[sub_BouwdeelInactief/BO_rel]);
 		attribute<Eur   >                     Ki_gv          := union_data(., sub_BouwdeelActief/xIsolatieAmbitie/Ki_gv , const(0[EUR],    sub_BouwdeelInactief));
-		attribute<Eur   >                     Ki_gv_nat      := union_data(., sub_BouwdeelActief/xIsolatieAmbitie/Ki_gv_nat, const(0[EUR],    sub_BouwdeelInactief));
 		attribute<Eur_yr>                     Kji_gv         := union_data(., sub_BouwdeelActief/xIsolatieAmbitie/Kji_gv, const(0[EUR_yr], sub_BouwdeelInactief));
 		attribute<Eur_yr>                     Kmi_gv         := union_data(., sub_BouwdeelActief/xIsolatieAmbitie/Kmi_gv, const(0[EUR_yr], sub_BouwdeelInactief));
 		
@@ -131,8 +129,8 @@ unit<uint32> ProductActieveWoning := select_with_org_rel(BO/Activatie/ProductAct
 		unit<uint32> PAW_xInvesteringsOptie := combine(xIsolatieAmbitie, Classifications/GebouwOptieCategorie)
 		{
 			attribute<BO>                                   BO_rel                   := xIsolatieAmbitie/BO_rel[xIsolatieAmbitie_rel], ishidden = "True";
-			attribute<xIsolatieAmbitie>                     xIsolatieAmbitie_rel     := first_rel, ishidden = "True";
-			attribute<Classifications/GebouwOptieCategorie> GebouwOptieCategorie_rel := second_rel, ishidden = "True";
+			attribute<xIsolatieAmbitie>                     xIsolatieAmbitie_rel     := first_Rel, ishidden = "True";
+			attribute<Classifications/GebouwOptieCategorie> GebouwOptieCategorie_rel := second_Rel, ishidden = "True";
 			
 			attribute<ProductActieveWoning>                 ProductActieveWoning_rel := xIsolatieAmbitie_rel->ProductActieveWoning_rel, ishidden = "True"; //[xIsolatieAmbitie_rel];
 			attribute<Classifications/IsolatieAmbitie>      MinIsolatieAmbitie_rel   := xIsolatieAmbitie_rel->MinIsolatieAmbitie_rel, ishidden = "True";
@@ -198,10 +196,9 @@ unit<uint32> ProductActieveWoning := select_with_org_rel(BO/Activatie/ProductAct
 				attribute<GJ_yr> Winst_RV      (xGebouwOptie) := xIsolatieAmbitie/functioneel/Winst_RV[xIsolatieAmbitie_rel];
 				attribute<ratio> Correction_RV (xGebouwOptie) := xIsolatieAmbitie/functioneel/Correction_RV[xIsolatieAmbitie_rel];
 			}
-			attribute<EUR>    Ki_gv  	:= xIsolatieAmbitie/Ki_gv[xIsolatieAmbitie_rel];
-			attribute<EUR>    Ki_gv_nat	:= xIsolatieAmbitie/Ki_gv_nat[xIsolatieAmbitie_rel];			
-			attribute<EUR_yr> Kji_gv 	:= xIsolatieAmbitie/Kji_gv[xIsolatieAmbitie_rel];
-			attribute<EUR_yr> Kmi_gv 	:= xIsolatieAmbitie/Kmi_gv[xIsolatieAmbitie_rel];
+			attribute<EUR>    Ki_gv  := xIsolatieAmbitie/Ki_gv[xIsolatieAmbitie_rel];
+			attribute<EUR_yr> Kji_gv := xIsolatieAmbitie/Kji_gv[xIsolatieAmbitie_rel];
+			attribute<EUR_yr> Kmi_gv := xIsolatieAmbitie/Kmi_gv[xIsolatieAmbitie_rel];
 		}
 	}	
 }

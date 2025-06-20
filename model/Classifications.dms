@@ -447,7 +447,6 @@ container Classifications: Using = "Units", KeepData = "True", IsHidden = "True"
 		attribute<string> IsolatieNiveau_name:= IsolatieNiveau/name[second_rel];
 		
 		attribute<IsolatieMaatregel> IsolatieMaatregel_rel := rlookup(name, IsolatieMaatregel/name);
-//		attribute<bool>              isActieveMaatregel    := second_rel > 0[uint32] && Maatregel_label != ''; TODO: optimize, alleen maatregelen doorrekenen die daadwerkelijk gebruikt worden
 		attribute<string>            Maatregel_label       := Isolatie_imp/maatregel[Isolatiemaatregel/imp[IsolatieMaatregel_rel]];
 		attribute<percent>           P100_RV               := rjoin(name, Isolatie_imp/name, Isolatie_imp/R_RV)[percent];
 		attribute<ratio>             R_RV (Classifications/BouwdeelIsolatie):= Classifications/BouwdeelIsolatie/P100_RV / 100[percent];
@@ -468,13 +467,9 @@ container Classifications: Using = "Units", KeepData = "True", IsHidden = "True"
 		container kosten := for_each_nedv(Uitvoering/name, 'Isolatie_imp/'+ Uitvoering/name + '[imp][eur_m2]' ,IsolatieMaatregel, eur_m2);
 		
 		unit<uint32> xUitvoering := combine(IsolatieMaatregel, Uitvoering) {
-//			attribute<eur_m2> kosten := ='union_data(xUitvoering, '+AsItemList('IsolatieMaatregel/kosten/'+Uitvoering/name)+')';
 			attribute<eur_m2> kosten := ='merge(uint8(second_rel), eur_m2,'+AsItemList('IsolatieMaatregel/kosten/'+Uitvoering/name+'[first_rel]')+')';
 		}
-		
-//		container R_RV    := for_each_nedv(Vraagprofiel/name, 'Isolatie_imp/besparing_' + Vraagprofiel/name+'[imp][percent]', ., percent);
-		attribute<percent> P100_RV := Isolatie_imp/R_RV[imp][percent];
-		attribute<Ratio>   R_RV    := P100_RV / 100[percent];
+			attribute<percent> R_RV := Isolatie_imp/R_RV[imp][percent];
 		
 		container V := for_each_nedv(name, 'value('+string(id(.))+', ..)', void, .);
 	}
@@ -999,12 +994,12 @@ container Classifications: Using = "Units", KeepData = "True", IsHidden = "True"
 	
 	unit<uint32> SP  := combine(SchillabelEx, ProductTypeEx)
 	{
-		attribute<string> name := first_rel->name + '.' + second_rel->name;
+		attribute<string> name := first_Rel->name + '.' + second_rel->name;
 		attribute<string> label := name, DialogType = "LabelText";
 	}
 	unit<uint32> ISP := combine(Installatie, SP)
 	{
-		attribute<string> code := first_rel->name + '.' + second_rel->name;
+		attribute<string> code := first_Rel->name + '.' + second_rel->name;
 		attribute<Performance> Performance_rel := invert(Performance/ISP_rel);
 		attribute<string> label := code, DialogType = "LabelText";
 		
@@ -1076,7 +1071,7 @@ container Classifications: Using = "Units", KeepData = "True", IsHidden = "True"
 	
 	unit<uint32> InvesteringsOptie := combine(GebouwOptieCategorie, IsolatieAmbitie)
 	{
-		attribute<GebouwOptieCategorie> GebouwOptieCategorie_rel := first_rel;
+		attribute<GebouwOptieCategorie> GebouwOptieCategorie_rel := first_Rel;
 		attribute<IsolatieAmbitie>      IsolatieAmbitie_rel      := second_rel;
 	}
 	

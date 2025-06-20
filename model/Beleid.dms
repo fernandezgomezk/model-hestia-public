@@ -7,7 +7,8 @@
 
 container Beleid
 {
-	parameter<string> BeleidPath := '%projDir%/runs/Beleid_'+warmtestrategie+'.csv';
+		parameter<string> BeleidPath := '%projDir%/runs/Beleid_KEV24_'+KEVvariant+'.csv';
+
 	//====== Inlezen invoerbestand beleidsinstrumenten
 	unit<uint32> Invoer : StorageName = "=BeleidPath", StorageType = "gdal.vect", StorageReadOnly = "True"
 	{
@@ -308,6 +309,17 @@ container Beleid
 					SchilfactorVoorwaarde  ? IsDefined(MinSchilfactor) && IsDefined(MaxSchilfactor)  : IsNull(MinSchilfactor) && IsNull(MaxSchilfactor),
 					BouwjaarVoorwaarde     ? IsDefined(MinBouwjaar) && IsDefined(MaxBouwjaar) : IsNull(MinBouwjaar) && IsNull(MaxBouwjaar)
 					);
+					
+				attribute<bool>  LabelVoorwaarde (BestaandeBouwNorm) := strcount(voorwaarde1, lowercase('Huidig label:')) + strcount(voorwaarde2, lowercase('Huidig label:')) > 0;
+
+				container HuidigLabel := for_each_nedv(
+					  Classifications/Schillabel/name
+					, 'not(LabelVoorwaarde) ? true :
+					  strcount(voorwaarde1,'+ quote(lowercase('Huidig label:')) +') > 0 ? strcount(trim(replace(voorwaarde1,'+ quote(lowercase('Huidig label:')) +','+ quote('')+')), lowercase('+quote(Classifications/Schillabel/name)+')) > 0 
+					: strcount(trim(replace(voorwaarde2, '+quote(lowercase('Huidig label:'))+', '+quote('')+')), lowercase('+quote(Classifications/Schillabel/name)+')) > 0'
+					, BestaandeBouwNorm
+					, bool
+					);
 			}
 		}
 	}
@@ -333,9 +345,11 @@ container Beleid
 		container Doel_false  := for_each_nedv(Classifications/Eigendom/Label,'const(false,Subsidie)',Subsidie,bool), IsHidden = "True";
 		container ParseDoelgroep := Doel_false
 		{
-			attribute<bool>      Koop         (Subsidie) := strcount(doelgroep, 'koopw') + strcount(doelgroep, 'alle') > 0;
-			attribute<bool>      Parthuur     (Subsidie) := strcount(doelgroep, 'parti') + strcount(doelgroep, 'alle') > 0;
-			attribute<bool>      Wooncorp     (Subsidie) := strcount(doelgroep, 'socia') + strcount(doelgroep, 'alle') > 0;
+			attribute<bool>     Koop         (Subsidie) := strcount(doelgroep, 'koopw') + strcount(doelgroep, 'alle') > 0;
+			attribute<bool>     Parthuur     (Subsidie) := strcount(doelgroep, 'parti') + strcount(doelgroep, 'alle') > 0;
+			attribute<bool>     Wooncorp     (Subsidie) := strcount(doelgroep, 'socia') + strcount(doelgroep, 'alle') > 0;
+			attribute<bool> 	EGW      	 (Subsidie) := strcount(doelgroep, 'meerg') == 0;
+			attribute<bool> 	MGW      	 (Subsidie) := strcount(doelgroep, 'engez') == 0;
 		}
 
 		//====== Bepalen welke technische maatregelen onder het subsidieinstrument vallen
@@ -347,7 +361,7 @@ container Beleid
 				attribute<bool> All        (Subsidie) := strcount(grondslag, 'installaties') > 0;
 				attribute<bool> eWP_lw     (Subsidie) := All || (strcount(grondslag, 'warmtepomp') > 0 && strcount(grondslag, 'hybride warmtepomp') == 0);
 				attribute<bool> eWP_bw     (Subsidie) := All || (strcount(grondslag, 'warmtepomp') > 0 && strcount(grondslag, 'hybride warmtepomp') == 0);
-				attribute<bool> eWP_ll     (Subsidie) := All || (strcount(grondslag, 'warmtepomp') > 0 && strcount(grondslag, 'hybride warmtepomp') == 0);
+				attribute<bool> eWP_ll     (Subsidie) := All || (strcount(grondslag, 'airco') > 0);
 
 				attribute<bool> Pellet     (Subsidie) := All || (strcount(grondslag, 'pelletkach') > 0);
 				attribute<bool> Bioketel   (Subsidie) := All || (strcount(grondslag, 'biomassake') > 0);
@@ -355,7 +369,7 @@ container Beleid
 				attribute<bool> ZonB       (Subsidie) := All || (strcount(grondslag, 'zonneboile') > 0);
 				attribute<bool> ZonPV      (Subsidie) := All || (strcount(grondslag, 'zonnepanel') > 0);
 
-				attribute<bool> hHR        (Subsidie) := All || (strcount(grondslag, '(hybride) w') + strcount(grondslag, 'hybride warmtepomp') > 0);
+			//	attribute<bool> hHR        (Subsidie) := All || (strcount(grondslag, '(hybride) w') + strcount(grondslag, 'hybride warmtepomp') > 0);
 				attribute<bool> BasisHWP_w (Subsidie) := All || (strcount(grondslag, '(hybride) w') + strcount(grondslag, 'hybride warmtepomp') > 0);
 
 				attribute<bool> LTAS       (Subsidie) := All || (strcount(grondslag, 'ltas') > 0);
@@ -427,8 +441,8 @@ container Beleid
 
 			container Doelgroep := for_each_nedv(Classifications/Eigendom/label,'/Invoer/Beleid/Verbod/ParseDoelgroep/'+Classifications/Eigendom/label+'[org_rel]',Verbod,bool)
 			{
-				attribute<bool> EGW (Verbod) := /Invoer/Beleid/Verbod/ParseDoelgroep/EGW[nr_orgentity];
-				attribute<bool> MGW (Verbod) := /Invoer/Beleid/Verbod/ParseDoelgroep/MGW[nr_orgentity];
+				attribute<bool> EGW (Verbod) := /Invoer/Beleid/Verbod/ParseDoelgroep/EGW[org_rel];
+				attribute<bool> MGW (Verbod) := /Invoer/Beleid/Verbod/ParseDoelgroep/MGW[org_rel];
 			}
 
 			container Grondslag := for_each_nedv(
@@ -516,7 +530,11 @@ container Beleid
 
 			attribute<SubsidieBudget> SubsidieBudget_rel  := /Invoer/Beleid/subsidie/SubsidieBudget_rel[org_rel];
 
-			container Doelgroep := for_each_nedv(Classifications/Eigendom/label,'/Invoer/Beleid/subsidie/ParseDoelgroep/'+Classifications/Eigendom/label+'[org_rel]',Subsidie,bool);
+			container Doelgroep := for_each_nedv(Classifications/Eigendom/label,'/Invoer/Beleid/subsidie/ParseDoelgroep/'+Classifications/Eigendom/label+'[org_rel]',Subsidie,bool)
+			{
+				attribute<bool> EGW (Subsidie) := /Invoer/Beleid/Subsidie/ParseDoelgroep/EGW[org_rel];
+				attribute<bool> MGW (Subsidie) := /Invoer/Beleid/Subsidie/ParseDoelgroep/MGW[org_rel];
+			}
 
 			container Maatregel
 			{
@@ -551,6 +569,9 @@ container Beleid
 			}
 			container V := for_each_nedv(name, 'value('+string(id(.))+', ..)', void, .), isHidden = "True";
 		}
+		
+		unit<uint32> ISDE := select_with_attr_by_cond(Subsidie, strcount(Subsidie/label, 'isde') == 1u);
+						
 
 		unit<uint32> NieuwbouwNorm := select_with_org_rel(/Invoer/Beleid/Normering/NieuwbouwNorm/StartJaar <= Zichtjaar && /Invoer/Beleid/Normering/NieuwbouwNorm/EindJaar >= Zichtjaar)
 		{
@@ -595,19 +616,17 @@ container Beleid
 
 			container Voorwaarde
 			{
-				attribute<ratio>     MinSchilAandeel 		(BestaandebouwNorm) := /Invoer/Beleid/Normering/BestaandeBouwNorm/ParseVoorwaarde/MinSchilAandeel[org_rel];
-				attribute<ratio>     MinSchilfactor  		(BestaandebouwNorm) := /Invoer/Beleid/Normering/BestaandeBouwNorm/ParseVoorwaarde/MinSchilfactor[org_rel];
-				attribute<ratio>     MaxSchilfactor  		(BestaandebouwNorm) := /Invoer/Beleid/Normering/BestaandeBouwNorm/ParseVoorwaarde/MaxSchilfactor[org_rel];
-				attribute<yr_uint16> Minbouwjaar     		(BestaandebouwNorm) := /Invoer/Beleid/Normering/BestaandeBouwNorm/ParseVoorwaarde/Minbouwjaar[org_rel];
-				attribute<yr_uint16> MaxBouwjaar     		(BestaandebouwNorm) := /Invoer/Beleid/Normering/BestaandeBouwNorm/ParseVoorwaarde/MaxBouwjaar[org_rel];
-				attribute<bool>  	 VentilatieVoorwaarde	(BestaandebouwNorm) := /Invoer/Beleid/Normering/BestaandeBouwNorm/ParseVoorwaarde/VentilatieVoorwaarde[org_rel];
-
-				container HuidigVT := for_each_nedv(
-					  /Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes/name
-					, '/Invoer/Beleid/Normering/BestaandeBouwNorm/ParseVoorwaarde/HuidigVT/'+/Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes/name+'[org_rel]'
+				attribute<ratio>     MinSchilAandeel (BestaandebouwNorm) := /Invoer/Beleid/Normering/BestaandeBouwNorm/ParseVoorwaarde/MinSchilAandeel[org_rel];
+				attribute<ratio>     MinSchilfactor  (BestaandebouwNorm) := /Invoer/Beleid/Normering/BestaandeBouwNorm/ParseVoorwaarde/MinSchilfactor[org_rel];
+				attribute<ratio>     MaxSchilfactor  (BestaandebouwNorm) := /Invoer/Beleid/Normering/BestaandeBouwNorm/ParseVoorwaarde/MaxSchilfactor[org_rel];
+				attribute<yr_uint16> Minbouwjaar     (BestaandebouwNorm) := /Invoer/Beleid/Normering/BestaandeBouwNorm/ParseVoorwaarde/Minbouwjaar[org_rel];
+				attribute<yr_uint16> MaxBouwjaar     (BestaandebouwNorm) := /Invoer/Beleid/Normering/BestaandeBouwNorm/ParseVoorwaarde/MaxBouwjaar[org_rel];
+				container HuidigLabel := for_each_nedv(
+					  Classifications/Schillabel/name
+					, '/Invoer/Beleid/Normering/BestaandeBouwNorm/ParseVoorwaarde/HuidigLabel/'+Classifications/Schillabel/name+'[org_rel]'
 					, BestaandeBouwNorm
 					, bool
-					); 
+					);
 			}
 
 			container BouwdeelNorm := for_each_nedv(

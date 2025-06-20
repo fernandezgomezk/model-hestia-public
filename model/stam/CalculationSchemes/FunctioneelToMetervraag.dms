@@ -75,6 +75,14 @@ Template FunctioneelToMetervraag
 		, float64
 	);
 
+	container metervraag_per_product_per_input
+		{
+		attribute<GJ_yr> metervraag_elektriciteit_rv_basis 	(VraagBO)	:= 	BemeterdeGebouwInput_rel/RVb == Classifications/BemeterdeGebouwInput/V/E ? metervraag_per_product/RVb : float64(0);
+		attribute<GJ_yr> metervraag_elektriciteit_rv_piek 	(VraagBO) 	:= 	BemeterdeGebouwInput_rel/RVp == Classifications/BemeterdeGebouwInput/V/E ? metervraag_per_product/RVp : float64(0);
+		attribute<GJ_yr> metervraag_elektriciteit_tw_basis 	(VraagBO)	:= 	BemeterdeGebouwInput_rel/TWb == Classifications/BemeterdeGebouwInput/V/E ? metervraag_per_product/TWb : float64(0);
+		attribute<GJ_yr> metervraag_elektriciteit_tw_piek 	(VraagBO) 	:= 	BemeterdeGebouwInput_rel/TWp == Classifications/BemeterdeGebouwInput/V/E ? metervraag_per_product/TWp : float64(0);		
+		}
+		
 	container BemeterdeGebouwInput_rel := for_each_nedv(Classifications/Product/name
 		, 'rlookup(Classifications/Performance/Input_rel, Classifications/BemeterdeGebouwInput/org_rel)[SPF/PerformancePerProduct/'+Classifications/Product/name+']'
 		, VraagBO

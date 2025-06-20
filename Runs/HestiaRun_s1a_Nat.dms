@@ -20,8 +20,12 @@ container HestiaRun
 	parameter<string> warmtestrategie 		  := 'S1a';
 	parameter<string> vervangingsmoment 	  := 'Nat', Descr = "Eindgebruikerskosten volgens natuurlijk of zelfstandig vervangingsmoment";
 
+	//specifiek voor KEV:
+	parameter<string> KEVvariant := 'VV';
+
+
 	//====== Opbouw lijst van zichtjaren en rekenstappen
-	unit<uint8> all_rekenstap: nrofrows = 51, IsHidden = "True";
+	unit<uint8> all_rekenstap: nrofrows = 31, IsHidden = "True";
 	unit<uint8> rekenstap:= select_with_org_rel(id(all_rekenstap) < aantal_jaar), IsHidden = "True"
 	{
 		attribute<units/yr_uint16> Jaar  := (eerste_jaar + uint16(id(.)))[units/yr_uint16];
@@ -72,7 +76,7 @@ container HestiaRun
 			#include <%projDir%/Runs/DefaultSettings/Rekenstap.dms>		
 		}
 
-		parameter<string> EnergieprijsScenario := '20240701_KEV24_VV_Euro2020';
+		parameter<string> EnergieprijsScenario := '20250411_KEV25_'+KEVvariant+'_Euro2020';
 		
 		container SpecifiekeInstellingen := DefaultInstellingen/Basis, IsHidden = "True"
 		{
@@ -82,24 +86,11 @@ container HestiaRun
 			// Invoer: Per rekenstap worden specifieke instellingen gebruikt.
 			// De lijst van rekenstappen wordt gedefinieerd bij rekenstap.
 			
-		/*	container RekenStappen := for_each_nt(rekenstap/repeats/name, rekenstap/Rx_xxxx)
+			container RekenStappen := for_each_nt(rekenstap/repeats/name, rekenstap/Rx_xxxx)
 			{
 				container StartJaar := DefaultInstellingen/Basis;
 				container Overige   := DefaultInstellingen/Rekenstap/Specifiek;
 			}
-			*/
-			container RekenStappen
-			{
-				container StartJaar := DefaultInstellingen/Basis;
-				container R4_2024 := DefaultInstellingen/R4_2024/Specifiek;
-				container R1_2021 := DefaultInstellingen/Rekenstap/Specifiek;
-				container R2_2022 := DefaultInstellingen/Rekenstap/Specifiek;
-				container R3_2023 := DefaultInstellingen/Rekenstap/Specifiek;
-
-			}
-			
-			
-
 		}
 		// Ophalen ruimtelijke invoerbestanden, kengetallen en energieprijzen.
 		#include <%projDir%/model/Beleid.dms>

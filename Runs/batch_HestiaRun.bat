@@ -13,11 +13,21 @@ Call path/set.bat %1
 set HESTIA_STUDIEGEBIED=NL
 set HESTIA_OUTPUT=NL
 
-START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt"  "%prj_dir%\Runs\HestiaRun_s1a.dms" /TussenResultaten/R4_2024/StateNaAllocatie/bebouwingImpl/Woning/BO/Jaarlijks/Eindgebruikerskosten/export_strategie/export_csv/Export
-START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt"  "%prj_dir%\Runs\HestiaRun_s1b.dms" /TussenResultaten/R4_2024/StateNaAllocatie/bebouwingImpl/Woning/BO/Jaarlijks/Eindgebruikerskosten/export_strategie/export_csv/Export
-START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt"  "%prj_dir%\Runs\HestiaRun_s2a.dms" /TussenResultaten/R4_2024/StateNaAllocatie/bebouwingImpl/Woning/BO/Jaarlijks/Eindgebruikerskosten/export_strategie/export_csv/Export
-START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt"  "%prj_dir%\Runs\HestiaRun_s2d.dms" /TussenResultaten/R4_2024/StateNaAllocatie/bebouwingImpl/Woning/BO/Jaarlijks/Eindgebruikerskosten/export_strategie/export_csv/Export
-START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt"  "%prj_dir%\Runs\HestiaRun_s4a.dms" /TussenResultaten/R4_2024/StateNaAllocatie/bebouwingImpl/Woning/BO/Jaarlijks/Eindgebruikerskosten/export_strategie/export_csv/Export
-START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt"  "%prj_dir%\Runs\HestiaRun_s4b.dms" /TussenResultaten/R4_2024/StateNaAllocatie/bebouwingImpl/Woning/BO/Jaarlijks/Eindgebruikerskosten/export_strategie/export_csv/Export
+START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt"  "%prj_dir%\Runs\HestiaRun.dms" /TussenResultaten/StartJaar/AllocatieResultaten/Woning/BO/Outputtabellen/export_csv/Export
+START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt" "%prj_dir%\Runs\HestiaRun.dms" /TussenResultaten/R1_2021/AllocatieResultaten/Woning/BO/Outputtabellen/export_csv/Export
+START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt" "%prj_dir%\Runs\HestiaRun.dms" /TussenResultaten/R2_2022/AllocatieResultaten/Woning/BO/Outputtabellen/export_csv/Export
+START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt" "%prj_dir%\Runs\HestiaRun.dms" /TussenResultaten/R3_2023/AllocatieResultaten/Woning/BO/Outputtabellen/export_csv/Export
+START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt" "%prj_dir%\Runs\HestiaRun.dms" /TussenResultaten/R4_2024/AllocatieResultaten/Woning/BO/Outputtabellen/export_csv/Export
+START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt" "%prj_dir%\Runs\HestiaRun.dms" /TussenResultaten/R5_2025/AllocatieResultaten/Woning/BO/Outputtabellen/export_csv/Export
+START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt" "%prj_dir%\Runs\HestiaRun.dms" /TussenResultaten/R6_2026/AllocatieResultaten/Woning/BO/Outputtabellen/export_csv/Export
+START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt" "%prj_dir%\Runs\HestiaRun.dms" /TussenResultaten/R7_2027/AllocatieResultaten/Woning/BO/Outputtabellen/export_csv/Export
+START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt" "%prj_dir%\Runs\HestiaRun.dms" /TussenResultaten/R8_2028/AllocatieResultaten/Woning/BO/Outputtabellen/export_csv/Export
+START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt" "%prj_dir%\Runs\HestiaRun.dms" /TussenResultaten/R9_2029/AllocatieResultaten/Woning/BO/Outputtabellen/export_csv/Export
+START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt" "%prj_dir%\Runs\HestiaRun.dms" /TussenResultaten/R10_2030/AllocatieResultaten/Woning/BO/Outputtabellen/export_csv/Export
+START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt" "%prj_dir%\Runs\HestiaRun.dms" /TussenResultaten/R15_2035/AllocatieResultaten/Woning/BO/Outputtabellen/export_csv/Export
+START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt" "%prj_dir%\Runs\HestiaRun.dms" /TussenResultaten/R20_2040/AllocatieResultaten/Woning/BO/Outputtabellen/export_csv/Export
+START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt" "%prj_dir%\Runs\HestiaRun.dms" /TussenResultaten/R25_2045/AllocatieResultaten/Woning/BO/Outputtabellen/export_csv/Export
+START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt" "%prj_dir%\Runs\HestiaRun.dms" /TussenResultaten/R30_2050/AllocatieResultaten/Woning/BO/Outputtabellen/export_csv/Export
+
 
 pause Totaal klaar

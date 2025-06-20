@@ -50,7 +50,7 @@
 			attribute<eur_yr> Oj_hv := 12d * float64(vergoeding) * 1.0[eur_yr] * HuurakVerhogingGebruikSchuif;
 		}
 
-		unit<uint32> huurpunten_sprong : StorageName = "%projDir%/Eindgebruikerskosten/huurpunten_sprong.csv", StorageType = "gdal.vect", StorageReadOnly = "True"
+		unit<uint32> huurpunten_labelsprong : StorageName = "%projDir%/Eindgebruikerskosten/huurpunten_labelsprong.csv", StorageType = "gdal.vect", StorageReadOnly = "True"
 		{
 			attribute<string> label := huidig_label + '_' + doel_label + '_' + oppervlak + '_' + woningtype;
 
@@ -71,7 +71,7 @@
 			//parameter<eur_yr> Huurverhoging_perpunt := mean(marginal);
 		}
 
-		unit<uint32> huurtoeslag_input : StorageName = "%projDir%/Eindgebruikerskosten/huurtoeslag_input.csv", StorageType = "gdal.vect", StorageReadOnly = "True"
+		unit<uint32> rentepercentages : StorageName = "%projDir%/Eindgebruikerskosten/rentepercentages.csv", StorageType = "gdal.vect", StorageReadOnly = "True"
 		{
 			attribute<eur> vermogensgrens;
 			attribute<eur_yr> inkomensgrens;

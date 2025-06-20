@@ -79,9 +79,10 @@ container Activatie
 
 	attribute<bool>    Verhuismoment (..) := rnd_uniform(JaarSeed * 2u, .., range(float32, 0d, 1d)) < Classifications/WoningType/Verhuiskans[BO/WoningType_rel];
 	
-	attribute<float64> KoudeKans     (..) := rnd_uniform(JaarSeed * 3u, .., range(float32, 0d, 1d)), isHidden = "True";
-	attribute<bool>    KoudemomentB  (..) := KoudeKans   > 1.0[ratio] - StartKoudeBasis  , Descr = "Jaarlijkse kans dat een gebouweigenaar besluit te starten met de basisvraag naar koude in te vullen" , isHidden = "True";
-	attribute<bool>    KoudemomentP  (..) := KoudeKans   > 1.0[ratio] - StartOokKoudePiek, Descr = "Jaarlijkse kans dat een gebouweigenaar besluit te starten ook de piekvraag naar koude in te vullen, indien ook al basis ingevuld" , isHidden = "True";
+	attribute<float64> KoudeKansB    (..) := rnd_uniform(JaarSeed * 3u, .., range(float32, 0d, 1d)), isHidden = "True";
+	attribute<float64> KoudeKansP    (..) := rnd_uniform(JaarSeed * 4u, .., range(float32, 0d, 1d)), isHidden = "True";
+	attribute<bool>    KoudemomentB  (..) := KoudeKansB > 1.0[ratio] - StartKoudeBasis  , Descr = "Jaarlijkse kans dat een gebouweigenaar besluit te starten met de basisvraag naar koude in te vullen" , isHidden = "True";
+	attribute<bool>    KoudemomentP  (..) := KoudeKansP > 1.0[ratio] - StartOokKoudePiek, Descr = "Jaarlijkse kans dat een gebouweigenaar besluit te starten ook de piekvraag naar koude in te vullen, indien ook al basis ingevuld" , isHidden = "True";
 
 	parameter<ratio> increment        := 1.0/(1.0-SpreidingsFactor)*StaartFactor, isHidden = "True";
 
@@ -132,7 +133,11 @@ container Activatie
 		attribute<bool> TWp (...) := (InstallatiePerProduct/TWp == InstallatiePerProduct/TWb) ? TWb : (Verhuismoment || Producten_EOL/TWp) || Beleid/BeleidsActivatie/TW;
 
 		attribute<bool> KDb (...) := InstallatiePerProduct/KDb == Classifications/Installatie/V/gebiedsOptie ? false : Beleid/BeleidsActivatie/KD || (InstallatiePerProduct/KDb == InstallatiePerProduct/RVb) ? RVb : (Verhuismoment || Producten_EOL/KDb || (InstallatiePerProduct/KDb == Classifications/Installatie/V/geen && KoudemomentB));
-		attribute<bool> KDp (...) := Beleid/BeleidsActivatie/KD || ((InstallatiePerProduct/KDb == InstallatiePerProduct/KDp) && (InstallatiePerProduct/KDp != Classifications/Installatie/V/geen)) ? KDb : (Verhuismoment || Producten_EOL/KDb || (InstallatiePerProduct/KDp == Classifications/Installatie/V/geen && KoudemomentP && KDb));	
+		
+		attribute<bool> KDp (...) :=
+			   Beleid/BeleidsActivatie/KD // actief indien door beleid bepaald
+			|| ((InstallatiePerProduct/KDb == InstallatiePerProduct/KDp) && (InstallatiePerProduct/KDp != Classifications/Installatie/V/geen)) ? KDb //installaties basis/piek zijn hetzelfde (en niet geen), dan gelijk aan basis
+			: (Verhuismoment || Producten_EOL/KDb || (InstallatiePerProduct/KDp == Classifications/Installatie/V/geen && KoudemomentP && KDb));	
 
 		attribute<bool> VT  (...) := Beleid/BeleidsActivatie/VT || Bouwdelen/RenovatieMoment || Zichtjaar_jaar - InstallatiePerProduct/LastVervanging/VT >= Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes/Levensduur [ InstallatiePerProduct/VT ] 	;
 	//	attribute<bool> VT  (...) := Beleid/BeleidsActivatie/VT || Zichtjaar_jaar - InstallatiePerProduct/LastVervanging/VT >= Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes/Levensduur [ InstallatiePerProduct/VT ] 	;
@@ -163,17 +168,25 @@ container Activatie
 	attribute<bool> BouwdeelVervanging (..) := ='add('+AsItemList('uint8(Bouwdelen/'+Classifications/bouwdeel/name+')')+') > 0b';
 	attribute<bool> ProductVervanging  (..) := ='add('+AsItemList('uint8(Producten/'+Classifications/product/name+')')+') > 0b';
 
-	attribute<bool> KanNietActiveren   (..) := AansluitFactor <= 0.0;/*=Invoer/DefaultInstellingen/Basis/RuimtelijkeOntwikkelingAan ? Woningen die nog niet gebouwd zijn, of al gesloopt, mogen zeker niet geactiveerd worden.
-		'MakeDefined(sub_or_null(Sloopjaar, Zichtjaar_jaar), 9999w) < 10[yr_uint16] || MakeDefined(sub_or_null(Zichtjaar_jaar, Bouwjaar), 9999w) < 10[yr_uint16] || Afbouw || Aanbouw || not(nrAansluitingen > 0.0[nrAsl])' :
-		'const(false,..)'; */
+	attribute<bool> KanNietActiveren   (..) := =Invoer/DefaultInstellingen/Basis/RuimtelijkeOntwikkelingAan ? 
+		'  MakeDefined(sub_or_null(Sloopjaar, Zichtjaar_jaar), 9999w) < 10[yr_uint16] 
+		|| MakeDefined(sub_or_null(Zichtjaar_jaar, Bouwjaar),  9999w) < 10[yr_uint16]
+		|| Afbouw 
+		|| Aanbouw 
+		|| not(nrAansluitingen > 0.0[nrAsl])
+		|| InstallatiePerProduct/RVb == Classifications/Installatie/V/Bioketel 
+		|| InstallatiePerProduct/RVb == Classifications/Installatie/V/Pelletkachel
+		|| InstallatiePerProduct/RVp == Classifications/Installatie/V/Bioketel 
+		|| InstallatiePerProduct/RVp == Classifications/Installatie/V/Pelletkachel' :
+		'const(false,..)';
 	attribute<bool> BouwdeelActief     (..) := =RekenStapName == 'StartJaar' ? 'const(false,..)' : 'BouwdeelVervanging && not(KanNietActiveren)';
 	attribute<bool> ProductActief      (..) := =RekenStapName == 'StartJaar' ? 'const(false,..)' : 'ProductVervanging  && not(KanNietActiveren)';
 
 	attribute<classifications/Uitvoering> Uitvoering (..) := switch(
-		  case(AND(Bouwdelen/RenovatieMoment, IsMeergezins                                                     ), Zichtjaar_jaar == Peiljaar ? Classifications/Uitvoering/V/Zst_Mgw_Prj : Classifications/Uitvoering/V/Nat_Mgw_Prj)
+		  case(AND(Bouwdelen/RenovatieMoment, IsMeergezins                                                     ), Classifications/Uitvoering/V/Zst_Mgw_Prj)
 	//	, case(AND(Bouwdelen/RenovatieMoment, IsMeergezins                                                     ), Classifications/Uitvoering/V/Nat_Mgw_Ind) //Meergezinswoningen zijn altijd projectmatig (zet dit weer aan om aanname anders te maken)
-		, case(AND(Bouwdelen/RenovatieMoment              , Eigendom_rel == Classifications/Eigendom/V/WoonCorp), Zichtjaar_jaar == Peiljaar ? Classifications/Uitvoering/V/Zst_Egw_Prj : Classifications/Uitvoering/V/Nat_Egw_Prj)
-		, case(AND(Bouwdelen/RenovatieMoment                                                                   ), Zichtjaar_jaar == Peiljaar ? Classifications/Uitvoering/V/Zst_Egw_Ind : Classifications/Uitvoering/V/Nat_Egw_Ind)
+		, case(AND(Bouwdelen/RenovatieMoment              , Eigendom_rel == Classifications/Eigendom/V/WoonCorp), Classifications/Uitvoering/V/Zst_Egw_Prj)
+		, case(AND(Bouwdelen/RenovatieMoment                                                                   ), Classifications/Uitvoering/V/Zst_Egw_Ind)
 		, case(AND(                           IsMeergezins                                                     ), Classifications/Uitvoering/V/Zst_Mgw_Prj)
 	//	, case(AND(                           IsMeergezins                                                     ), Classifications/Uitvoering/V/Zst_Mgw_Ind) //Meergezinswoningen zijn altijd projectmatig (zet dit weer aan om aanname anders te maken)
 		, case(AND(                                         Eigendom_rel == Classifications/Eigendom/V/WoonCorp), Classifications/Uitvoering/V/Zst_Egw_Prj)

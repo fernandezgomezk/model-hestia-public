@@ -149,13 +149,18 @@ template BebouwingsComponentT
 		attribute<ratio> NietGeslooptFactor := Float64(Sloopjaar > Zichtjaar_jaar);
 			
 		attribute<bool>  Afbouw             := =Classifications/Periode/isHistorisch[Periode_rel] ? 'const(false,.)' : 'PrevObject/ResterendNu > 0.0 && (Sloopjaar <= Zichtjaar_jaar)';
-		attribute<bool>  Aanbouw            := MakeDefined(Bouwjaar, 0w) >= StartNieuwbouwJaar, ishidden = "True";
+		attribute<bool>  Aanbouw            := MakeDefined(Bouwjaar, 0w) >= StartNieuwbouwJaar && bouwperiode_eindjaar >= Zichtjaar_jaar, ishidden = "True";
 
 		parameter<ratio> AanbouwPerJaar := Zichtjaar_jaar <= 2030w ? 1d / (2030w - (StartNieuwbouwJaar -1[yr_uint16]))[float64] : 0.1, ishidden = "True";
 		attribute<yr_uint16> bouwperiode_beginjaar := 
 			Bouwjaar > 2040[yr_uint16] ? 2041[yr_uint16] : 
 			Bouwjaar > 2030[yr_uint16] ? 2031[yr_uint16] : 
 			Bouwjaar > StartNieuwbouwJaar - 1[yr_uint16] ? StartNieuwbouwJaar : Bouwjaar, ishidden = "True";
+		attribute<yr_uint16> bouwperiode_eindjaar := 
+			Bouwjaar < StartNieuwbouwJaar ? Bouwjaar        :
+			Bouwjaar < 2030[yr_uint16]    ? 2030[yr_uint16] : 
+			Bouwjaar < 2040[yr_uint16]    ? 2040[yr_uint16] : 
+			                                2050[yr_uint16] , ishidden = "True";
 		
 		attribute<ratio> Aanbouwfactor   := =Invoer/DefaultInstellingen/Basis/RuimtelijkeOntwikkelingAan ? 
 			'Aanbouw ?'
@@ -295,11 +300,11 @@ template BebouwingsComponentT
 			container Gedragfactor := SpecifiekeInstellingen/RuimtelijkeVraag/Gedrag, ishidden = "True";
 			attribute<ratio> Klimaateffect (..) := KlimaatFactorMap[gridm100_rel]; // ToDO: dubbelle punt nodig?
 
-			attribute<GJ_yr> VT (..) := BaseValues/VT * Gedragfactor/VT * nrAansluitingen[float64];
-			attribute<GJ_yr> KK (..) := BaseValues/KK * Gedragfactor/KK * nrAansluitingen[float64];
-			attribute<GJ_yr> EA (..) := BaseValues/EA * Gedragfactor/EA * nrAansluitingen[float64];
-			attribute<GJ_yr> TW (..) := BaseValues/TW * Gedragfactor/TW * nrAansluitingen[float64];
-			attribute<GJ_yr> KD (..) := BaseValues/KD * Gedragfactor/KD * nrAansluitingen[float64] * ( 1.0 + 3.66 *(1.0 - Klimaateffect));
+			attribute<GJ_yr> VT (..) := BaseValues/VT * Gedragfactor/VT[RekenStap_rel] * nrAansluitingen[float64];
+			attribute<GJ_yr> KK (..) := BaseValues/KK * Gedragfactor/KK[RekenStap_rel] * nrAansluitingen[float64];
+			attribute<GJ_yr> EA (..) := BaseValues/EA * Gedragfactor/EA[RekenStap_rel] * nrAansluitingen[float64];
+			attribute<GJ_yr> TW (..) := BaseValues/TW * Gedragfactor/TW[RekenStap_rel] * nrAansluitingen[float64];
+			attribute<GJ_yr> KD (..) := BaseValues/KD * Gedragfactor/KD[RekenStap_rel] * nrAansluitingen[float64] * ( 1.0 + 3.36 *(1.0 - Klimaateffect));
 			
 			attribute<ratio> Fitfactor_VT (..) := PrevObject/Functioneel/Fitfactor_VT;
 			container BaseValues := for_each_nedv(Classifications/FunctioneleVraag/name, 'PrevObject/Functioneel/BaseValues/' + Classifications/FunctioneleVraag/name, .., GJ_yr);
@@ -310,8 +315,9 @@ template BebouwingsComponentT
 				.., GJ_yr);
 				
 			container RV_N0_per_bouwdeel_now := for_each_nedv(Classifications/bouwdeel/name,
-				'RV_N0_per_bouwdeel_now_raw/'+ Classifications/bouwdeel/name+ ' * Gedragfactor/RV * Klimaateffect',
-				.., GJ_yr);
+				'RV_N0_per_bouwdeel/'+ Classifications/bouwdeel/name+ ' * Gedragfactor/RV[RekenStap_rel] * nrAansluitingen[float64] * Klimaateffect',
+				..,
+				GJ_yr);
 		}
 		container Functioneel          := CalculationSchemes/BerekenFunctioneel(BO, BO, id(.));
 		container MetervraagBerekening := CalculationSchemes/FunctioneelToMetervraag(BO, false); 
@@ -345,6 +351,22 @@ template BebouwingsComponentT
 			attribute<eur_yr> oh_KD          (BO) := PrevObject/jaarlijks/oh_KD;
 			attribute<eur_yr> adm_KD         (BO) := PrevObject/jaarlijks/adm_KD;
 		}
+		
+		container InvesteringenSamenvatting
+		{
+			attribute<bool> ProductActief 			(BO) := Activatie/ProductActief;
+			attribute<bool> BouwdeelActief 			(BO) := Activatie/BouwdeelActief;
+			attribute<bool> BouwdeelOfProductActief	(BO) := ProductActief || BouwdeelActief;
+			attribute<bool> BouwdeelEnProductActief (BO) := ProductActief && BouwdeelActief;
+		
+			attribute<uint32> 	AantalUniekeAmbities 		(BO) := count(BouwdeelActieveWoning/UniekAmbitie/Bo_rel, BouwdeelActieveWoning/UniekAmbitie/Bo_rel);
+			attribute<uint32> 	AantalInvesteringsopties 	(BO) := count(ActieveWoning/xInvesteringsOptie/Bo_rel, ActieveWoning/xInvesteringsOptie/Bo_rel), IntegrityCheck = 'ProductActief && BouwdeelActief ? this <= 3 * AantalUniekeAmbities : ProductActief && not(BouwdeelActief) ? this <= 3 :  this <=5', Descr = 'Isolatieambitites x GebouwoptieCategorie';
+			attribute<bool> 	InvesteringGedaan			(BO) := any(ActieveWoning/Choice_per_ActieveWoning/isSelected, invert(ActieveWoning/Choice_per_ActieveWoning/xInvesteringsOptie_rel))[invert(ActieveWoning/Bo_rel)];
+			attribute<uint32> 	GekozenIsolatieAmbitie   	(BO) := ActieveWoning/Choice_Per_BO/GeschikteOptie_rel;
+			
+			}
+		
+		
 	}
 		
 	//============== Voorwaarden voor het wel of niet toepassen van een gebouwoptie. Welke geldt is opgegeven in de runinstellingen per Rekenstap.
