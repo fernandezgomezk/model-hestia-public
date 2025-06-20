@@ -36,8 +36,8 @@ unit<uint32> BouwdeelActieveWoning := select_with_org_rel(BO/Activatie/BouwdeelA
 	attribute<ratio>   Rs_gv          (BouwdeelActieveWoning) := Geldig ? makedefined(ZBS/Subsidieaandeel[ZBS_rel],0.0[ratio]) : 0d;
 	}
 		
-	attribute<ratio>   Rs_gv             (BouwdeelActieveWoning) := = 'max_elem('+AsItemList('subsidies/'+ZBS/name+'/Rs_gv')+')'; 
-	    //attribute<ratio>   Rs           (BouwdeelActieveWoning) := const(0d,BouwdeelActieveWoning);
+	attribute<ratio>   Rs_gv          (BouwdeelActieveWoning) := = 'max_elem('+AsItemList('subsidies/'+ZBS/name+'/Rs_gv')+')'; 
+  //attribute<ratio>   Rs_gv          (BouwdeelActieveWoning) := const(0d,BouwdeelActieveWoning);
 
 	unit<uint8> IV := classifications/IsolatieVerbetering, ishidden = "True";
 	
@@ -104,9 +104,14 @@ unit<uint32> BouwdeelActieveWoning := select_with_org_rel(BO/Activatie/BouwdeelA
 			)
 		,	AmbitieBerekening, float64
 		);
+		
+		container MaxIsolatieScore := for_each_nedv(Classifications/Bouwdeel/name, 
+			'Max_elem(0.0, '+ AsItemList('IsolatieScore/'+classifications/IsolatieMaatregel/name, classifications/IsolatieMaatregel/bouwdeel_rel) +')'
+			, AmbitieBerekening, float64
+			);
 
 		container Geschiktheid := for_each_nedv(classifications/IsolatieMaatregel/name
-			, replace('IsolatieScore/@BDI - Max_elem('+ AsItemList('IsolatieScore/@BDN_'+/Classifications/IsolatieDoel/name) +')' 
+			, replace('IsolatieScore/@BDI - MaxIsolatieScore/@BDN' 
 				,	'@BDI', classifications/IsolatieMaatregel/name
 				,	'@BDN', classifications/IsolatieMaatregel/bouwdeel_name
 				)
@@ -114,15 +119,16 @@ unit<uint32> BouwdeelActieveWoning := select_with_org_rel(BO/Activatie/BouwdeelA
 			,float64);
 
 		// TODO: check for overflow
-		parameter<float64> LOG_MAX_FLOAT64 := 700.0, ishidden = "True"; // slightly less than ln( 2^1024 / pcount(classifications/BouwdeelIsolatie/bouwdeel_rel) )
+			parameter<float64> KeuzeinvloedVanGeld:= 1.0 / (1.0[eur]);
+//		parameter<float64> LOG_MAX_FLOAT64 := 700.0, ishidden = "True"; // slightly less than ln( 2^1024 / pcount(classifications/BouwdeelIsolatie/bouwdeel_rel) )
 		container OddsRatio := for_each_nedv(classifications/IsolatieMaatregel/name
-		,	replace('IsDefined(Geschiktheid/@BDI) ? exp(min_elem((Geschiktheid/@BDI / 1.0[eur]) * SpecificBeta/@BDI, LOG_MAX_FLOAT64)) : 0.0'
+		,	replace('IsDefined(Geschiktheid/@BDI) ? exp(Geschiktheid/@BDI * KeuzeinvloedVanGeld * SpecificBeta/@BDI) : 0.0'
 			,	'@BDI', classifications/IsolatieMaatregel/name)
 		,	AmbitieBerekening, float64
 		)
 		{
 			container Total := for_each_nedv(classifications/bouwdeel/name
-			, 'add(0.0001, '+AsItemList(classifications/IsolatieMaatregel/name, classifications/IsolatieMaatregel/bouwdeel_rel)+')'
+			, 'add(exp((0.0-MaxIsolatieScore/'+classifications/bouwdeel/name+') * KeuzeinvloedVanGeld), '+AsItemList(classifications/IsolatieMaatregel/name, classifications/IsolatieMaatregel/bouwdeel_rel)+')'
 			, AmbitieBerekening, float64
 			);
 		}
