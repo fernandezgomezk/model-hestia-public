@@ -180,7 +180,7 @@ container CalculationSchemes: Using = "Units;Geography"
 			unit<uint32> Kooktype := Invoer/Kengetallen/OverigeInstallaties/KK/Installatietypes;
 
 			parameter<uint32>  seed        := 144;
-  			attribute<float64> RndNr (Obs) := rnd_uniform(seed, Obs, range(float64, 0d, 1d));
+  			attribute<float64> RndNr (Obs) := rnd_uniform(seed, Obs/seed, range(float64, 0d, 1d));
 
   			unit<uint32> BouwjaarKlasseKoken : nrofrows = 5
   			{

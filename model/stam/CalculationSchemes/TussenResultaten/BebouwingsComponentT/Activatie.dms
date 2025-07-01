@@ -162,7 +162,7 @@ container Activatie
 		attribute<Bool> DR (...) := =SpreidingsFactor > 0.99 ? 'RenovatieMoment || Beleid/BeleidsActivatie/DR ? true : Bouwdelen_base/DR' : 'RenovatieMoment || Beleid/BeleidsActivatie/DR ? true : Bouwdeel_odds/DR > rnd_uniform(JaarSeed * 15u, .../seed, range(float64, 0d, 1d))';
 
 		attribute<Bool> MS (...) := =SpreidingsFactor > 0.99 ? 'RenovatieMoment || Beleid/BeleidsActivatie/MS || Bouwdelen_base/MG ? true : Bouwdelen_base/MS' : 'RenovatieMoment || Beleid/BeleidsActivatie/MS || Bouwdelen_base/MG ? true : Bouwdeel_odds/MS > rnd_uniform(JaarSeed * 16u, .../seed, range(float64, 0d, 1d))';
-		attribute<Bool> PL (...) := =SpreidingsFactor > 0.99 ? 'RenovatieMoment || Beleid/BeleidsActivatie/PL || Bouwdelen_base/MG ? true : Bouwdelen_base/PL' : 'RenovatieMoment || Beleid/BeleidsActivatie/PL || Bouwdelen_base/MG ? true : Bouwdeel_odds/PL > rnd_uniform(JaarSeed * 17u, ..., range(float64, 0d, 1d))';
+		attribute<Bool> PL (...) := =SpreidingsFactor > 0.99 ? 'RenovatieMoment || Beleid/BeleidsActivatie/PL || Bouwdelen_base/MG ? true : Bouwdelen_base/PL' : 'RenovatieMoment || Beleid/BeleidsActivatie/PL || Bouwdelen_base/MG ? true : Bouwdeel_odds/PL > rnd_uniform(JaarSeed * 17u, .../seed, range(float64, 0d, 1d))';
 	}
 
 	attribute<bool> BouwdeelVervanging (..) := ='add('+AsItemList('uint8(Bouwdelen/'+Classifications/bouwdeel/name+')')+') > 0b';

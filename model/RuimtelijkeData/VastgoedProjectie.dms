@@ -138,7 +138,7 @@ container VastgoedProjectie
 				attribute<Classifications/Eigendom>   Eigendom_rel   		:= union_data(.,BO_perjaar_koop/Eigendom_rel  ,BO_perjaar_wooncorp/Eigendom_rel  ,BO_perjaar_parthuur/Eigendom_rel  );
 				attribute<nrAsl>                      nr_aansl_frac_impl 	:= union_data(.,BO_perjaar_koop/nr_aansl      ,BO_perjaar_wooncorp/nr_aansl      ,BO_perjaar_parthuur/nr_aansl      );
 				attribute<nrAsl>                      nr_aansl_frac  		:= nr_aansl_frac_impl * NieuwBouwFactor;
-				attribute<uint32>                     nr_aansl       		:= uint32(roundDown(nr_aansl_frac + rnd_uniform(0, BO_perjaar, range(float64,0d,1d))));
+				attribute<uint32>                     nr_aansl       		:= uint32(roundDown(nr_aansl_frac + rnd_uniform(0, BO_perjaar/seed_offset, range(float64,0d,1d))));
 				attribute<Classifications/WoningType> Woningtype_rel 		:= union_data(.,BO_perjaar_koop/Woningtype_rel,BO_perjaar_wooncorp/Woningtype_rel,BO_perjaar_parthuur/Woningtype_rel);
 				attribute<uint32>                     seed_offset           := union_data(., BO_perjaar_base/seed_offset, BO_perjaar_base/seed_offset+uint32(BO_perjaar_koop/nr_aansl), BO_perjaar_base/seed_offset+uint32(BO_perjaar_koop/nr_aansl)+uint32(BO_perjaar_wooncorp/nr_aansl));
 			}
@@ -226,7 +226,7 @@ container VastgoedProjectie
 
 			container NieuwbouwWarmtenet
 			{
-				attribute<float64> rnd (BebouwingsObject) := rnd_uniform(/Invoer/TechnischeInstellingen/RandomSeed * 316[uint32], BebouwingsObject, range(float64, 0d, 1d));
+				attribute<float64> rnd (BebouwingsObject) := rnd_uniform(/Invoer/TechnischeInstellingen/RandomSeed * 316[uint32], BebouwingsObject/seed, range(float64, 0d, 1d));
 				attribute<bool> StartWarmtenet (BebouwingsObject) := 
 					  Woningtype_rel == Classifications/WoningType/V/vrijstaand ? (rnd < 0.052[ratio])
 					: Woningtype_rel == Classifications/WoningType/V/twee_onder_1_kap ? (rnd < 0.040[ratio])

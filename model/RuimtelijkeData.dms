@@ -165,7 +165,7 @@ container RuimtelijkeData: Using = "Units;Geography;Model", FreeData = "True"
 				unit<uint32>                          ModelObject           := Invoer/Kengetallen/Bebouwing/Woning/Results, IsHidden = "True";
 				attribute<ModelObject>                ModelObject_rel (VBO) := rlookup( VBO/ModelObjectKey , ModelObject/ModelObjectKey ), IsHidden = "True";
 				parameter<uint32>                     seed                  := Invoer/TechnischeInstellingen/RandomSeed + 199, IsHidden = "True";
-				attribute<float32>                    RndNr           (VBO) := rnd_uniform(seed, vbo, range(float32, 0f, 1f)), IsHidden = "True";
+				attribute<float32>                    RndNr           (VBO) := rnd_uniform(seed, vbo/seed, range(float32, 0f, 1f)), IsHidden = "True";
 
 				container Probability := for_each_nedv(
 					  Classifications/SchilLabel/Name
@@ -377,7 +377,7 @@ container RuimtelijkeData: Using = "Units;Geography;Model", FreeData = "True"
 				
 
 				parameter<uint32>                     seed            := Invoer/TechnischeInstellingen/RandomSeed + 101;
-				attribute<float64>                    RndNr           := rnd_uniform(seed, vbo, range(float64, 0d, 1d));
+				attribute<float64>                    RndNr           := rnd_uniform(seed, vbo/seed, range(float64, 0d, 1d));
 				attribute<BouwdeelSrc>                BouwdeelSrc_rel := ='makedefined('+AsItemList(replace('not(bouwdelen/unique_combi_label_rel == bouwdelen/unique_combi_label/V/@SL@) ? (0/0)[BouwdeelSrc] : ClassBreak_p_Label/@SL@/sub/org_rel[Classify(RndNr, ClassBreak_p_Label/@SL@/sub/ClassBreaks)]','@SL@',bouwdelen/unique_combi_label/label))+')';
 			
 				container Isolatie_vbo := for_each_nedv(
@@ -439,7 +439,7 @@ container RuimtelijkeData: Using = "Units;Geography;Model", FreeData = "True"
 					attribute<Classifications/Schillabel> Schillabel_rel  := =Invoer/StartgegevensAan ? 'makedefined(Energielabel/data/SchilLabel_rel[rlookup(BAG/import/VBO/identificatie, Energielabel/data/vbo_id)], DefaultLabel_rel)' : 'DefaultLabel_rel';
 					
 					parameter<uint32>                     seed             := 101;
-					attribute<float64>                    RndNr            := rnd_uniform(seed, vbo, range(float64, 0d, 1d));
+					attribute<float64>                    RndNr            := rnd_uniform(seed, vbo/seed, range(float64, 0d, 1d));
 					attribute<BouwdeelSrc>                bouwdeelsrc_rel  := ='makedefined('+AsItemList(replace('not(Schillabel_rel == Classifications/SchilLabel/V/@SL@) ? (0/0)[BouwdeelSrc] : BouwdeelSrc/ClassBreak_p_Label/@SL@/sub/org_rel[Classify(RndNr, BouwdeelSrc/ClassBreak_p_Label/@SL@/sub/ClassBreaks)]','@SL@',Classifications/SchilLabel/name))+')';
 				
 					container Isolatie_vbo

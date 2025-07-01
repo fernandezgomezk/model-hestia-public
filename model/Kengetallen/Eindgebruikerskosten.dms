@@ -208,8 +208,8 @@
 				//Twee uniform verdeelde random getallen
 				parameter<uint32>  seed1    := Invoer/TechnischeInstellingen/RandomSeed + 199, IsHidden = "True";
 				parameter<uint32>  seed2    := Invoer/TechnischeInstellingen/RandomSeed + 200, IsHidden = "True"; 
-				attribute<float32> rndNr_1 := rnd_uniform(seed1, vbo, range(float32, 0f, 1f)), IsHidden = "True";
-				attribute<float32> rndNr_2 := rnd_uniform(seed2, vbo, range(float32, 0f, 1f)), IsHidden = "True";
+				attribute<float32> rndNr_1 := rnd_uniform(seed1, vbo/seed, range(float32, 0f, 1f)), IsHidden = "True";
+				attribute<float32> rndNr_2 := rnd_uniform(seed2, vbo/seed, range(float32, 0f, 1f)), IsHidden = "True";
 			
 				//Paren van normaal verdeelde getallen
 				attribute<float32> Z0 := sqrt(-2f * log(rndNr_1)) * cos(2f * float32(pi()) * rndNr_2);
@@ -217,7 +217,7 @@
 				
 				//Een getal per paar kiezen
 				parameter<uint32>  seed3    := Invoer/TechnischeInstellingen/RandomSeed + 201, IsHidden = "True"; 
-				attribute<float32> rndNr_3 := rnd_uniform(seed1, vbo, range(float32, 0f, 1f)), IsHidden = "True";
+				attribute<float32> rndNr_3 := rnd_uniform(seed1, vbo/seed, range(float32, 0f, 1f)), IsHidden = "True";
 				attribute<float32> Z := rndNr_3 < 0.5f ? Z0 : Z1;	
 				
 				/*unit<uint32> continu_per_vbo := for_each_ind( //Opzetje voor vermenigvuldigen van continue variabelen
@@ -281,8 +281,8 @@
 						attribute<class/WEG>                  ModelObject_rel 	(VBO) 	:= rlookup(vbo/Gemeente_ModelObjectKey, gemeente_discreet/WEG_rel), IsHidden = "True";
 						parameter<uint32>                     seed_hh                  	:= Invoer/TechnischeInstellingen/RandomSeed + 199, IsHidden = "True";
 						parameter<uint32>                     seed_lfd                  := Invoer/TechnischeInstellingen/RandomSeed + 198, IsHidden = "True";
-						attribute<float32>                    RndNr_hh          (VBO) 	:= rnd_uniform(seed_hh, vbo, range(float32, 0f, 1f)), IsHidden = "True";
-						attribute<float32>                    RndNr_lfd         (VBO) 	:= rnd_uniform(seed_lfd, vbo, range(float32, 0f, 1f)), IsHidden = "True";
+						attribute<float32>                    RndNr_hh          (VBO) 	:= rnd_uniform(seed_hh, vbo/seed, range(float32, 0f, 1f)), IsHidden = "True";
+						attribute<float32>                    RndNr_lfd         (VBO) 	:= rnd_uniform(seed_lfd, vbo/seed, range(float32, 0f, 1f)), IsHidden = "True";
 
 					container AantPersHH
 					{					
@@ -373,8 +373,8 @@
 						attribute<class/WEB>                  ModelObject_rel 	(VBO) 	:= rlookup(vbo/Buurt_ModelObjectKey, buurt_discreet/WEB_rel), IsHidden = "True";
 						parameter<uint32>                     seed_hh                  	:= Invoer/TechnischeInstellingen/RandomSeed + 199, IsHidden = "True";
 						parameter<uint32>                     seed_lfd                  := Invoer/TechnischeInstellingen/RandomSeed + 198, IsHidden = "True";
-						attribute<float32>                    RndNr_hh          (VBO) 	:= rnd_uniform(seed_hh, vbo, range(float32, 0f, 1f)), IsHidden = "True";
-						attribute<float32>                    RndNr_lfd         (VBO) 	:= rnd_uniform(seed_lfd, vbo, range(float32, 0f, 1f)), IsHidden = "True";
+						attribute<float32>                    RndNr_hh          (VBO) 	:= rnd_uniform(seed_hh, vbo/seed, range(float32, 0f, 1f)), IsHidden = "True";
+						attribute<float32>                    RndNr_lfd         (VBO) 	:= rnd_uniform(seed_lfd, vbo/seed, range(float32, 0f, 1f)), IsHidden = "True";
 
 					container AantPersHH
 					{					

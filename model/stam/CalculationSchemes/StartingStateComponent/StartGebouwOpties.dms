@@ -105,7 +105,7 @@ container StartGebouwOpties
 
 	container WnetAllocatie // allocatie van warmtenetaansluitingen onder nieuwbouwwoningen
 	{
-		attribute<float64> rnd     (results) := rnd_uniform(/Invoer/TechnischeInstellingen/RandomSeed * par/wseed, results, range(float64, 0d, 1d));
+		attribute<float64> rnd     (results) := rnd_uniform(/Invoer/TechnischeInstellingen/RandomSeed * par/wseed, results/seed, range(float64, 0d, 1d));
 		attribute<bool>    Alloc_i (results) := 
 			  Woningtype_rel == Classifications/WoningType/V/vrijstaand ? (rnd < 0.052[ratio])
 			: Woningtype_rel == Classifications/WoningType/V/twee_onder_1_kap ? (rnd < 0.040[ratio])
@@ -132,7 +132,7 @@ container StartGebouwOpties
 		//heeft gebouw een warmtepomp? initiele check o.b.v. ligging gasnetten en warmtenetten (gebouw ligt niet in warmtenet, is wel gasloos, en heeft een goed label)
 		attribute<bool> AllocWarmtepomp_i (results) := gasloos && not(AllocWarmtenet) && Defaultlabel_rel <= par/label_cutoff_ewp;
 		attribute<bool> AllocLWP_i        (results) := AllocWarmtepomp_i && not(AllocBWP_i);
-		attribute<bool> AllocBWP_i        (results) := AllocWarmtepomp_i && rnd_uniform(par/BWPseed, results, range(float64, 0d, 1d)) < par/R_Bodem;
+		attribute<bool> AllocBWP_i        (results) := AllocWarmtepomp_i && rnd_uniform(par/BWPseed, results/seed, range(float64, 0d, 1d)) < par/R_Bodem;
 
 		unit<uint32> ObjectKlassen := Invoer/Kengetallen/Bebouwing/Woning/Results
 		{
@@ -145,7 +145,7 @@ container StartGebouwOpties
 			unit<uint32> HWP := results
 			{
 				attribute<bool>    kanAllocHWP                  := not(AllocWarmtenet || AllocWarmtepomp_i || AllocBioketel || AllocOlieketel);
-				attribute<float64> rnd                          := rnd_uniform(par/HWPseed, results, range(float64, 0d, 1d));
+				attribute<float64> rnd                          := rnd_uniform(par/HWPseed, results/seed, range(float64, 0d, 1d));
 				attribute<nrAsl>   CandidateHWP   (ModelObject) := sum(nrAansluitingen_i * float64(kanAllocHWP), ModelObject_rel);
 				attribute<nrAsl>   toAllocate     (ModelObject) := ToekomstKlasse ? 0.0[nrAsl] : R_HWP * nr_candidate;
 				attribute<float64> P              (ModelObject) := makedefined(float64(toAllocate / CandidateHWP),0.0[float64]);
@@ -155,7 +155,7 @@ container StartGebouwOpties
 			unit<uint32> LWP := results
 			{
 				attribute<bool>    kanAllocLWP                  := not(AllocWarmtenet || AllocWarmtepomp_i || AllocBioketel || AllocOlieketel || HWP/Allocated);
-				attribute<float64> rnd                          := rnd_uniform(par/LWPseed, results, range(float64, 0d, 1d));
+				attribute<float64> rnd                          := rnd_uniform(par/LWPseed, results/seed, range(float64, 0d, 1d));
 				attribute<nrAsl>   CandidateLWP   (ModelObject) := sum(nrAansluitingen_i * float64(kanAllocLWP), ModelObject_rel);
 				attribute<nrAsl>   LWP_allocated  (ModelObject) := ToekomstKlasse ? 0.0[nrAsl] : sum(float64(AllocLWP_i) * Results/nrAansluitingen_i, ModelObject_rel);
 				attribute<nrAsl>   LWP_target     (ModelObject) := ToekomstKlasse ? 0.0[nrAsl] : R_LWP * nr_candidate;
@@ -168,7 +168,7 @@ container StartGebouwOpties
 			unit<uint32> BWP := results
 			{
 				attribute<bool>    kanAllocBWP                  := not(AllocWarmtenet || AllocWarmtepomp_i || AllocBioketel || AllocOlieketel || HWP/Allocated || LWP/Allocated);
-				attribute<float64> rnd                          := rnd_uniform(par/BWPseed, results, range(float64, 0d, 1d));
+				attribute<float64> rnd                          := rnd_uniform(par/BWPseed, results/seed, range(float64, 0d, 1d));
 				attribute<nrAsl>   CandidateBWP   (ModelObject) := sum(nrAansluitingen_i * float64(kanAllocBWP), ModelObject_rel);
 				attribute<nrAsl>   BWP_allocated  (ModelObject) := ToekomstKlasse ? 0.0[nrAsl] : sum(float64(AllocBWP_i) * Results/nrAansluitingen_i, ModelObject_rel);
 				attribute<nrAsl>   BWP_target     (ModelObject) := ToekomstKlasse ? 0.0[nrAsl] : R_BWP * nr_candidate;
@@ -204,11 +204,11 @@ container StartGebouwOpties
 	{
 		attribute<bool> WPnormering_geldig  (results) := 
 			  BouwjaarOf9999  < 2020[yr_uint16] ? false
-			: Bouwjaar == 2020[yr_uint16] ? rnd_uniform(/Invoer/TechnischeInstellingen/RandomSeed * 441[uint32], results, range(float64, 0d, 1d)) < 0.86[float64]
-			: Bouwjaar == 2021[yr_uint16] ? rnd_uniform(/Invoer/TechnischeInstellingen/RandomSeed * 442[uint32], results, range(float64, 0d, 1d)) < 0.91[float64]
+			: Bouwjaar == 2020[yr_uint16] ? rnd_uniform(/Invoer/TechnischeInstellingen/RandomSeed * 441[uint32], results/seed, range(float64, 0d, 1d)) < 0.86[float64]
+			: Bouwjaar == 2021[yr_uint16] ? rnd_uniform(/Invoer/TechnischeInstellingen/RandomSeed * 442[uint32], results/seed, range(float64, 0d, 1d)) < 0.91[float64]
 			: true, Descr = "wordt gebouw gasloos gebouwd? voor 2020 nooit, na 2022 altijd, in de tussenjaren grotendeels", Source = "https://energeia.nl/bijna-91-van-de-nieuwbouwwoningen-in-2021-zonder-gasaansluiting/";
 
-		attribute<bool> BWP_normering (results) := WPnormering_geldig && rnd_uniform(/Invoer/TechnischeInstellingen/RandomSeed * 443[uint32], results, range(float64, 0d, 1d)) < par/R_Bodem;
+		attribute<bool> BWP_normering (results) := WPnormering_geldig && rnd_uniform(/Invoer/TechnischeInstellingen/RandomSeed * 443[uint32], results/seed, range(float64, 0d, 1d)) < par/R_Bodem;
 		attribute<bool> LWP_normering (results) := WPnormering_geldig && not(BWP_normering);
 	}
 
@@ -221,7 +221,7 @@ container StartGebouwOpties
 	//attribute<bool> AllocBioketel   (results) := gasloos && not(AllocWarmtenet) && not(AllocHWP) && not(AllocBWP) && not(AllocLWP);
 
 	//heeft gebouw een oliekachel? o.b.v. sampling
-	attribute<float64> rnd_1        (results) := rnd_uniform(par/HRseed, results, range(float64, 0d, 1d));
+	attribute<float64> rnd_1        (results) := rnd_uniform(par/HRseed, results/seed, range(float64, 0d, 1d));
 	attribute<bool> AllocOlieketel  (results) := not(AllocWarmtenet) && not( WPallocatie/AllocWarmtepomp_i) && not(AllocBioketel) && (
 			  Woningtype_rel == Classifications/WoningType/V/vrijstaand ?
 				( Eigendom_rel == Classifications/Eigendom/V/koop ?
@@ -249,13 +249,13 @@ container StartGebouwOpties
 		);
 
 	//heeft gebouw een moderne HR ketel? o.b.v. sampling
-	attribute<float64> rnd_2        (results) := rnd_uniform(par/HRseed, results, range(float64, 0d, 1d));
+	attribute<float64> rnd_2        (results) := rnd_uniform(par/HRseed, results/seed, range(float64, 0d, 1d));
 	attribute<bool> AllocHRketel    (results) := not(AllocWarmtenet) && not(AllocHWP) && not(AllocBWP) && not(AllocLWP) && not(AllocBioketel) && not(AllocOlieketel) && float64(par/aandeelHR) > rnd_2;
 
 	//allocatie lucht-lucht warmtepompen 381000 in 2020 (Bron: https://www.cbs.nl/nl-nl/nieuws/2022/40/steeds-meer-warmtepompen-bij-woningen#:~:text=In%202021%20stonden%20er%20206,meer%20dan%20een%20jaar%20eerder. )
 	//op 7914510 woningen totaal (BAG) is dit afgerond 4,8 %. 
 	parameter<float64> lleWPkans            := 0.048[float64];
-	attribute<float64> rndllewp   (results) := rnd_uniform(par/llewpseed, results, range(float64, 0d, 1d));
+	attribute<float64> rndllewp   (results) := rnd_uniform(par/llewpseed, results/seed, range(float64, 0d, 1d));
 	Attribute<bool>    AllocLlewp (results) := Invoer/StartgegevensAan ? rndllewp <= lleWPkans : const(false,results);
 	parameter<float64> pelletkachelkans     := 0.007[float64]; //56782 / 7914510
 	parameter<float64> houtkachelkans       := 0.117[float64]; //(985332 - 56782) / 7914510

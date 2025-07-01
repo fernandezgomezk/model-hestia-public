@@ -156,6 +156,7 @@ unit<uint32> BouwdeelActieveWoning := select_with_org_rel(BO/Activatie/BouwdeelA
 		attribute<IV> IsolatieVerbetering_rel := second_rel, IsHidden = "True"; // second_rel
 		
 		attribute<BO> BO_rel  := BouwdeelActieveWoning/BO_rel[BouwdeelActieveWoning_rel], ishidden = "True";
+		attribute<uint32> seed := BO/seed[BO_rel];
 
 		attribute<classifications/IsolatieAmbitie> IsolatieAmbitie_rel := IV/IsolatieAmbitie_rel[IsolatieVerbetering_rel];
 		
@@ -241,6 +242,7 @@ unit<uint32> BouwdeelActieveWoning := select_with_org_rel(BO/Activatie/BouwdeelA
 		attribute<bool> AmbitieHeeftRestrictie := DynamicProgramForMinimumIsolatieNiveauEis[BouwdeelActieveWoning_rel];
 		unit<uint32> DP_WoningAmbitie := select(AmbitieHeeftRestrictie)
 		{
+			attribute<uint32> seed := collect_by_cond(DP_WoningAmbitie, AmbitieHeeftRestrictie, AmbitieBerekening/seed);
 			attribute<GJ_Yr> VraagBucketSize := collect_by_cond(DP_WoningAmbitie, MaximumVraagWaarde[BouwdeelActieveWoning_rel]) / Float64(#VraagBucket + #Classifications/Bouwdeel);
 			container OddsRatio_raw := for_each_nedv(classifications/IsolatieMaatregel/name,
 				'collect_by_cond(DP_WoningAmbitie, .../OddsRatio/'+classifications/IsolatieMaatregel/name+')'
@@ -351,17 +353,17 @@ unit<uint32> BouwdeelActieveWoning := select_with_org_rel(BO/Activatie/BouwdeelA
 				attribute<float64> CumulWays0 := cumulate(RescaledWays0, first_rel);
 			}
 			
-			attribute<float64> rndX := rnd_uniform(10, DP_WoningAmbitie, range(0.0, 1.0));
-			attribute<float64> rnd9 := rnd_uniform( 9, DP_WoningAmbitie, range(0.0, 1.0));
-			attribute<float64> rnd8 := rnd_uniform( 8, DP_WoningAmbitie, range(0.0, 1.0));
-			attribute<float64> rnd7 := rnd_uniform( 7, DP_WoningAmbitie, range(0.0, 1.0));
-			attribute<float64> rnd6 := rnd_uniform( 6, DP_WoningAmbitie, range(0.0, 1.0));
-			attribute<float64> rnd5 := rnd_uniform( 5, DP_WoningAmbitie, range(0.0, 1.0));
-			attribute<float64> rnd4 := rnd_uniform( 4, DP_WoningAmbitie, range(0.0, 1.0));
-			attribute<float64> rnd3 := rnd_uniform( 3, DP_WoningAmbitie, range(0.0, 1.0));
-			attribute<float64> rnd2 := rnd_uniform( 2, DP_WoningAmbitie, range(0.0, 1.0));
-			attribute<float64> rnd1 := rnd_uniform( 1, DP_WoningAmbitie, range(0.0, 1.0));
-			attribute<float64> rnd0 := rnd_uniform( 0, DP_WoningAmbitie, range(0.0, 1.0));
+			attribute<float64> rndX := rnd_uniform(10, DP_WoningAmbitie/seed, range(0.0, 1.0));
+			attribute<float64> rnd9 := rnd_uniform( 9, DP_WoningAmbitie/seed, range(0.0, 1.0));
+			attribute<float64> rnd8 := rnd_uniform( 8, DP_WoningAmbitie/seed, range(0.0, 1.0));
+			attribute<float64> rnd7 := rnd_uniform( 7, DP_WoningAmbitie/seed, range(0.0, 1.0));
+			attribute<float64> rnd6 := rnd_uniform( 6, DP_WoningAmbitie/seed, range(0.0, 1.0));
+			attribute<float64> rnd5 := rnd_uniform( 5, DP_WoningAmbitie/seed, range(0.0, 1.0));
+			attribute<float64> rnd4 := rnd_uniform( 4, DP_WoningAmbitie/seed, range(0.0, 1.0));
+			attribute<float64> rnd3 := rnd_uniform( 3, DP_WoningAmbitie/seed, range(0.0, 1.0));
+			attribute<float64> rnd2 := rnd_uniform( 2, DP_WoningAmbitie/seed, range(0.0, 1.0));
+			attribute<float64> rnd1 := rnd_uniform( 1, DP_WoningAmbitie/seed, range(0.0, 1.0));
+			attribute<float64> rnd0 := rnd_uniform( 0, DP_WoningAmbitie/seed, range(0.0, 1.0));
 			
 			attribute<VraagBucket> chosenX := =AsList(replace('rndX <= DP_Bucket/CumulWaysX[combine_data(DP_Bucket, ID(DP_WoningAmbitie), @VB[VraagBucket])] ? @VB[VraagBucket] :', '@VB', string(ID(VraagBucket))), '') + '(0/0)[VraagBucket]';
 			attribute<VraagBucket> chosen9 := =AsList(replace('rnd9 <= DP_Bucket/CumulWays9[combine_data(DP_Bucket, ID(DP_WoningAmbitie), @VB[VraagBucket])] ? @VB[VraagBucket] :', '@VB', string(ID(VraagBucket))), '') + '(0/0)[VraagBucket]';
