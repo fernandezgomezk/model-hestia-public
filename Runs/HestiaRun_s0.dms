@@ -20,6 +20,9 @@ container HestiaRun
 	parameter<string> warmtestrategie 		  := 's0';
 	parameter<string> vervangingsmoment 	  := 'Zst', Descr = "Eindgebruikerskosten volgens natuurlijk of zelfstandig vervangingsmoment";
 
+	//specifiek voor KEV:
+	parameter<string> KEVvariant := 'VV';
+	
 	//====== Opbouw lijst van zichtjaren en rekenstappen
 	unit<uint8> all_rekenstap: nrofrows = 51, IsHidden = "True";
 	unit<uint8> rekenstap:= select_with_org_rel(id(all_rekenstap) < aantal_jaar), IsHidden = "True"

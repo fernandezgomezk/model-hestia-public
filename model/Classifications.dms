@@ -469,7 +469,7 @@ container Classifications: Using = "Units", KeepData = "True", IsHidden = "True"
 		unit<uint32> xUitvoering := combine(IsolatieMaatregel, Uitvoering) {
 			attribute<eur_m2> kosten := ='merge(uint8(second_rel), eur_m2,'+AsItemList('IsolatieMaatregel/kosten/'+Uitvoering/name+'[first_rel]')+')';
 		}
-			attribute<percent> R_RV := Isolatie_imp/R_RV[imp][percent];
+			attribute<Ratio> R_RV := Float64(Isolatie_imp/R_RV[imp]);
 		
 		container V := for_each_nedv(name, 'value('+string(id(.))+', ..)', void, .);
 	}
@@ -1098,6 +1098,7 @@ container Classifications: Using = "Units", KeepData = "True", IsHidden = "True"
 		
 		container V := for_each_nedv(name, 'value('+string(id(.))+', ..)', void, .);
 
+		attribute<string>               min_schillabel_specifiek := min_schillabel; // MTA 01/07/2025: niet aanwezig in GebouwOptie.csv. Merge issue?
 		attribute<GebouwOptieCategorie> Categorie_rel      := rlookup(categorie, GebouwOptieCategorie/name);
 		attribute<Schillabel>           Min_schillabel_rel := rlookup(min_schillabel, Schillabel/name);
 		attribute<Schillabel>           Min_schillabel_specifiek_rel := rlookup(min_schillabel_specifiek, Schillabel/name);
