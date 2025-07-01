@@ -566,6 +566,10 @@ template select_with_org_relGebouwOptieT
 		attribute<Float64> P50P                (GeschiktObject) := Classifications/Scurve_gebouwoptie/p50p_f[combine_data(Classifications/Scurve_gebouwoptie, BO/Eigendom_rel[GeschikteOptie/BO_rel], GeschikteOptie/GebouwOptie_rel)];
 		attribute<Eur_yr>  kosten_tbv_afweging (GeschiktObject) := kosten_or_undefined * P50P; 
 		
+		attribute<Classifications/Schillabel>   Energielabel_rel     (GeschiktObject) := ../Energielabel_rel;
+		attribute<Classifications/Energielabel> EL_rel 	             (GeschiktObject) := ../EL_rel;
+		attribute<Classifications/Schillabel>   SchilLabel_rel       (GeschiktObject) := ../Schillabel_rel;
+		
 		container BemeterdeGebouwInput_rel := Func2Meter/BemeterdeGebouwInput_rel;
 
 		container kapitaallasten := for_each_nedv(
@@ -637,7 +641,7 @@ template select_with_org_relGebouwOptieT
 			GeschiktObject,
 			Eur);
 				
+		container Func2Meter := GeschikteOptieBerekening/Func2Meter;
 		container metervraag := Func2Meter/result;
-		container Upref      := GeschikteOptieBerekening;
 	}	
 }
