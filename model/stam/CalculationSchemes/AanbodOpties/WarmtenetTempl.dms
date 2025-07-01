@@ -353,7 +353,7 @@ template WarmtenetTempl
 					parameter<eur_asl> Bedrag   := makedefined(ZBS/Subsidiebedrag[ZBS_rel],0.0[eur_asl]), ishidden = "True";
 
 					attribute<bool>    InDoelgroep (AllCandidate) := ='OR('+AsItemList(replace('ZBS/doelgroep/@ED[ZBS_rel] && BO/Eigendom_rel[BO_rel] == Classifications/Eigendom/V/@ED','@ED',Classifications/Eigendom/label))+')', ishidden = "True";
-					attribute<bool>    Naleving    (AllCandidate) := rnd_uniform(JaarSeed * 403u, AllCandidate, range(float64, 0d, 1d)) <= ZBS/Naleving[ZBS_rel];
+					attribute<bool>    Naleving    (AllCandidate) := rnd_uniform(JaarSeed * 403u, AllCandidate/seed, range(float64, 0d, 1d)) <= ZBS/Naleving[ZBS_rel];
 					attribute<bool>    Geldig      (AllCandidate) := InDoelgroep && Naleving;
 
 					attribute<eur>     Oi_subsidie (AllCandidate) := BO/nrAansluitingen[BO_rel] * Bedrag + Ki_id * Aandeel;
@@ -844,7 +844,7 @@ template WarmtenetTempl
 			attribute<float64> Odds_alt         (..) := exp(min_elem(Geschiktheid_alt * Aannames/BETA_alt, LOG_MAX_FLOAT64 ));
 			attribute<float64> TotalOdds        (..) := Odds_alt + Odds_w;
 			attribute<float64> Probability_w    (..) := Odds_w / TotalOdds;
-			attribute<float64> rnd              (..) := rnd_uniform(JaarSeed * 241u, .., range(float64, 0d, 1d));
+			attribute<float64> rnd              (..) := rnd_uniform(JaarSeed * 241u, ../seed, range(float64, 0d, 1d));
 			attribute<bool>    Afweging         (..) := rnd <= Probability_w;
 		}
 

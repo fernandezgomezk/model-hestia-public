@@ -371,6 +371,7 @@ container VastgoedProjectie
 	{
 		attribute<Classifications/combines/WBE> ModelObjectKey := =replace(unionExpr, '@ATTR', 'ModelObjectKey');
 		attribute<string> code := =replace(unionExpr, '@ATTR', 'code');
+		attribute<uint32> seed := id(.) + 100000000;
 		attribute<string> label := =replace(unionExpr, '@ATTR', 'label');
 		attribute<rdc_meter> Geometry := =replace(unionExpr, '@ATTR', 'Geometry');
 		attribute<Invoer/RuimtelijkeData/StudieGebied/buurt> buurt_rel := =replace(unionExpr, '@ATTR', 'buurt_rel');

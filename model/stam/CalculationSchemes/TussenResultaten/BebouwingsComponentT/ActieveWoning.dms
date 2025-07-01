@@ -14,6 +14,7 @@
 unit<uint32> ActieveWoning := select_with_org_rel(BO/Activatie/ProductActief || BO/Activatie/BouwdeelActief)
 {		
 	attribute<BO> BO_rel := org_rel, ishidden = "False";
+	attribute<uint32> seed := BO_rel->seed;
 	attribute<rdc_meter> Geometry := lookup(BO_rel, BO/Geometry), ishidden = "True";
 	attribute<ActieveWoning> per_BO(BO) := invert(BO_rel), ishidden = "True";
 	
@@ -22,6 +23,7 @@ unit<uint32> ActieveWoning := select_with_org_rel(BO/Activatie/ProductActief || 
 		parameter<string> constr_expr2 := 'union_data(xInvesteringsOptie, ProductActieveWoning/xIsolatieAmbitie/PAW_xInvesteringsOptie/@A, BouwdeelActieveWoning/ProductInactieveAmbitie/@A)';
 		
 		attribute<BO> BO_rel := union_data(xInvesteringsOptie, ProductActieveWoning/xIsolatieAmbitie/PAW_xInvesteringsOptie/BO_rel, BouwdeelActieveWoning/ProductInactieveAmbitie/BO_rel);
+		attribute<uint32> seed := BO_rel->seed;
 
 	//	attribute<ActieveWoning> ActieveWoning_rel := union_data(xInvesteringsOptie
 	//	,	ProductActieveWoning/xIsolatieAmbitie/PAW_xInvesteringsOptie/ProductActieveWoning_rel
@@ -130,7 +132,7 @@ unit<uint32> ActieveWoning := select_with_org_rel(BO/Activatie/ProductActief || 
 		attribute<Float64> TotalOddsRatio(xInvesteringsOptie) := sum(OddsRatio, GeschikteOptie/xInvesteringsOptie_rel);
 		attribute<Float64> Probability   (GeschikteOptie)     := OddsRatio / TotalOddsRatio[GeschikteOptie/xInvesteringsOptie_rel];
 		attribute<Float64> CumulProb     (GeschikteOptie)     := cumulate(Probability, GeschikteOptie/xInvesteringsOptie_rel);
-		attribute<Float64> rnd           (xInvesteringsOptie) := rnd_uniform(JaarSeed * 5u, xInvesteringsOptie, range(float64, 0.0, 1.0));
+		attribute<Float64> rnd           (xInvesteringsOptie) := rnd_uniform(JaarSeed * 5u, xInvesteringsOptie/seed, range(float64, 0.0, 1.0));
 		attribute<bool>    isSelected    (GeschikteOptie)     := MakeDefined(CumulProb - Probability, -1.0) <= rnd[GeschikteOptie/xInvesteringsOptie_rel] && rnd[GeschikteOptie/xInvesteringsOptie_rel] < MakeDefined(CumulProb, 0.0);
 		attribute<uint32>  nrSelected    (xInvesteringsOptie) := sum_uint32(isSelected, GeschikteOptie/xInvesteringsOptie_rel); // Diagnostic IntegrityCheck = "all(nrSelected == 1)"
 
@@ -177,7 +179,7 @@ unit<uint32> ActieveWoning := select_with_org_rel(BO/Activatie/ProductActief || 
 		attribute<Float64> TotalOddsRatio(ActieveWoning)      := sum(OddsRatio, xInvesteringsOptie/ActieveWoning_rel);
 		attribute<Float64> Probability   (xInvesteringsOptie) := OddsRatio / TotalOddsRatio[xInvesteringsOptie/ActieveWoning_rel];
 		attribute<Float64> CumulProb     (xInvesteringsOptie) := cumulate(Probability, xInvesteringsOptie/ActieveWoning_rel);
-		attribute<Float64> rnd           (ActieveWoning)      := rnd_uniform(JaarSeed * 6u, ActieveWoning, range(float64, 0.0, 1.0));
+		attribute<Float64> rnd           (ActieveWoning)      := rnd_uniform(JaarSeed * 6u, ActieveWoning/seed, range(float64, 0.0, 1.0));
 		attribute<bool>    isSelected    (xInvesteringsOptie) := MakeDefined(CumulProb - Probability, -1.0) <= rnd[xInvesteringsOptie/ActieveWoning_rel] && rnd[xInvesteringsOptie/ActieveWoning_rel] < CumulProb;
 		attribute<uint32>  nrSelected    (ActieveWoning)      := sum_uint32(isSelected, xInvesteringsOptie/ActieveWoning_rel); // Diagnostic IntegrityCheck = "all(nrSelected == 1)"
 
@@ -198,7 +200,7 @@ unit<uint32> ActieveWoning := select_with_org_rel(BO/Activatie/ProductActief || 
 	{
 		attribute<Classifications/Schillabel>  Schillabel_rel   (BO) := makedefined(GeschikteOptie/SchilLabel_rel   [Choice_per_BO/GeschikteOptie_rel], BO/SchilLabel_rel);
 		attribute<Classifications/Schillabel>  Energielabel_rel (BO) := makedefined(GeschikteOptie/Energielabel_rel [Choice_per_BO/GeschikteOptie_rel], BO/Energielabel_rel);
-		attribute<Classifications/Energielabel>  EL_rel (BO) := makedefined(GeschikteOptie/EL_rel [Choice_per_BO/GeschikteOptie_rel], BO/EL_rel);
+		attribute<Classifications/Energielabel>  EL_rel (BO) := makedefined(GeschikteOptie/EL_rel [Choice_per_BO/GeschikteOptie_rel], BO/EL_rel); // MTA 01/07/2025: GeschikteOptie/EL_rel is not defined
 		
 		attribute<Classifications/GebouwOptie> GebouwOptie_rel  (BO) := makedefined(GeschikteOptie/GebouwOptie_rel  [Choice_per_BO/GeschikteOptie_rel], BO/GebouwOptie_rel);
 		

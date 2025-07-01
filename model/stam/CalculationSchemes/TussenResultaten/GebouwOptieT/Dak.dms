@@ -26,7 +26,7 @@ container DK
 		parameter<BBN> BBN_rel;
 		//end case parameters
 
-		attribute<bool>  Naleving (GeschiktObject) := first(rnd_uniform(JaarSeed * 106u, GeschiktObject, range(float64, 0d, 1d)), GeschiktObject/BO_rel)[GeschiktObject/BO_rel] <= BBN/Naleving[BBN_rel];
+		attribute<bool>  Naleving (GeschiktObject) := first(rnd_uniform(JaarSeed * 106u, GeschiktObject/seed, range(float64, 0d, 1d)), GeschiktObject/BO_rel)[GeschiktObject/BO_rel] <= BBN/Naleving[BBN_rel];
 		
 
 		container voorwaarden
@@ -126,7 +126,7 @@ container DK
 	{
 		attribute<Eur_yr>  Kj_duursteoptie     (GeschiktObject) := ='Max_elem('+AsItemList('PerOptie/'+inst/Name+'/Kosten_tbv_afweging')+')';
 		attribute<float64> TotalOdds           (GeschiktObject) := ='add('+AsItemList('PerOptie/'+inst/Name+'/Odds')+')';
-		attribute<float64> rnd                 (GeschiktObject) := rnd_uniform(JaarSeed * 41u, GeschiktObject, range(float64, 0d, 1d));
+		attribute<float64> rnd                 (GeschiktObject) := rnd_uniform(JaarSeed * 41u, GeschiktObject/seed, range(float64, 0d, 1d));
 		attribute<inst>    Installatietype_def (GeschiktObject) := ='Max_elem('+AsItemList('PerOptie/'+inst/Name+'/Type_choice')+')';
 	}
 		

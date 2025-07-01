@@ -60,6 +60,7 @@ container Bebouwing : isHidden = "True"
 	{
 		attribute<string> code  := =replace(unionExpr, '@ATTR', 'code');
 		attribute<string> label := =replace(unionExpr, '@ATTR', 'label');
+		attribute<uint32> seed  := =replace(unionExpr, '@ATTR', 'seed');
 		attribute<rdc_meter> Geometry := =replace(unionExpr, '@ATTR', 'Geometry');
 		attribute<Invoer/RuimtelijkeData/StudieGebied/buurt> buurt_rel := =replace(unionExpr, '@ATTR', 'buurt_rel');
 		attribute<Invoer/RuimtelijkeData/BestaandeWarmtenetten/Aflevergebied_data> Aflevergebied_rel := =replace(unionExpr, '@ATTR', 'Aflevergebied_rel');

@@ -30,7 +30,7 @@ container ventilatie
 		parameter<BBN> BBN_rel;
 		//end case parameters
 
-		attribute<bool>  Naleving (GeschiktObject) := first(rnd_uniform(JaarSeed * 106u, GeschiktObject, range(float64, 0d, 1d)), GeschiktObject/BO_rel)[GeschiktObject/BO_rel] <= BBN/Naleving[BBN_rel];
+		attribute<bool>  Naleving (GeschiktObject) := first(rnd_uniform(JaarSeed * 106u, GeschiktObject/seed, range(float64, 0d, 1d)), GeschiktObject/BO_rel)[GeschiktObject/BO_rel] <= BBN/Naleving[BBN_rel];
 		
 
 		container voorwaarden
@@ -145,7 +145,7 @@ container ventilatie
 		{
 			attribute<Eur_yr>  Kj_duursteoptie (GeschiktObject) := ='Max_elem('+AsItemList('PerOptie/'+Ventilatieopties/Name+'/Kosten_tbv_afweging')+')';
 			attribute<float64> TotalOdds       (GeschiktObject) := ='add('+AsItemList('PerOptie/'+Ventilatieopties/Name+'/Odds')+')';
-			attribute<float64> rnd             (GeschiktObject) := rnd_uniform(JaarSeed * 19u, GeschiktObject, range(float64, 0d, 1d));
+			attribute<float64> rnd             (GeschiktObject) := rnd_uniform(JaarSeed * 19u, GeschiktObject/seed, range(float64, 0d, 1d));
 
 			attribute<Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes> Installatietype_def (GeschiktObject) := ='Max_elem('+AsItemList('PerOptie/'+Ventilatieopties/Name+'/Type_choice')+')';
 			attribute<Ventilatieopties>                                           Ventilatieoptie_def (GeschiktObject) := ='Max_elem('+AsItemList('PerOptie/'+Ventilatieopties/Name+'/Ventilatieoptie_choice')+')';

@@ -84,7 +84,7 @@ template BebouwingsComponentT
 					yr_uint16);
 
 				attribute<bool> BouwnormNaleving (BO) := Bouwjaar < 2020[uint16] ? False :
-				rnd_uniform(JaarSeed * 101u, BO, range(float64, 0d, 1d)) <= first(ZichtjaarBeleid/NieuwbouwNorm/naleving);
+				rnd_uniform(JaarSeed * 101u, BO/seed, range(float64, 0d, 1d)) <= first(ZichtjaarBeleid/NieuwbouwNorm/naleving);
 
 				container Isolatie := for_each_nedv(
 					classifications/bouwdeel/name,
@@ -259,9 +259,9 @@ template BebouwingsComponentT
 				attribute<bool> OverhevelKandidaat (BO) := not(isNuNieuw) && nrAansluitingen > 0d && Overheveling/BouwSoortBouwJaarKlasseEigendom_rel == BouwSoortBouwJaarKlasseEigendom_rel;
 				
 				//====== random nummer tussen 0 en 1 per kandidaat, als overhevelkandidaat. Anders hoog getal zodat BO niet geselecteerd wordt voor overheveling
-				attribute<float64> randomnrKoop     (BO) := OverhevelKandidaat ? rnd_uniform(JaarSeed * 18u, BO, range(float64, 0d, 1d)) : Sum(BO/nrAansluitingen);
-				attribute<float64> randomnrWoonCorp (BO) := OverhevelKandidaat ? rnd_uniform(JaarSeed * 19u, BO, range(float64, 0d, 1d)) : Sum(BO/nrAansluitingen);
-				attribute<float64> randomnrPartHuur (BO) := OverhevelKandidaat ? rnd_uniform(JaarSeed * 20u, BO, range(float64, 0d, 1d)) : Sum(BO/nrAansluitingen);
+				attribute<float64> randomnrKoop     (BO) := OverhevelKandidaat ? rnd_uniform(JaarSeed * 18u, BO/seed, range(float64, 0d, 1d)) : Sum(BO/nrAansluitingen);
+				attribute<float64> randomnrWoonCorp (BO) := OverhevelKandidaat ? rnd_uniform(JaarSeed * 19u, BO/seed, range(float64, 0d, 1d)) : Sum(BO/nrAansluitingen);
+				attribute<float64> randomnrPartHuur (BO) := OverhevelKandidaat ? rnd_uniform(JaarSeed * 20u, BO/seed, range(float64, 0d, 1d)) : Sum(BO/nrAansluitingen);
 				
 				//====== Schalen aantallen over te hevelen woningen
 				parameter<nrAsl> nrAslNaarKoopGeschaald     := nrAslNaarKoop     * SchalingsFactor;

@@ -39,6 +39,7 @@ template select_with_org_relGebouwOptieT
 	unit<uint32> GeschiktObject := select(LabelGeschikt && KoudeGeschikt && Criterium), ishidden = "True"
 	{
 		attribute<BO>                              BO_rel                 := collect_by_cond(GeschiktObject, ActiefObject/BO_rel);
+		attribute<uint32>                          Seed                   := BO_rel->seed;
 		attribute<Classifications/SchilLabel>      SchilLabel_rel         := collect_by_cond(GeschiktObject, ActiefObject/SchilLabel_rel);
 		attribute<Classifications/SchilLabel>      Energielabel_rel       := ../Energielabel_rel;
 		attribute<Classifications/GebouwOptie>     GebouwOptie_rel        := collect_by_cond(GeschiktObject, ../GebouwOptie_rel);
@@ -386,7 +387,7 @@ template select_with_org_relGebouwOptieT
 																		  float64((GeschiktObject/InstallatiePerProduct/DK  != BO/InstallatiePerProduct/DK[GeschikteOptie/BO_rel])  && (strcount(lowercase(Invoer/Kengetallen/OverigeInstallaties/DK/Installatietypes/Label[GeschiktObject/InstallatiePerProduct/DK]), 'zonneboiler') > 0));
 		attribute<float64> nrMaatregelen	 (GeschiktObject)          := nrMaatregelen_iso + nrMaatregelen_inst;																		  
 		attribute<bool>    nrMaatregelen_ok  (GeschiktObject)          := nrMaatregelen >= MinMaatregelen && nrMaatregelen <= MaxMaatregelen;
-		attribute<bool>    Naleving          (GeschiktObject)          := rnd_uniform(JaarSeed * 103u, BO , range(float64, 0d, 1d))[ GeschikteOptie/BO_rel] <= ZBS/Naleving [ZBS_rel];
+		attribute<bool>    Naleving          (GeschiktObject)          := rnd_uniform(JaarSeed * 103u, BO/seed, range(float64, 0d, 1d))[ GeschikteOptie/BO_rel] <= ZBS/Naleving [ZBS_rel];
 		attribute<bool>    Geldig            (GeschiktObject)          := InDoelgroep && nrMaatregelen_ok && nrStappenOk && Naleving;
 		attribute<bool>    Geldig_xPrd       (GeschiktObject/xProduct) := Geldig[GeschiktObject/xProduct/GeschiktObject_rel];
 
@@ -488,7 +489,7 @@ template select_with_org_relGebouwOptieT
 			parameter<BBN> BBN_rel;
 			//end case parameters
 
-			attribute<bool> Naleving       (GeschiktObject) := first(rnd_uniform(JaarSeed * 106u, GeschiktObject, range(float64, 0d, 1d)), GeschiktObject/BO_rel)[GeschiktObject/BO_rel] <= BBN/Naleving[BBN_rel];
+			attribute<bool> Naleving       (GeschiktObject) := first(rnd_uniform(JaarSeed * 106u, GeschiktObject/seed, range(float64, 0d, 1d)), GeschiktObject/BO_rel)[GeschiktObject/BO_rel] <= BBN/Naleving[BBN_rel];
 			attribute<bool> InDoelgroepED  (GeschiktObject) := ='OR('+AsItemList(replace('BBN/doelgroep/@ED[BBN_rel] && BO/Eigendom_rel[geschiktobject/BO_rel] == Classifications/Eigendom/V/@ED','@ED',Classifications/Eigendom/label))+')', ishidden = "True";
 			attribute<bool> InDoelgroepWT  (GeschiktObject) := (BBN/doelgroep/EGW[BBN_rel] && not(BO/IsMeergezins[GeschiktObject/BO_rel])) || (BBN/doelgroep/MGW[BBN_rel] && BO/IsMeergezins[GeschiktObject/BO_rel]);
 			attribute<bool> BouwjaarVoldaan(GeschiktObject) := BO/Bouwjaar[GeschiktObject/BO_rel] >= MakeDefined(BBN/Voorwaarde/MinBouwjaar[BBN_rel], 0w) && BO/Bouwjaar[GeschiktObject/BO_rel] < MakeDefined(BBN/Voorwaarde/MaxBouwjaar[BBN_rel], 9999w);
@@ -532,7 +533,7 @@ template select_with_org_relGebouwOptieT
 		container Naleving
 		{
 			parameter<ratio> AandeelNaleving := ZBV/Naleving[ZBV_rel];
-			attribute<bool>  PerObject (Geschiktobject) := rnd_uniform(JaarSeed * 173u, Geschiktobject, range(float64, 0d, 1d)) <= AandeelNaleving;
+			attribute<bool>  PerObject (Geschiktobject) := rnd_uniform(JaarSeed * 173u, Geschiktobject/seed, range(float64, 0d, 1d)) <= AandeelNaleving;
 
 		}
 		container LabelVoorwaarde := for_each_nedv(Classifications/Schillabel/name , 'ZBV/Voorwaarde/HuidigLabel/'+Classifications/SchilLabel/name+'[ZBV_rel]', void, bool)

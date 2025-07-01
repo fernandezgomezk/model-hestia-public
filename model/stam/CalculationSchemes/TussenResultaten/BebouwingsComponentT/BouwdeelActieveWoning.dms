@@ -16,6 +16,8 @@ unit<uint32> BouwdeelActieveWoning := select_with_org_rel(BO/Activatie/BouwdeelA
 	attribute<BO>     BO_rel   := org_rel, ishidden = "True";
 	attribute<rdc_meter> Geometry := lookup(BO_rel, BO/Geometry), ishidden = "True";
 	
+	attribute<uint32> seed := BO_rel->seed;
+	
 	container IsolatieNiveau_rel := for_each_nedv(classifications/bouwdeel/name, 'BO/Bouwdelen/Isolatie/'+classifications/bouwdeel/name+'[BO_rel]', ., Classifications/IsolatieNiveau), ishidden = "True";
 	
 	attribute<m2> TotalArea := ='add('+AsItemList('BO/Bouwdelen/'+Classifications/bouwdeel/name+'[BO_rel]')+')', ishidden = "True";
@@ -31,7 +33,7 @@ unit<uint32> BouwdeelActieveWoning := select_with_org_rel(BO/Activatie/BouwdeelA
 	attribute<bool>    InDoelgroepED  (BouwdeelActieveWoning) := ='OR('+AsItemList(replace('ZBS/doelgroep/@ED[ZBS_rel] && BO/Eigendom_rel[BO_rel] == Classifications/Eigendom/V/@ED','@ED',Classifications/Eigendom/label))+')', ishidden = "True";
 	attribute<bool>    InDoelgroepWT  (BouwdeelActieveWoning) := (ZBS/doelgroep/EGW[ZBS_rel] && not(BO/IsMeergezins[BO_rel])) || (ZBS/doelgroep/MGW[ZBS_rel] && BO/IsMeergezins[BO_rel]);
 	attribute<bool>    InDoelgroep    (BouwdeelActieveWoning) := InDoelgroepED && InDoelgroepWT;
-	attribute<bool>    Naleving       (BouwdeelActieveWoning) := rnd_uniform(JaarSeed * 103u, BO , range(float64, 0d, 1d))[BO_rel] <= ZBS/Naleving[ZBS_rel];
+	attribute<bool>    Naleving       (BouwdeelActieveWoning) := rnd_uniform(JaarSeed * 103u, BO/seed, range(float64, 0d, 1d))[BO_rel] <= ZBS/Naleving[ZBS_rel];
 	attribute<bool>    Geldig         (BouwdeelActieveWoning) := InDoelgroep && Naleving && Isolatiesubsidie;
 	attribute<ratio>   Rs_gv          (BouwdeelActieveWoning) := Geldig ? makedefined(ZBS/Subsidieaandeel[ZBS_rel],0.0[ratio]) : 0d;
 	}
@@ -497,7 +499,7 @@ unit<uint32> BouwdeelActieveWoning := select_with_org_rel(BO/Activatie/BouwdeelA
 					parameter<BBN> BBN_rel;
 					//end case parameters
 
-					attribute<bool>  Naleving (BO) := rnd_uniform(JaarSeed * 106u, BO, range(float64, 0d, 1d)) <= BBN/Naleving[BBN_rel];
+					attribute<bool>  Naleving (BO) := rnd_uniform(JaarSeed * 106u, BO/seed, range(float64, 0d, 1d)) <= BBN/Naleving[BBN_rel];
 					
 
 					container voorwaarden
@@ -640,7 +642,7 @@ unit<uint32> BouwdeelActieveWoning := select_with_org_rel(BO/Activatie/BouwdeelA
 		+ MakeDefined('+ '+classifications/IsolatieDoel/name[sub_or_null(ID(classifications/IsolatieDoel), 1b)], '')
 		, AmbitieBerekening, float64
 		);
-		attribute<float64> rnd (BouwdeelActieveWoning) := rnd_uniform(JaarSeed * #Classifications/Bouwdeel + uint32(bouwdeel_rel), BouwdeelActieveWoning, range(float64, 0.0, 1.0));
+		attribute<float64> rnd (BouwdeelActieveWoning) := rnd_uniform(JaarSeed * 57 + uint32(bouwdeel_rel),  BouwdeelActieveWoning/seed, range(float64, 0.0, 1.0));
 		
 		attribute<bool> Activatie (BouwdeelActieveWoning) := ='BO/Activatie/Bouwdelen/'+classifications/Bouwdeel/name[bouwdeel_rel]+'[BO_rel] || DynamicProgramForMinimumIsolatieNiveauEis';
 

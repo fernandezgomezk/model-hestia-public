@@ -235,6 +235,7 @@ container BAG: url="%HestiaDataDir%/BAG/20240430_actualisatie_BAG_WP.txt"
 		attribute<classifications/WoningType>             Woningtype_rel             := collect_by_cond(., import/vbo/Woningtype_rel);
 		attribute<uint8>                                  nr_verdiepingen            := pand_rel->nr_verdiepingen;
 		attribute<typeringen/gebruiksdoel>                gebruiksdoel               := const(Invoer/RuimtelijkeData/BAG/typeringen/gebruiksdoel/V/woon,.);
+		attribute<uint32>                                 seed                       := org_rel;
 		
 		container Bouwdelen := for_each_nedv(
 			Classifications/bouwdeel/name
