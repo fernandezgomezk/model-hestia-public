@@ -572,7 +572,10 @@ template StateNaAllocatieComponent
 						
 						//jaarlijkse onderhoudskosten installaties en kosten koken
 						attribute<eur_yr> Kj_inductie_eur_jr			 := Ki_inductie_eur / 15[yr];
-						attribute<eur_yr> Kj_oh_installatie_eur_jr		 := strcount(lowercase(warmtestrategie), 's2') + strcount(lowercase(warmtestrategie), 's3d') > 0 ? 0[eur_yr] :Kj_oh_LO[org_rel];
+						attribute<eur_yr> Kj_oh_installatie_eur_jr		 := switch(
+																					case(lowercase(strategie) == 's3d',  warmtenetberekening/Ki_booster * 0.0090[_yr]),
+																					case(strcount(lowercase(warmtestrategie), 's2') > 0, 0[eur_yr]),
+																					Kj_oh_LO[org_rel] * 1.21d);
 						
 						//Huurverhoging, huurtoeslag, hypotheekrenteaftrek
 						attribute<eur_yr> Extra_huur_hu_nat_eur_jr					 := switch(
