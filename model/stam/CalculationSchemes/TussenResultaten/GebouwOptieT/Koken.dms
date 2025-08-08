@@ -20,8 +20,8 @@ container koken
 		attribute<Inst>    Installatietype_def (GeschiktObject) := =not(Afweging_KK) ? 'Installatietype_org' : 'gasloos || overstap ? Inst/V/Elek : Installatietype_org', Descr = "nieuwe situatie qua koken";
 		attribute<bool>    IsChangedNow        (GeschiktObject) := Installatietype_org != Installatietype_def;
 		attribute<eur>     Ki_koken            (GeschiktObject) := float64(IsChangedNow) * BO/nrAansluitingen[GeschiktObject/BO_rel] * 
-																	( Schuiven/KostenMin * Leercurves/Koken/curve * Inst/Ki_asl_min[Installatietype_def]
-																	+ Schuiven/KostenMax * Leercurves/Koken/curve * Inst/Ki_asl_max[Installatietype_def]), Descr = "investeringskosten eventuele overstap";
+																	( Schuiven/KostenMin * Leercurves/Koken/curve * (BO/IsMeergezins[GeschiktObject/BO_rel] ? Inst/Ki_asl_wh_min[Installatietype_def] : Inst/Ki_asl_wl_min[Installatietype_def]) 
+																	+ Schuiven/KostenMax * Leercurves/Koken/curve * (BO/IsMeergezins[GeschiktObject/BO_rel] ? Inst/Ki_asl_wh_max[Installatietype_def] : Inst/Ki_asl_wl_max[Installatietype_def])), Descr = "investeringskosten eventuele overstap";
 	}
 	attribute<Inst> Installatietype_rel (GeschiktObject) := Afweging/Installatietype_def;
 }

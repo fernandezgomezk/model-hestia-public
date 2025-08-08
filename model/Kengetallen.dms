@@ -314,8 +314,10 @@ container Kengetallen: Using = "Units;Geography", KeepData = "True"
 			{
 				attribute<string>    name       : ['Gas', 'Elek'], IsHidden = "True";
 				attribute<string>    label      : ['Gaskookstel', 'Inductieplaat'];
-				attribute<eur_asl>   Ki_asl_min : [ 000, 1000], Source = "PBL (2019), Achtergronddocument Effecten Ontwerp Klimaatakkoord: Gebouwde Omgeving. Den Haag: Planbureau voor de Leefomgeving";
-				attribute<eur_asl>   Ki_asl_max : [ 000, 1000], Source = "PBL (2019), Achtergronddocument Effecten Ontwerp Klimaatakkoord: Gebouwde Omgeving. Den Haag: Planbureau voor de Leefomgeving";
+				attribute<eur_asl>   Ki_asl_wl_min : [ 000, 502.12], Source = "PBL (2025), Verdieping op de actualisatie van de Startanalyse. Den Haag: Planbureau voor de Leefomgeving", Descr = "minimale investeringskosten elektrisch koken (inductie) woningen eengezins";
+				attribute<eur_asl>   Ki_asl_wh_min : [ 000, 502.12], Source = "PBL (2025), Verdieping op de actualisatie van de Startanalyse. Den Haag: Planbureau voor de Leefomgeving", Descr = "minimale investeringskosten elektrisch koken (inductie) woningen meergezins";
+				attribute<eur_asl>   Ki_asl_wl_max : [ 000, 2259.54], Source = "PBL (2025), Verdieping op de actualisatie van de Startanalyse. Den Haag: Planbureau voor de Leefomgeving", Descr = "maximale investeringskosten elektrisch koken (inductie) woningen eengezins";
+				attribute<eur_asl>   Ki_asl_wh_max : [ 000, 1841.11], Source = "PBL (2025), Verdieping op de actualisatie van de Startanalyse. Den Haag: Planbureau voor de Leefomgeving", Descr = "maximale investeringskosten elektrisch koken (inductie) woningen meergezins";
 				attribute<ratio>     SPF        : [0.40, 0.65], Source = "TNO (2023)"; 
 				attribute<yr_uint16> Levensduur : [  15,   15], Source = "Consumentenbond";
 				attribute<Classifications/BemeterdeGebouwInput> BemeterdeGebouwInput_rel : [1,0], IsHidden = "True";
