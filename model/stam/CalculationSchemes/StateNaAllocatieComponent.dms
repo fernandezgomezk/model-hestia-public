@@ -677,7 +677,7 @@ template StateNaAllocatieComponent
 
 
 					}
-					parameter<string> OutputFolder := 'D:/Eindgebruikerskosten/model-hestia-public/20250425';
+					parameter<string> OutputFolder := 'D:/Eindgebruikerskosten/model-hestia-public/20250817';
 					unit<uint32> variable := SubItem_PropValues(table,'name');
 					container export_csv := Model/CalculationSchemes/Rapportage/WriteTable32ToCSV(table, AsList(variable/name, ';'), OutputFolder+'/'+warmtestrategie+'_'+vervangingsmoment+'_'+string(peiljaar)+'_export.csv');
 				}
@@ -844,7 +844,7 @@ template StateNaAllocatieComponent
 						attribute<eur_yr> egk_vh_nat_eur_jr            := jaarlijkse_kosten_vh_nat_eur_jr + jaarlijkse_baten_vh_nat_eur_jr;
 						attribute<eur_yr> egk_vh_zst_eur_jr            := jaarlijkse_kosten_vh_zst_eur_jr + jaarlijkse_baten_vh_zst_eur_jr;
 					}
-					parameter<string> OutputFolder := 'D:/Eindgebruikerskosten/model-hestia-public/20250425';
+					parameter<string> OutputFolder := 'D:/Eindgebruikerskosten/model-hestia-public/20250817';
 					unit<uint32> variable := SubItem_PropValues(table,'name');
 					container export_csv := Model/CalculationSchemes/Rapportage/WriteTable32ToCSV(table, AsList(variable/name, ';'), OutputFolder+'/'+warmtestrategie+'_'+string(peiljaar)+'_export.csv');
 				}
