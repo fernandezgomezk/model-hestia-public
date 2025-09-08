@@ -506,6 +506,7 @@ template StateNaAllocatieComponent
 						attribute<string> wijkcode			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/WK_CODE[buurt_rel][org_rel];
 						attribute<string> buurt				 := Invoer/RuimtelijkeData/Studiegebied/Buurt/BU_NAAM[buurt_rel][org_rel];
 						attribute<string> buurtcode			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/BU_CODE[buurt_rel][org_rel];
+						attribute<string> postcode			 := BO/postcode[org_rel];
 						attribute<string> RDcoordinaten	 	 := string(geometry[org_rel]);
 						//attribute<uint16> bouwjaar			 := BO/bouwjaar[org_rel];
 						attribute<string> bouwjaarklasse	 := BO/bouwjaar[org_rel] < 1945w ? '<1945' :
@@ -701,6 +702,7 @@ template StateNaAllocatieComponent
 						attribute<string> wijkcode			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/WK_CODE[buurt_rel][org_rel];
 						attribute<string> buurt				 := Invoer/RuimtelijkeData/Studiegebied/Buurt/BU_NAAM[buurt_rel][org_rel];
 						attribute<string> buurtcode			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/BU_CODE[buurt_rel][org_rel];
+						attribute<string> postcode			 := BO/postcode[org_rel];
 						attribute<string> RDcoordinaten	 	 := string(geometry[org_rel]);
 						attribute<uint16> bouwjaar			 := BO/bouwjaar[org_rel];
 						attribute<string> bouwjaarklasse	 := BO/bouwjaar[org_rel] < 1945w ? '<1945' :

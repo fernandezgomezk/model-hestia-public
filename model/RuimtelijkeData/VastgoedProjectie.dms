@@ -195,6 +195,7 @@ container VastgoedProjectie
 			attribute<string>                      Code              := TypeName +string( Periode/name[Periode_rel] )+string( Geometry ) ;
 			attribute<string>                      TypeName          := Classifications/WoningType/name[Woningtype_rel];
 			attribute<string>                      label             := Code, DialogType = "LabelText";
+			attribute<string>                      postcode          := Code;
 			attribute<nrAsl>                       nrAansluitingen_i := float64(NB/nr_aansl[nbb_rel]);
 			attribute<Classifications/WoningType>  Woningtype_rel    := NB/Woningtype_rel[nbb_rel];
 			attribute<bool> 					   isMeergezins 	 := Classifications/Woningtype/IsMeergezins[WoningType_rel];
@@ -372,6 +373,7 @@ container VastgoedProjectie
 		attribute<Classifications/combines/WBE> ModelObjectKey := =replace(unionExpr, '@ATTR', 'ModelObjectKey');
 		attribute<string> code := =replace(unionExpr, '@ATTR', 'code');
 		attribute<string> label := =replace(unionExpr, '@ATTR', 'label');
+		attribute<string> postcode := =replace(unionExpr, '@ATTR', 'postcode');
 		attribute<rdc_meter> Geometry := =replace(unionExpr, '@ATTR', 'Geometry');
 		attribute<Invoer/RuimtelijkeData/StudieGebied/buurt> buurt_rel := =replace(unionExpr, '@ATTR', 'buurt_rel');
 		attribute<Invoer/RuimtelijkeData/BestaandeWarmtenetten/Aflevergebied_data> Aflevergebied_rel := =replace(unionExpr, '@ATTR', 'Aflevergebied_rel');
