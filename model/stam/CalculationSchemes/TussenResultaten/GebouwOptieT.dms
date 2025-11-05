@@ -105,7 +105,7 @@ template select_with_org_relGebouwOptieT
 			attribute<Classifications/Installatie>  Installatie_rel := ='union_data(., '+AsItemList('GeschiktObject/GebouwOptie_rel->PerProduct/'+Classifications/Product/name)+')';
 			attribute<bool>         IsActief        := ='union_data(.,'+AsItemList(replace(IPP_invest_cond, '@PN', Classifications/Product/name))+')'; 
 				
-			attribute<xInstallatie> xInstallatie_code := point(UInt32(xProduct/GeschiktObject_rel), UInt32(IsActief? xProduct/Installatie_rel : classifications/Installatie/V/geen), xInstallatie);
+			attribute<xInstallatie> xInstallatie_code := point_yx(UInt32(xProduct/GeschiktObject_rel), UInt32(IsActief? xProduct/Installatie_rel : classifications/Installatie/V/geen), xInstallatie);
 			attribute<uInstallatie> uInstallatie_rel := rlookup(xInstallatie_code, uInstallatie/Values);
 			
 			attribute<.> per_uInstallatie(uInstallatie) :=  uInstallatie/First_xProduct_rel;

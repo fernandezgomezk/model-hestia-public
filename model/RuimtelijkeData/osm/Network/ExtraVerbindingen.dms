@@ -795,7 +795,7 @@ container ExtraVerbindingen
 		attribute<uint32>                      order      := Elements/Text[value(UInt32(ID(.))* nrAttr + 3, Elements)][uint32];
 		attribute<OSM/wegtype> wegtype    := Elements/Text[value(UInt32(ID(.))* nrAttr + 4, Elements)][OSM/wegtype];
 		
-		attribute<rdc_meter>              location   := point(Y,X,rdc_meter);
+		attribute<rdc_meter>              location   := point_xy(X,Y,rdc_meter);
 		// attribute<geometries/LambertEA>        location   := location_rd[LambertEA];
 		parameter<uint32>                      nrPoly     := uint32(max(Elements/Text[value(UInt32(ID(.))* nrAttr + 2, Elements)])) + 1;
 	}

@@ -1,14 +1,14 @@
-container NetworkPreperation
+container Network
 {  
 	unit<uint32> road := Merge_SourceData/Merge_Country_Roads;
 	
-	container preperation
+	container preparation
 	{
 		unit<uint32> road_segments  := arc2segm(road/geometry)
 		{
 			attribute<string>       key              := String(pointRow(point)) + '_' + String(pointCol(point)) + '_' + String(pointRow(nextpoint)) + '_'+ String(pointCol(nextpoint));
-			attribute<OSM/wegtype>  wegtype          := road/wegtype[SequenceNr];
-			attribute<string>       OSM_id           := road/OSM_id[SequenceNr];
+			attribute<OSM/wegtype>  wegtype          := road/wegtype[Sequence_rel];
+			attribute<string>       OSM_id           := road/OSM_id[Sequence_rel];
 			
 			unit<uint32> pointset  := union_unit(., .)
 			{
@@ -25,17 +25,17 @@ container NetworkPreperation
 		{
 			attribute<rdc_meter>               UnionData (arc);
 			attribute<OSM/wegtype>  		   wegtype          := MakeDefined(road_segments/wegtype[nr_OrgEntity], OSM/wegtype/V/connectlink);
-			attribute<string>                       OSM_id           := road_segments/OSM_id[nr_OrgEntity];
+			attribute<string>                  OSM_id           := road_segments/OSM_id[nr_OrgEntity];
 		}
 		
 	}
 	
 	
-	unit<uint32> Network_with_extraverbindingen  := ='union_unit(preperation/road_segments_with_extra_nodes, preperation/ExtraVerbindingen/link)'
+	unit<uint32> Network_with_extraverbindingen  := ='union_unit(preparation/road_segments_with_extra_nodes, preparation/ExtraVerbindingen/link)'
 	{
-		attribute<rdc_meter>               geometry (arc)   := union_data(., preperation/road_segments_with_extra_nodes/uniondata, preperation/ExtraVerbindingen/link/geometry);
-		attribute<OSM/wegtype>  		   wegtype          := union_data(., preperation/road_segments_with_extra_nodes/wegtype,   preperation/ExtraVerbindingen/link/wegtype);
-		attribute<string>                  OSM_id           := union_data(., preperation/road_segments_with_extra_nodes/OSM_id,  const('',preperation/ExtraVerbindingen/link));
+		attribute<rdc_meter>               geometry (arc)   := union_data(., preparation/road_segments_with_extra_nodes/uniondata, preparation/ExtraVerbindingen/link/geometry);
+		attribute<OSM/wegtype>  		   wegtype          := union_data(., preparation/road_segments_with_extra_nodes/wegtype,   preparation/ExtraVerbindingen/link/wegtype);
+		attribute<string>                  OSM_id           := union_data(., preparation/road_segments_with_extra_nodes/OSM_id,  const('',preparation/ExtraVerbindingen/link));
 		attribute<rdc_meter>               point            := first_point(geometry);
 		attribute<rdc_meter>               nextpoint        := last_point(geometry);
 			
