@@ -7,7 +7,7 @@
 
 container Beleid
 {
-	parameter<string> BeleidPath := '%projDir%/runs/Beleid_'+warmtestrategie+'.csv';
+	parameter<string> BeleidPath := '%projDir%/runs/Beleid_'+contigent+'.csv';
 	//====== Inlezen invoerbestand beleidsinstrumenten
 	unit<uint32> Invoer : StorageName = "=BeleidPath", StorageType = "gdal.vect", StorageReadOnly = "True"
 	{

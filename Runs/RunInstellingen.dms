@@ -7,10 +7,9 @@
 container RunInstellingen
 {
 	parameter<uint16> eerste_jaar            := 2020[uint16], 			Descr = "Eerste zichtjaar";
-	parameter<Units/yr_uint16> peiljaar		 := 2024[Units/yr_uint16], 	Descr = "Zichtjaar berekening eindgebruikerskosten";
-	parameter<uint8>  aantal_jaar            := 5[uint8], 				Descr = "Aantal zichtjaren";
+	parameter<Units/yr_uint16> peiljaar		 := 2025[Units/yr_uint16], 	Descr = "Zichtjaar berekening eindgebruikerskosten";
+	parameter<uint8>  aantal_jaar            := 6[uint8], 				Descr = "Aantal zichtjaren";
 	parameter<string> Studiegebied      : ['NL'];
 	//parameter<string> StudieGebied 		: ['GM0402,GM0344,GM1581,GM0439,GM0153,GM0599,GM0034,GM0050,GM0321'];
-	//parameter<string>   StudieGebied 	: ['GM0050'];
-
+	//parameter<string>   StudieGebied 	: ['GM0213'];
 }
