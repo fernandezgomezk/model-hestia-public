@@ -419,6 +419,7 @@ template StateNaAllocatieComponent
 					unit<uint32> table := select_with_org_rel(BO/bouwjaar < 2023[uint16])
 					{
 						attribute<string> vbo_BAG_ID		 := BO/code[org_rel];
+						attribute<nrAsl>  nrAansluitingen	 := BO/nrAansluitingen[org_rel];
 						attribute<string> strategie			 := const(lowercase(warmtestrategie), BO)[org_rel];
 						
 						//Tussenresultaten voor checks, niet opleveren				
@@ -698,6 +699,7 @@ template StateNaAllocatieComponent
 						attribute<Classifications/Installatie> temp_KDp_voor		:= Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/KDp[org_rel];
 
 						attribute<string> vbo_BAG_ID		 := BO/code[org_rel];
+						attribute<nrAsl>  nrAansluitingen	 := BO/nrAansluitingen[org_rel];
 						attribute<string> strategie			 := const('Aardgas(referentie)', BO)[org_rel];
 						attribute<string> provincie			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/PROV_NAAM[buurt_rel][org_rel];
 						attribute<string> gemeente			 := Invoer/RuimtelijkeData/Studiegebied/Buurt/GM_NAAM[buurt_rel][org_rel];
