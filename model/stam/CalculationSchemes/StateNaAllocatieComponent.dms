@@ -313,11 +313,15 @@ template StateNaAllocatieComponent
 					
 					container Huidig
 					{
-						attribute<ratio> BelastingSchijf	(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BrutoInkomen[Eur_yr] / 122.78d * 131.26d <= Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_laag[ratio]
-						: Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BrutoInkomen[Eur_yr]/ 122.78d * 131.26d > Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_hoog 
-						: (0/0)[ratio];// kan dit er uit?
+						attribute<Eur_yr> Rentelasten_per_jaar_i 															(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/Hypotheekrentelasten / 122.78d * 131.26d * 12d [Eur_yr], Descr = "Hypotheekrentelasten o.b.v. woningkenmerken beginsituatie"; //omgerekend van eur2022 naar eurS2022
+
+						attribute<bool> Overheveling 																		(BO) := BO/Eigendom_rel != Invoer/RuimtelijkeData/Bebouwing/Woning/Eigendom_rel;			
+						attribute<Invoer/Kengetallen/Eindgebruikerskosten/WP9/Class/Eigendomhuurkoop> Eigendomhuurkoop_rel  (BO) := overheveling ? (BO/Eigendom_rel == 0 ? 0[Invoer/Kengetallen/Eindgebruikerskosten/WP9/Class/eigendomhuurkoop] : 1[Invoer/Kengetallen/Eindgebruikerskosten/WP9/Class/eigendomhuurkoop]) : Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/Eigendomhuurkoop_rel, Descr = "Bij overheveling Eigendomhuurkoop_rel opnieuw bepalen t.o.v. beginsituatie, o.b.v. nieuw eigendomstype";
+						attribute<Invoer/Kengetallen/Eindgebruikerskosten/WP9/Class/WEB> 	Buurt_ModelObjectKey  			(BO) := overheveling ? combine_data( Invoer/Kengetallen/Eindgebruikerskosten/WP9/Class/WEB,  combine_data( Invoer/Kengetallen/Eindgebruikerskosten/WP9/Class/WE , Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/Woningtype5_rel, Eigendomhuurkoop_rel), Buurt_rel ) : Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/Buurt_ModelObjectKey, Descr = "Bij overheveling Buurt_ModelObject_rel opnieuw bepalen o.b.v. nieuw eigendomstype";
+						attribute<Invoer/Kengetallen/Eindgebruikerskosten/WP9/class/WEB>	ModelObject_rel 			   	(BO) := overheveling ? rlookup( Buurt_ModelObjectKey, /Invoer/Kengetallen/Eindgebruikerskosten/WP9/buurt_continu/WEB_rel) : Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/buurt_continu_per_vbo/ModelObject_rel, Descr = "Bij overheveling ModelObject_rel opnieuw bepalen o.b.v. nieuw eigendomstype", IsHidden = "True";
+						attribute<eur_yr> Rentelasten_per_jaar_overheveling 												(BO) := overheveling ? (exp(Invoer/Kengetallen/Eindgebruikerskosten/WP9/buurt_continu/Asl/Hypotheekrentelasten [ ModelObject_rel ] + log( Oppervlakte /1[ m2 ]) * Invoer/Kengetallen/Eindgebruikerskosten/WP9/buurt_continu/Opp/Hypotheekrentelasten [ ModelObject_rel ] + (0d + sqrt( Invoer/Kengetallen/Eindgebruikerskosten/WP9/buurt_continu/Var_resid/Hypotheekrentelasten [ ModelObject_rel ]) * float64( Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/Z )))) / 122.78d * 131.26d * 12d [ Eur_yr ] : (0/0)[eur_yr], Descr = "Bij overheveling nieuwe rentelasten bepalen met parameters uit CBS microdata o.b.v. nieuw eigendomstype";
 						
-						attribute<Eur_yr> Rentelasten_per_jaar 		(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/Hypotheekrentelasten / 122.78d * 131.26d * 12d [Eur_yr]; //omgerekend van eur2022 naar eurS2024
+						attribute<eur_yr> Rentelasten_per_jaar 																(BO) := overheveling ? Rentelasten_per_jaar_overheveling : Rentelasten_per_jaar_i;
 						attribute<_yr> vermoedelijk_rentepercentage_hypotheek 					(BO) := Rentelasten_per_jaar[Eur_yr] / (Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/Hypotheekschuld[Eur] / 122.78d * 131.26d);
 						
 						attribute<Eur_yr> eigenwoningforfait 									(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/WOZwaarde[Eur] / 122.78d * 131.26d < WOZ_grens_eigenwoningforfait[Eur] ? (Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/WOZwaarde[Eur] / 122.78d * 131.26d) * eigenwoningforfait_laag[_yr]
@@ -343,9 +347,6 @@ template StateNaAllocatieComponent
 					
 					container Na_investering
 					{
-						attribute<ratio> BelastingSchijf	(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BrutoInkomen[Eur_yr] / 122.78d * 131.26d <= Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_laag[ratio]
-						: Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/BrutoInkomen[Eur_yr] / 122.78d * 131.26d > Inkomensgrens_belastingschijf[Eur_yr] ? BelastingSchijf_hoog 
-						: (0/0)[ratio]; // kan dit er uit?
 						attribute<Eur> WOZwaarde									(BO) := Invoer/Kengetallen/Eindgebruikerskosten/WP9/vbo/huishoudenskenmerken/WOZwaarde[Eur] / 122.78d * 131.26d + aandeel_investering_WOZ * (Ki_looptijd_iso + Ki_looptijd_inst) / 106.96d * 131.26d ; //investeringen omgerekend naar euro2024
 						attribute<Eur_yr> eigenwoningforfait						(BO) :=  WOZwaarde < WOZ_grens_eigenwoningforfait[Eur] ? WOZwaarde[Eur] * eigenwoningforfait_laag[_yr]
 						: WOZwaarde[Eur] >= WOZ_grens_eigenwoningforfait[Eur] ? eigenwoningforfait_hoog_vast[Eur_yr] + (WOZwaarde[Eur] - WOZ_grens_eigenwoningforfait[Eur]) * eigenwoningforfait_hoog_variabel[_yr]
@@ -606,6 +607,7 @@ template StateNaAllocatieComponent
 						
 						//jaarlijkse baten en kosten
 						attribute<eur_yr> jaarlijkse_baten_eb_nat_hy_eur_jr			:= Extra_teruggave_HRA_eb_hy_nat_eur_jr;
+						//attribute<bool>   IntegrityCheck_eb_baten					:= BO/Eigendom_rel[org_rel] == 0 && BO/bouwjaar[org_rel] < 2023[uint16] ? isdefined(jaarlijkse_baten_eb_nat_hy_eur_jr) : isnull(jaarlijkse_baten_eb_nat_hy_eur_jr); //t.b.v. check hoeveel (overgehevelde) koopwoningen geen rentelasten toegekend krijgen.
 						attribute<eur_yr> jaarlijkse_baten_eb_nat_wf_eur_jr			:= Extra_teruggave_HRA_eb_wf_nat_eur_jr;
 						attribute<eur_yr> jaarlijkse_baten_hu_nat_eur_jr			:= Extra_huurtoeslag_hu_nat_eur_jr;
 						attribute<eur_yr> jaarlijkse_baten_vh_nat_eur_jr			:= Extra_huur_vh_nat_eur_jr;
