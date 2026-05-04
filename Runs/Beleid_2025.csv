@@ -64,14 +64,12 @@ PresWoCoInvest	Prestatieafspraken wocos 2022-2025 investering	2022	2023	subsidie
 PresWoCoCVVerbod	Prestatieafspraken wocos 2022-2025 CV verbod	2023	2023	verbod	socialehuur, eengezins	VR, HR	1			Huidig label:A,B,C,D		0.2	
 sub_SVOH	Subsidieregeling Verduurzaming en Onderhoud Huurwoningen (SVOH)	2022	2023	subsidie	particulierehuur	isolatie, (hybride) warmtepomp, ventilatie	0.3	0	0	maximum bedrag: 6000		0.2	2022:38mln,2023:38mln,2024:38mln,2025:38mln
 sub_SVOH_2024	Subsidieregeling Verduurzaming en Onderhoud Huurwoningen (SVOH)	2024	2024	subsidie	particulierehuur	isolatie, (hybride) warmtepomp, ventilatie	0.3	0	0	maximum bedrag: 11161		1	
-act_schil	Activatie bouwdelen 2024	2024	2024	activatie	alle	RO,RB,DS,DP,MG,MS,PL,VL					Bouwjaar: 0-1993	1	
-act_vent	Activatie ventilatie 2024	2024	2024	activatie	alle	VT				VT_Nat	Bouwjaar: 0-1996	1	
-nrm_B_EGWvt	Ventilatie label B EGW tot 1996	2024	2024	normering	bestaande bouw	VT_Mec_Glk_new				VT_Nat	Bouwjaar: 0-1996	1	
-nrm_B_EGW1	Maatregelenpakket label B EGW tot 1930	2024	2024	normering	bestaande bouw, eengezins 	RB_N3,RO_N3,DS_N3,DP_N3,MG_N3,PL_N3,VL_N3					Bouwjaar: 0-1930	1	
-nrm_B_EGW2	Maatregelenpakket label B EGW 1930-1969	2024	2024	normering	bestaande bouw, eengezins 	RB_N3,RO_N3,DS_N3,DP_N3,MG_N3,MS_N1,VL_N3					Bouwjaar: 1930-1970	1	
-nrm_B_EGW3	Maatregelenpakket label B EGW na 1970	2024	2024	normering	bestaande bouw, eengezins 	RB_N3,RO_N3,DS_N3,DP_N3,MG_N3,MS_N2,VL_N3					Bouwjaar: 1970-1993	1	
-nrm_B_MGW1	Maatregelenpakket label B MGW tot 1970	2024	2024	normering	bestaande bouw, meergezins 	RB_N3,RO_N3,DP_N3,MG_N3,MS_N1,VL_N3					Bouwjaar: 0-1970	1	
-nrm_B_MGW2	Maatregelenpakket label B MGW na 1970	2024	2024	normering	bestaande bouw, meergezins 	RB_N3,RO_N3,DP_N3,MG_N3,MS_N2,VL_N3					Bouwjaar: 1970-1993	1	
-act_instal	warmtepomp installatieactivatie 2024	2024	2024	activatie	alle	RV,TW						1	
-nrm_eWP_lw_2	warmtepomp normering	2024	2024	verbod	alle	VR,HR,Olieketel,Bioketel,Pelletkachel,BasisHWP_w,hHR,eWP_bw,eWP_ll,IR,H2R,eBoiler,EWVgroot,EWVklein,mWKK,eWP_bw_uG,eWP_bw_uK,hWP_lw_u,DS_keuken,DS_douche,AircoVast,AircoMobiel				Huidig label: A,B,C,D,E,F,G,N		1	
-nrm_zonpv2	verbod zonpv	2020	2024	normering	bestaande bouw	DK_geen						1	
+act_schil	Activatie bouwdelen 2025	2025	2025	activatie	alle	RO,RB,DS,DP,MG,MS,PL,VL					Bouwjaar: 0-1993	1	
+act_vent	Activatie ventilatie 2025	2025	2025	activatie	alle	VT				VT_Nat	Bouwjaar: 0-1996	1	
+nrm_B_EGWvt	Ventilatie label B EGW tot 1996	2025	2025	normering	bestaande bouw	VT_Mec_Glk_new				VT_Nat	Bouwjaar: 0-1996	1	
+nrm_B_EGW1	Maatregelenpakket label B EGW tot 1930	2025	2025	normering	bestaande bouw, eengezins 	RB_N3,RO_N3,DS_N3,DP_N3,MG_N3,PL_N3,VL_N3					Bouwjaar: 0-1930	1	
+nrm_B_EGW2	Maatregelenpakket label B EGW 1930-1969	2025	2025	normering	bestaande bouw, eengezins 	RB_N3,RO_N3,DS_N3,DP_N3,MG_N3,MS_N1,VL_N3					Bouwjaar: 1930-1970	1	
+nrm_B_EGW3	Maatregelenpakket label B EGW na 1970	2025	2025	normering	bestaande bouw, eengezins 	RB_N3,RO_N3,DS_N3,DP_N3,MG_N3,MS_N2,VL_N3					Bouwjaar: 1970-1993	1	
+nrm_B_MGW1	Maatregelenpakket label B MGW tot 1970	2025	2025	normering	bestaande bouw, meergezins 	RB_N3,RO_N3,DP_N3,MG_N3,MS_N1,VL_N3					Bouwjaar: 0-1970	1	
+nrm_B_MGW2	Maatregelenpakket label B MGW na 1970	2025	2025	normering	bestaande bouw, meergezins 	RB_N3,RO_N3,DP_N3,MG_N3,MS_N2,VL_N3					Bouwjaar: 1970-1993	1	
+nrm_zonpv2	verbod zonpv	2020	2025	normering	bestaande bouw	DK_geen						1	

@@ -10,15 +10,15 @@ container HestiaRun
 	#include <%projDir%/model/Units.dms>
 	#include <%projDir%/model/Geography.dms>
 	#include <%projDir%/model/Classifications.dms>
-	#include <%projDir%/Runs/RunInstellingen.dms>											  
+	#include <%projDir%/Runs/RunInstellingen.dms>
 
 	//====== Invoer: over welke periode moet er worden gerekend?
 	parameter<uint16> eerste_jaar             := RunInstellingen/eerste_jaar, Descr = "Eerste zichtjaar";
 	parameter<uint8>  aantal_jaar             := RunInstellingen/aantal_jaar, Descr = "Aantal zichtjaren";
 	parameter<string> Studiegebied            := Invoer/StudieGebied;
-	parameter<units/yr_uint16> peiljaar		  := RunInstellingen/Peiljaar, Descr = "Zichtjaar eindgebruikerskosten";
-	parameter<string> warmtestrategie 		  := 's3d';
-	parameter<string> vervangingsmoment 	  := 'Nat', Descr = "Eindgebruikerskosten volgens natuurlijk of zelfstandig vervangingsmoment";
+	parameter<units/yr_uint16> peiljaar		  := 2021[Units/yr_uint16], Descr = "Zichtjaar eindgebruikerskosten";
+	parameter<string> warmtestrategie 		  := 'S1a';
+	parameter<string> vervangingsmoment 	  := 'Zst', Descr = "Eindgebruikerskosten volgens natuurlijk of zelfstandig vervangingsmoment";
 
 	//====== Opbouw lijst van zichtjaren en rekenstappen
 	unit<uint8> all_rekenstap: nrofrows = 51, IsHidden = "True";
@@ -91,10 +91,11 @@ container HestiaRun
 			container RekenStappen
 			{
 				container StartJaar := DefaultInstellingen/Basis;
-				container R4_2024 := DefaultInstellingen/R4_2024/Specifiek;
 				container R1_2021 := DefaultInstellingen/Rekenstap/Specifiek;
 				container R2_2022 := DefaultInstellingen/Rekenstap/Specifiek;
 				container R3_2023 := DefaultInstellingen/Rekenstap/Specifiek;
+				container R4_2024 := DefaultInstellingen/Rekenstap/Specifiek;
+				container R5_2025 := DefaultInstellingen/Rekenstap/Specifiek;
 
 			}
 			
