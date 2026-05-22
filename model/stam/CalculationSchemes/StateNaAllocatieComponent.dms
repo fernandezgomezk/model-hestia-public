@@ -419,12 +419,27 @@ template StateNaAllocatieComponent
 					unit<uint32> table := select_with_org_rel(BO/bouwjaar < 2023[uint16])
 					{
 						attribute<string> vbo_BAG_ID		 := BO/code[org_rel];
+						
+						attribute<m3_yr> gas_voor_m3    	 := BebouwingsComponenten/Woning/BO/MetervraagBerekening/result/Gas[org_rel] / 0.03165[ GJ_m3 ];
+						attribute<kWh_yr> elek_voor_kWh      := BebouwingsComponenten/Woning/BO/MetervraagBerekening/result/E[org_rel] / 0.0036[ GJ / kWh ];
+						attribute<m3_yr> gas_na_m3 			 := AllocatieResultaten/Woning/metervraag/Gas[org_rel] / 0.03165[GJ_m3];
+						attribute<kWh_yr> elek_na_kWh 		 := strcount(lowercase(warmtestrategie), 's2') + strcount(lowercase(warmtestrategie), 's3') > 0 ? 
+																(AllocatieResultaten/Woning/metervraag/E[org_rel] - BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/Metervraag/metervraag_elektriciteit_rv_basis[org_rel] 
+																												  - BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/Metervraag/metervraag_elektriciteit_rv_piek[org_rel] 
+																												  - BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/Metervraag/metervraag_elektriciteit_tw_basis[org_rel] 
+																												  - BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/Metervraag/metervraag_elektriciteit_tw_piek[org_rel] 
+																												  + warmtenetberekening/metervraag_RV_E[org_rel] + warmtenetberekening/metervraag_TW_E[org_rel]) / 0.0036[GJ / kWh] : 
+																												  AllocatieResultaten/Woning/metervraag/E[org_rel] / 0.0036[GJ / kWh]; 
+						attribute<eur> ki_isolatie_zst_eur	 := vervangingsmoment == 'Zst' ? eenmalig/incl_btw/Ki_gv[org_rel]  : (0/0)[eur]; 
+						attribute<eur> ki_isolatie_nat_eur 	 	:= vervangingsmoment == 'Nat' ? eenmalig/incl_btw/Ki_gv_nat[org_rel] : (0/0)[eur];						
+						attribute<eur> ki_warmtepomp_HR_eur	 := switch(
+																		case(lowercase(warmtestrategie) == 's3d', 				 warmtenetberekening/Ki_booster),
+																		case(strcount(lowercase(warmtestrategie), 's2') > 0, 0[eur]),
+																		eenmalig/incl_btw/Ki15_LO[org_rel] + eenmalig/incl_btw/Ki30_LO[org_rel]); 																						  
+						/*
 						attribute<nrAsl>  nrAansluitingen	 := BO/nrAansluitingen[org_rel];
 						attribute<string> strategie			 := const(lowercase(warmtestrategie), BO)[org_rel];
-						
-						//Tussenresultaten voor checks, niet opleveren				
-						attribute<GJ_yr> temp_Aardgas_voor    						:= BebouwingsComponenten/Woning/BO/MetervraagBerekening/result/Gas[org_rel];
-						attribute<GJ_yr> temp_Elektriciteit_voor       				:= BebouwingsComponenten/Woning/BO/MetervraagBerekening/result/E[org_rel];
+												
 						attribute<GJ_yr> temp_Functioneel_RuimteVerwarming_na		:= BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/Functioneel/RV[org_rel];
 						attribute<GJ_yr> temp_Functioneel_RuimteVerwarming_voor		:= BebouwingsComponenten/Woning/BO/Functioneel/RV[org_rel];
 						attribute<GJ_yr> temp_Functioneel_Tapwater_na				:= BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/Functioneel/TW[org_rel];
@@ -549,7 +564,6 @@ template StateNaAllocatieComponent
 						attribute<eur> ki_ventilatie_zst_eur 	:= vervangingsmoment == 'Zst' ? Ki_ventilatie[org_rel] : (0/0)[eur];
 						attribute<eur> ki_koken_eur 			:= (eenmalig/incl_btw/Ki_KK[org_rel])/2d;
 						attribute<eur> ki_inductie_eur 			:= (eenmalig/incl_btw/Ki_KK[org_rel])/2d;
-						attribute<eur> ki_isolatie_nat_eur 	 	:= vervangingsmoment == 'Nat' ? eenmalig/incl_btw/Ki_gv_nat[org_rel] : (0/0)[eur];
 						attribute<eur> ki_ventilatie_nat_eur 	:= vervangingsmoment == 'Nat' ? Ki_ventilatie[org_rel] : (0/0)[eur];
 						attribute<eur> subsidies_zst_eur 	 		:= vervangingsmoment == 'Zst' ? ((strcount(lowercase(warmtestrategie), 's2') + strcount(lowercase(warmtestrategie), 's3d') > 0 ? 0[eur] : -1d * (eenmalig/incl_btw/Oi15_LO[org_rel] + eenmalig/incl_btw/Oi30_LO[org_rel])) - (warmtenetberekening/Oi_BAK[org_rel] + warmtenetberekening/Oi_booster[org_rel] + warmtenetberekening/Oi_KK[org_rel] + warmtenetberekening/Oi_LTAS[org_rel] + eenmalig/incl_btw/Oi_gv[org_rel])) : (0/0)[eur];
 						attribute<eur> subsidies_nat_eur 	 		:= vervangingsmoment == 'Nat' ? ((strcount(lowercase(warmtestrategie), 's2') + strcount(lowercase(warmtestrategie), 's3d') > 0 ? 0[eur] : -1d * (eenmalig/incl_btw/Oi15_LO[org_rel] + eenmalig/incl_btw/Oi30_LO[org_rel])) - (warmtenetberekening/Oi_BAK[org_rel] + warmtenetberekening/Oi_booster[org_rel] + warmtenetberekening/Oi_KK[org_rel] + warmtenetberekening/Oi_LTAS[org_rel] + eenmalig/incl_btw/Oi_gv_nat[org_rel])) : (0/0)[eur];
@@ -680,13 +694,13 @@ template StateNaAllocatieComponent
 						attribute<eur_yr> egk_vh_nat_eur_jr            := jaarlijkse_kosten_vh_nat_eur_jr + jaarlijkse_baten_vh_nat_eur_jr;
 						attribute<eur_yr> egk_vh_zst_eur_jr            := jaarlijkse_kosten_vh_zst_eur_jr + jaarlijkse_baten_vh_zst_eur_jr;
 
-
+	*/
 					}
-					parameter<string> OutputFolder := 'D:/Eindgebruikerskosten/model-hestia-public/20260109';
+					parameter<string> OutputFolder := 'D:/Thije/scenario_ingmar/20260310';
 					unit<uint32> variable := SubItem_PropValues(table,'name');
 					container export_csv := Model/CalculationSchemes/Rapportage/WriteTable32ToCSV(table, AsList(variable/name, ';'), OutputFolder+'/'+warmtestrategie+'_'+vervangingsmoment+'_'+string(peiljaar)+'_export.csv');
 				}
-				
+			
 				container export_ref
 				{
 					unit<uint32> table := select_with_org_rel(BO/bouwjaar < 2023[uint16])
