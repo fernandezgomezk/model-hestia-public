@@ -199,7 +199,10 @@ container BAG: url="%HestiaDataDir%/BAG/20240430_actualisatie_BAG_WP.txt"
 		&& IsDefined(import/pand/woonpand_type[import/vbo/pand_rel]) // TODO: Check with Folckert, see Trello MTA #15 
 		&& MakeDefined(import/vbo/oppervlak_filters/wonen, 0000[Units/m2]) >=  10[Units/m2]
 		&& MakeDefined(import/vbo/oppervlak_filters/wonen, 9999[Units/m2]) < 1000[Units/m2]
+		&& (/invoer/TechnischeInstellingen/StudieGebied_fractie == 1 
+		|| id(import/vbo) % invoer/TechnischeInstellingen/StudieGebied_fractie == invoer/TechnischeInstellingen/Welke_StudieGebied_fractie)
 		)
+	, 	Descr = "Selectie van BAG woningen op basis van studiegebied, oppervlak van het vbo en keuze voor fractie van het studiegebied"
 	,	DialogType = "Map"
 	,	DialogData = "geometry"
 	,	FreeData   = "False"

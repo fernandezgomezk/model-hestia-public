@@ -195,7 +195,11 @@ container VastgoedProjectie
 
 		unit<uint32> ModelObject := Invoer/Kengetallen/Bebouwing/Woning/Results;
 
-		unit<uint32> BebouwingsObject := select_with_attr_by_cond(BebouwingsObject_buff, IsDefined(BebouwingsObject_buff/buurt_rel)), IsHidden = "True"
+		unit<uint32> BebouwingsObject := select_with_attr_by_cond(BebouwingsObject_buff, 
+																IsDefined(BebouwingsObject_buff/buurt_rel) 
+																&& (Invoer/TechnischeInstellingen/StudieGebied_fractie == 1 
+																|| id(BebouwingsObject_buff) % invoer/TechnischeInstellingen/StudieGebied_fractie == Invoer/TechnischeInstellingen/Welke_StudieGebied_fractie))
+																, IsHidden = "True", Descr = "Selectie van nieuwbouwwoningen op basis van BebouwingsObject_buff en de keuze voor fractie van het studiegebied"		
 		{
 			attribute<string>                      Code              := TypeName +string( Periode/name[Periode_rel] )+string( Geometry ) ;
 			attribute<string>                      TypeName          := Classifications/WoningType/name[Woningtype_rel];
