@@ -149,6 +149,96 @@ template AllocatieResultatenComponent
         container export_csv := Model/CalculationSchemes/Rapportage/WriteTable32ToCSV(table, AsList(variable/name, ';'), OutputFolder+rekenstapname+'IsolatieStandaard_export.csv');
         }
 		
+		
+	container Resultaten_besparingskengetallen
+	{
+        unit<uint32> table := select_with_org_rel(isdefined(BO/code) && BO/bouwjaar < 2024[yr_uint16] && BO/nrAansluitingen == 1[nrAsl])
+		{
+			//attribute<string> maatregel								:= const(maatregel,.);
+			attribute<String> identificatie							:= BO/code[org_rel];
+			attribute<GJ_yr> Aardgas_na   							:= Woning/Metervraag/Gas[org_rel];
+			attribute<GJ_yr> Aardgas_voor    						:= BebouwingsComponenten/Woning/BO/MetervraagBerekening/result/Gas[org_rel];
+			attribute<GJ_yr> Elektriciteit_na       				:= Woning/Metervraag/E[org_rel];
+			attribute<GJ_yr> Elektriciteit_voor       				:= BebouwingsComponenten/Woning/BO/MetervraagBerekening/result/E[org_rel];
+			attribute<GJ_yr> Bruto_elektriciteit_na       			:= (Woning/Metervraag/E + BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/Metervraag/Oj_e_ZonPV)[org_rel];
+			attribute<GJ_yr> Bruto_elektriciteit_voor       		:= (BebouwingsComponenten/Woning/BO/MetervraagBerekening/result/E + BebouwingsComponenten/Woning/BO/MetervraagBerekening/eEffect/ZonPV/Oj_elek)[org_rel];
+			attribute<GJ_yr> Opbrengst_zonnepanelen_na				:= BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/Metervraag/Oj_e_ZonPV[org_rel];
+			attribute<GJ_yr> Opbrengst_zonnepanelen_voor			:= BebouwingsComponenten/Woning/BO/MetervraagBerekening/eEffect/ZonPV/Oj_elek[org_rel];
+			attribute<GJ_yr> Warmte_na								:= Woning/Metervraag/Warmte_70[org_rel];
+			attribute<GJ_yr> Warmte_voor							:= BebouwingsComponenten/Woning/BO/MetervraagBerekening/metervraag_per_input/Warmte_70[org_rel];
+			attribute<GJ_yr> Functioneel_RuimteVerwarming_na		:= Functioneel/V_RV[org_rel];
+			attribute<GJ_yr> Functioneel_RuimteVerwarming_voor		:= BebouwingsComponenten/Woning/BO/Functioneel/RV[org_rel];
+			attribute<GJ_yr> Functioneel_Tapwater_na				:= Functioneel/V_TW[org_rel];
+			attribute<GJ_yr> Functioneel_Tapwater_voor				:= BebouwingsComponenten/Woning/BO/Functioneel/TW[org_rel];
+			attribute<GJ_yr> Functioneel_KK_voor					:= BebouwingsComponenten/Woning/BO/Functioneel/KK[org_rel];
+			attribute<classifications/schillabel> Energielabel_na	:= BO/Energielabel_rel[org_rel];
+			attribute<UInt16> bouwjaar								:= BO/bouwjaar[org_rel];
+			attribute<m2> oppervlakte								:= BO/oppervlakte[org_rel];
+			attribute<string> Woningtype	:= Classifications/WoningType/name[BO/BebouwingsType][org_rel];
+			attribute<Classifications/Eigendom > EigendomsType		:= BO/Eigendom_rel[org_rel];
+			attribute<m2> RB_m2										:= BO/Bouwdelen/RB [org_rel];
+			attribute<m2> RO_m2										:= BO/Bouwdelen/RO [org_rel];
+			attribute<m2> DR_m2										:= BO/Bouwdelen/DR [org_rel];
+			attribute<m2> PL_m2										:= BO/Bouwdelen/PL [org_rel];
+			attribute<m2> VL_m2										:= BO/Bouwdelen/VL [org_rel];
+			attribute<m2> MG_m2										:= BO/Bouwdelen/MG [org_rel];
+			attribute<m2> MS_m2										:= BO/Bouwdelen/MS [org_rel];
+			attribute<m2> DP_m2										:= BO/Bouwdelen/DP [org_rel];
+			attribute<m2> DS_m2										:= BO/Bouwdelen/DS [org_rel];
+			attribute<Classifications/IsolatieNiveau> RB_na			:= BO/Bouwdelen/Isolatie/RB [org_rel];
+			attribute<Classifications/IsolatieNiveau> RB_voor		:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/RB[org_rel];
+			attribute<Classifications/IsolatieNiveau> RO_na			:= BO/Bouwdelen/Isolatie/RO[org_rel];
+			attribute<Classifications/IsolatieNiveau> RO_voor		:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/RO[org_rel];
+			attribute<Classifications/IsolatieNiveau> DR_na			:= BO/Bouwdelen/Isolatie/DR[org_rel];
+			attribute<Classifications/IsolatieNiveau> DR_voor		:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/DR[org_rel];
+			attribute<Classifications/IsolatieNiveau> PL_na			:= BO/Bouwdelen/Isolatie/PL[org_rel];
+			attribute<Classifications/IsolatieNiveau> PL_voor		:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/PL[org_rel];
+			attribute<Classifications/IsolatieNiveau> VL_na			:= BO/Bouwdelen/Isolatie/VL[org_rel];
+			attribute<Classifications/IsolatieNiveau> VL_voor		:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/VL[org_rel];
+			attribute<Classifications/IsolatieNiveau> MG_na			:= BO/Bouwdelen/Isolatie/MG[org_rel];
+			attribute<Classifications/IsolatieNiveau> MG_voor		:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/MG[org_rel];
+			attribute<Classifications/IsolatieNiveau> MS_na			:= BO/Bouwdelen/Isolatie/MS[org_rel];
+			attribute<Classifications/IsolatieNiveau> MS_voor		:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/MS[org_rel];
+			attribute<Classifications/IsolatieNiveau> DP_na			:= BO/Bouwdelen/Isolatie/DP[org_rel];
+			attribute<Classifications/IsolatieNiveau> DP_voor		:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/DP[org_rel];
+			attribute<Classifications/IsolatieNiveau> DS_na			:= BO/Bouwdelen/Isolatie/DS[org_rel];
+			attribute<Classifications/IsolatieNiveau> DS_voor		:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/DS[org_rel];
+			attribute<Classifications/IsolatieNiveau> KR_na    		:= BO/Bouwdelen/Isolatie/KR[org_rel];
+			attribute<Classifications/IsolatieNiveau> KR_voor    	:= Bebouwingscomponenten/Woning/BO/Bouwdelen/Isolatie/KR[org_rel];
+			attribute<string> VT_na    := Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes/Label[BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/VT][org_rel];
+			attribute<string> VT_voor  := Invoer/Kengetallen/OverigeInstallaties/VT/Installatietypes/Label[Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/VT][org_rel];
+			attribute<string> DK_na		:= Invoer/Kengetallen/OverigeInstallaties/DK/Installatietypes/Label[BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/DK][org_rel];
+			attribute<string> DK_voor	:= Invoer/Kengetallen/OverigeInstallaties/DK/Installatietypes/Label[Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/DK][org_rel];
+			attribute<Invoer/Kengetallen/OverigeInstallaties/KK/Installatietypes> KK_na		:= BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/KK[org_rel];
+			attribute<Invoer/Kengetallen/OverigeInstallaties/KK/Installatietypes> KK_voor    := Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/KK[org_rel];
+			attribute<Classifications/Installatie> RVb_na		:= BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/RVb[org_rel];
+			attribute<Classifications/Installatie> RVb_voor		:= Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/RVb[org_rel];
+			attribute<Classifications/Installatie> RVp_na		:= BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/RVp[org_rel];
+			attribute<Classifications/Installatie> RVp_voor		:= Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/RVp[org_rel]; //toegevoegd op 11/07/2023
+			attribute<Classifications/Installatie> TWb_na		:= BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/TWb[org_rel];//toegevoegd op 11/07/2023
+			attribute<Classifications/Installatie> TWb_voor		:= Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/TWb[org_rel];//toegevoegd op 11/07/2023
+			attribute<Classifications/Installatie> TWp_na		:= BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/TWp[org_rel];//toegevoegd op 11/07/2023
+			attribute<Classifications/Installatie> TWp_voor		:= Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/TWp[org_rel];//toegevoegd op 11/07/2023
+			attribute<Classifications/Installatie> KDb_voor		:= Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/KDb[org_rel];
+			attribute<Classifications/Installatie> KDp_voor		:= Bebouwingscomponenten/Woning/BO/InstallatiePerProduct/KDp[org_rel];
+			attribute<Classifications/Installatie> KDb_na		:= BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/KDb[org_rel];
+			attribute<Classifications/Installatie> KDp_na		:= BebouwingsComponenten/Woning/ActieveWoning/BebouwingsObjectMetGebouwOptie/InstallatiePerProduct/KDp[org_rel];
+			attribute<Eur> Ki15_LO							:= BO/eenmalig/Ki15_LO[org_rel];//toegevoegd op 11/07/2023
+			attribute<Eur> Ki_LTAS							:= BO/eenmalig/Ki_LTAS[org_rel];//toegevoegd op 04/07/2024
+			attribute<Eur> Ki_KK							:= BO/eenmalig/Ki_KK[org_rel];//toegevoegd op 04/07/2024		
+			attribute<Eur> Ki_DK		       						:= BO/eenmalig/Ki_DK[org_rel];
+			attribute<Units/kW> Capaciteit_RVb_na						  	:= BO/Func2Meter/eEffect/CapaciteitPerProduct/RVb[org_rel];
+			attribute<Units/kW> Capaciteit_RVp_na						  	:= BO/Func2Meter/eEffect/CapaciteitPerProduct/RVp[org_rel];
+			attribute<Units/kW> Capaciteit_TWb_na					  	:= BO/Func2Meter/eEffect/CapaciteitPerProduct/TWb[org_rel];
+			attribute<Units/kW> Capaciteit_TWp_na					  	:= BO/Func2Meter/eEffect/CapaciteitPerProduct/TWp[org_rel];
+			attribute<Units/kW> Capaciteit_KDb_na					  	:= BO/Func2Meter/eEffect/CapaciteitPerProduct/KDb[org_rel];
+			attribute<Units/kW> Capaciteit_KDp_na					  	:= BO/Func2Meter/eEffect/CapaciteitPerProduct/KDp[org_rel];
+		}
+		parameter<string> OutputFolder := '%localDataProjDir%/Results/NWF_besparingskengetallen/';
+		unit<uint32> variable := SubItem_PropValues(table,'name');
+		container export_csv := Model/CalculationSchemes/Rapportage/WriteTable32ToCSV(table, AsList(variable/name, ';'), OutputFolder+rekenstapname+'_'+maatregel+'_export.csv');
+	}
+		
 		container Metervraag := BO_Base/Metervraag
 		{
 			attribute<GJ_yr> EA        (BO) := Functioneel/EA / /Invoer/Kengetallen/Constanten/Efficiency_EA;
