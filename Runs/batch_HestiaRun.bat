@@ -7,6 +7,11 @@ REM Bij nogmaals runnen worden bestanden gewoon overschreven
 REM aanpassingen voor machine specifieke paden
 Call path/set.bat
 
-"%exe_path%" "/L%log_dir%\HestiaRun.txt"  "%prj_dir%\Runs\HestiaRun.dms" /Resultaten/Exports/GenerateAllIndicatoren
+START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt"  "%prj_dir%\Runs\HestiaRun_dakisolatie.dms" /TussenResultaten/R5_2025/AllocatieResultaten/Woning/BO/Resultaten_besparingskengetallen/export_csv/Export
+START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt"  "%prj_dir%\Runs\HestiaRun_gevelisolatie.dms" /TussenResultaten/R5_2025/AllocatieResultaten/Woning/BO/Resultaten_besparingskengetallen/export_csv/Export
+START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt"  "%prj_dir%\Runs\HestiaRun_glasisolatie.dms" /TussenResultaten/R5_2025/AllocatieResultaten/Woning/BO/Resultaten_besparingskengetallen/export_csv/Export
+START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt"  "%prj_dir%\Runs\HestiaRun_deurisolatie.dms" /TussenResultaten/R5_2025/AllocatieResultaten/Woning/BO/Resultaten_besparingskengetallen/export_csv/Export
+START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt"  "%prj_dir%\Runs\HestiaRun_spouwmuurisolatie.dms" /TussenResultaten/R5_2025/AllocatieResultaten/Woning/BO/Resultaten_besparingskengetallen/export_csv/Export
+START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt"  "%prj_dir%\Runs\HestiaRun_vloerisolatie.dms" /TussenResultaten/R5_2025/AllocatieResultaten/Woning/BO/Resultaten_besparingskengetallen/export_csv/Export
 
 pause Totaal klaar

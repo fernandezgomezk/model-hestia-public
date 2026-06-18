@@ -61,5 +61,5 @@ sub_SVVE1	Subsidieregeling verduurzaming verenigingen van eigenaren	2023	2024	su
 sub_SVVE2	Subsidieregeling verduurzaming verenigingen van eigenaren	2023	2024	subsidie	koopwoning, meergezins	(hybride) warmtepomp, isolatie, zonneboiler	0.3	0	0	Minimaal aantal maatregelen: 2		0.03	hoort bij sub_SVVE1																																																							   
 PresWoCoIsolatie	Prestatieafspraken wocos 2024-2030	2024	2024	normering	bestaande bouw,socialehuur	KR_N3,DP_N3,DS_N3,RO_N3,RB_N3,MS_N2,VL_N3,PL_N1,DR_N4,VT_Mec_Vst_Glk_New				Huidig label:B,C,D,E,F,G,N	bouwjaar: 0-1992	0.97		 
 PresWoCoAardgasvrij	Prestatieafspraken wocos 2024-2030	2024	2024	verbod	bestaande bouw,socialehuur	VR, HR, BasisHWP_w, hHR				Huidig label:A,B,C,D,E,F,G,N		0.2		 
-nrm_scenario_dakisolatie	Dakisolatie maatregel normering	2025	2025	normering	bestaande bouw	DP_N3,DS_N3						1
-act_scenario_dakisolatie	Dakisolatie maatregel activatie	2025	2025	activatie	alle	DP,DS				Huidig label:A,B,C,D,E,F,G,N		1
+nrm_scenario_vloerisolatie	Vloerisolatie maatregel normering	2025	2025	normering	bestaande bouw	VL_N3						1
+act_scenario_vloerisolatie	Vloerisolatie maatregel activatie	2025	2025	activatie	alle	VL				Huidig label:A,B,C,D,E,F,G,N		1
