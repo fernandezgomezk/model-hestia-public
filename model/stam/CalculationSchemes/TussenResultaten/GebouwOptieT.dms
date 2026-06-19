@@ -214,8 +214,8 @@ template select_with_org_relGebouwOptieT
 	
 	container OverigeInstallaties
 	{	
-		parameter<bool>   Afweging_VT         := Zichtjaar_jaar == refjaar ? false : SpecifiekeInstellingen/InstallatieSet/InstallatieSetcriteria/Afweging_VT, IsHidden = "True";
-		parameter<bool>   Afweging_DK         := Zichtjaar_jaar == refjaar ? false : SpecifiekeInstellingen/InstallatieSet/InstallatieSetcriteria/Afweging_DK, IsHidden = "True";
+		parameter<bool>   Afweging_VT         := Zichtjaar_jaar == refjaar && maatregel != 'ventilatie' ? false : SpecifiekeInstellingen/InstallatieSet/InstallatieSetcriteria/Afweging_VT, IsHidden = "True";
+		parameter<bool>   Afweging_DK         := Zichtjaar_jaar == refjaar && (maatregel != 'zonneboiler' && maatregel != 'zonnepanelen') ? false : SpecifiekeInstellingen/InstallatieSet/InstallatieSetcriteria/Afweging_DK, IsHidden = "True";
 		parameter<bool>   Afweging_KK         := Zichtjaar_jaar == refjaar ? false : SpecifiekeInstellingen/InstallatieSet/InstallatieSetcriteria/Afweging_KK, IsHidden = "True";
 
 		#include<Ventilatie.dms>
