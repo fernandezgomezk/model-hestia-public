@@ -13,5 +13,8 @@ START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt"  "%pr
 START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt"  "%prj_dir%\Runs\HestiaRun_deurisolatie.dms" /TussenResultaten/R5_2025/AllocatieResultaten/Woning/BO/Resultaten_besparingskengetallen/export_csv/Export
 START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt"  "%prj_dir%\Runs\HestiaRun_spouwmuurisolatie.dms" /TussenResultaten/R5_2025/AllocatieResultaten/Woning/BO/Resultaten_besparingskengetallen/export_csv/Export
 START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt"  "%prj_dir%\Runs\HestiaRun_vloerisolatie.dms" /TussenResultaten/R5_2025/AllocatieResultaten/Woning/BO/Resultaten_besparingskengetallen/export_csv/Export
+START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt"  "%prj_dir%\Runs\HestiaRun_biomassaketel.dms" /TussenResultaten/R5_2025/AllocatieResultaten/Woning/BO/Resultaten_besparingskengetallen/export_csv/Export
+START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt"  "%prj_dir%\Runs\HestiaRun_hrketel.dms" /TussenResultaten/R5_2025/AllocatieResultaten/Woning/BO/Resultaten_besparingskengetallen/export_csv/Export
+START "HESTIA" /WAIT /BELOWNORMAL "%exe_path%" "/L%log_dir%\HestiaRun.txt"  "%prj_dir%\Runs\HestiaRun_warmtepomp.dms" /TussenResultaten/R5_2025/AllocatieResultaten/Woning/BO/Resultaten_besparingskengetallen/export_csv/Export
 
 pause Totaal klaar
