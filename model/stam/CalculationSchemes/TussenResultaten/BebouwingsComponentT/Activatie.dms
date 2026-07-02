@@ -173,7 +173,6 @@ container Activatie
 	*/
 	attribute<bool> KanNietActiveren   (..) := =Invoer/DefaultInstellingen/Basis/RuimtelijkeOntwikkelingAan ? 
 	'  MakeDefined(sub_or_null(Sloopjaar, Zichtjaar_jaar), 9999w) < 10[yr_uint16] 
-	|| MakeDefined(sub_or_null(Zichtjaar_jaar, Bouwjaar),  9999w) < 10[yr_uint16]
 	|| Afbouw 
 	|| Aanbouw 
 	|| not(nrAansluitingen > 0.0[nrAsl])' :
