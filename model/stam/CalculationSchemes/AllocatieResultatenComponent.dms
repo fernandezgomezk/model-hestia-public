@@ -171,6 +171,33 @@ template AllocatieResultatenComponent
 			attribute<GJ_yr> Functioneel_Tapwater_na				:= Functioneel/V_TW[org_rel];
 			attribute<GJ_yr> Functioneel_Tapwater_voor				:= BebouwingsComponenten/Woning/BO/Functioneel/TW[org_rel];
 			attribute<GJ_yr> Functioneel_KK_voor					:= BebouwingsComponenten/Woning/BO/Functioneel/KK[org_rel];
+			attribute<GJ_yr> Aardgas_RV_voor						:= add(
+																			BebouwingsComponenten/Woning/BO/MetervraagBerekening/BemeterdeGebouwInput_rel/RVb[org_rel] == Classifications/BemeterdeGebouwInput/V/gas ? BebouwingsComponenten/Woning/BO/MetervraagBerekening/metervraag_per_product/RVb[org_rel] : 0[ GJ_yr ], 
+																			BebouwingsComponenten/Woning/BO/MetervraagBerekening/BemeterdeGebouwInput_rel/RVp[org_rel] == Classifications/BemeterdeGebouwInput/V/gas ? BebouwingsComponenten/Woning/BO/MetervraagBerekening/metervraag_per_product/RVp[org_rel] : 0[ GJ_yr ]
+																			);
+			attribute<GJ_yr> Elektriciteit_RV_voor					:= add(
+																			BebouwingsComponenten/Woning/BO/MetervraagBerekening/BemeterdeGebouwInput_rel/RVb[org_rel] == Classifications/BemeterdeGebouwInput/V/e ? BebouwingsComponenten/Woning/BO/MetervraagBerekening/metervraag_per_product/RVb[org_rel] : 0[ GJ_yr ], 
+																			BebouwingsComponenten/Woning/BO/MetervraagBerekening/BemeterdeGebouwInput_rel/RVp[org_rel] == Classifications/BemeterdeGebouwInput/V/e ? BebouwingsComponenten/Woning/BO/MetervraagBerekening/metervraag_per_product/RVp[org_rel] : 0[ GJ_yr ]
+																			);
+																			
+			attribute<GJ_yr> Warmte_RV_voor							:= add(
+																			BebouwingsComponenten/Woning/BO/MetervraagBerekening/BemeterdeGebouwInput_rel/RVb[org_rel] == Classifications/BemeterdeGebouwInput/V/Warmte_70 ? BebouwingsComponenten/Woning/BO/MetervraagBerekening/metervraag_per_product/RVb[org_rel] : 0[ GJ_yr ], 
+																			BebouwingsComponenten/Woning/BO/MetervraagBerekening/BemeterdeGebouwInput_rel/RVp[org_rel] == Classifications/BemeterdeGebouwInput/V/Warmte_70 ? BebouwingsComponenten/Woning/BO/MetervraagBerekening/metervraag_per_product/RVp[org_rel] : 0[ GJ_yr ]
+																			);
+	
+			attribute<GJ_yr> Aardgas_TW_voor						:= add(
+																			BebouwingsComponenten/Woning/BO/MetervraagBerekening/BemeterdeGebouwInput_rel/TWb[org_rel] == Classifications/BemeterdeGebouwInput/V/gas ? BebouwingsComponenten/Woning/BO/MetervraagBerekening/metervraag_per_product/TWb[org_rel] : 0[ GJ_yr ], 
+																			BebouwingsComponenten/Woning/BO/MetervraagBerekening/BemeterdeGebouwInput_rel/TWp[org_rel] == Classifications/BemeterdeGebouwInput/V/gas ? BebouwingsComponenten/Woning/BO/MetervraagBerekening/metervraag_per_product/TWp[org_rel] : 0[ GJ_yr ]
+																			);
+			attribute<GJ_yr> Elektriciteit_TW_voor					:= add(
+																			BebouwingsComponenten/Woning/BO/MetervraagBerekening/BemeterdeGebouwInput_rel/TWb[org_rel] == Classifications/BemeterdeGebouwInput/V/e ? BebouwingsComponenten/Woning/BO/MetervraagBerekening/metervraag_per_product/TWb[org_rel] : 0[ GJ_yr ], 
+																			BebouwingsComponenten/Woning/BO/MetervraagBerekening/BemeterdeGebouwInput_rel/TWp[org_rel] == Classifications/BemeterdeGebouwInput/V/e ? BebouwingsComponenten/Woning/BO/MetervraagBerekening/metervraag_per_product/TWp[org_rel] : 0[ GJ_yr ]
+																			);
+			attribute<GJ_yr> Warmte_TW_voor							:= add(
+																			BebouwingsComponenten/Woning/BO/MetervraagBerekening/BemeterdeGebouwInput_rel/TWb[org_rel] == Classifications/BemeterdeGebouwInput/V/Warmte_70 ? BebouwingsComponenten/Woning/BO/MetervraagBerekening/metervraag_per_product/TWb[org_rel] : 0[ GJ_yr ], 
+																			BebouwingsComponenten/Woning/BO/MetervraagBerekening/BemeterdeGebouwInput_rel/TWp[org_rel] == Classifications/BemeterdeGebouwInput/V/Warmte_70 ? BebouwingsComponenten/Woning/BO/MetervraagBerekening/metervraag_per_product/TWp[org_rel] : 0[ GJ_yr ]
+																			);																				
+																			
 			attribute<classifications/schillabel> Energielabel_na	:= BO/Energielabel_rel[org_rel];
 			attribute<UInt16> bouwjaar								:= BO/bouwjaar[org_rel];
 			attribute<m2> oppervlakte								:= BO/oppervlakte[org_rel];
