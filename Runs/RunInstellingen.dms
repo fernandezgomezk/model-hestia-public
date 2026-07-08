@@ -12,7 +12,7 @@ container RunInstellingen
 	parameter<string> Studiegebied      : ['NL'];
 	//parameter<string> StudieGebied 		: ['GM0402,GM0344,GM1581,GM0439,GM0153,GM0599,GM0034,GM0050,GM0321'];
 	//parameter<string>   StudieGebied 	: ['GM0213'];
-	parameter<uint32> StudieGebied_fractie := 100, Descr = "Gebruikt 1/deze waarde van het aantal woningen van het originele studiegebied";
+	parameter<uint32> StudieGebied_fractie := 1, Descr = "Gebruikt 1/deze waarde van het aantal woningen van het originele studiegebied";
 	parameter<uint32> Welke_StudieGebied_fractie := 0, Descr = "Kies welke van de fracties van het studiegebied gebruikt wordt (d.m.v. modulo (%) berekening later)";				
 
 
