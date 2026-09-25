@@ -99,7 +99,7 @@ template StateNaAllocatieComponent
 					parameter<Eur_yr> huur_afleverset 	  := 145.38[Eur_yr] / 131.26d * 106.96d;
 					parameter<eur_GJ> warmteprijs 		  := 46.69[Eur_GJ] / 131.26d * 106.96d;  
 					parameter<Eur_yr> meettarief	   	  := 31.68[Eur_yr] / 131.26d * 106.96d;
-					attribute<Eur>    BAK 			 (BO) := strcount(lowercase(warmtestrategie), 's2') + strcount(lowercase(warmtestrategie), 's3') > 0 ? const(5250.24[Eur], BO) / 131.26d * 106.96d : const(0[eur], BO); 
+					attribute<Eur>    BAK 			 (BO) := strcount(lowercase(warmtestrategie), 's2') + strcount(lowercase(warmtestrategie), 's3') > 0 ? const(5251.45[Eur], BO) / 135.86d * 106.96d : const(0[eur], BO); // BAK 2025 omgerekend naar euro2020, incl btw
 
 					parameter<eur> Ki_booster := 3000[eur] / 127.81d * 106.96d * 1.21d; // omgerekend van euro2023 naar euro2020, incl btw
 
