@@ -40,7 +40,7 @@ template AansluitCapaciteitT
 		
 	attribute<kW>    ASW_TWmt (Object) := = 
 		  BCsector == Classifications/BebouwingsSectorBase/V/Woning ?
-		  	'IsMeergezins ? Obj_Oppervlakte * Vermogens/ASW_TWmt_wl_opp + Obj_nrAansluitingen * Vermogens/ASW_TWmt_wl_asl : Obj_Oppervlakte * Vermogens/ASW_TWmt_wh_opp + Obj_nrAansluitingen * Vermogens/ASW_TWmt_wh_asl'
+		  	'IsMeergezins ? Obj_Oppervlakte * Vermogens/ASW_TWmt_wh_opp + Obj_nrAansluitingen * Vermogens/ASW_TWmt_wh_asl : Obj_Oppervlakte * Vermogens/ASW_TWmt_wl_opp + Obj_nrAansluitingen * Vermogens/ASW_TWmt_wl_asl'
 			: BCsector == Classifications/BebouwingsSectorBase/V/Util   ? 'Obj_Oppervlakte * Vermogens/ASW_TWmt_u_opp + Obj_nrAansluitingen * Vermogens/ASW_TWmt_u_asl'
 			: 'const(0.0[kW],..)', ishidden = "True";
 		
