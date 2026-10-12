@@ -91,17 +91,20 @@ template StateNaAllocatieComponent
 			
 			container Eindgebruikerskosten
 			{	
-						
+				parameter<float64> infl2025 := 135.86, descr = "inflatie 2025, 2015=100", source = "KEV2026";		
+				parameter<float64> infl2023 := 127.81, descr = "inflatie 2023, 2015=100", source = "KEV2026";		
+				parameter<float64> infl2022 := 122.78, descr = "inflatie 2022, 2015=100", source = "KEV2026";		
+				parameter<float64> infl2020 := 106.96, descr = "inflatie 2020, 2015=100", source = "KEV2026";		
 				container warmtenetberekening
 				{
-					parameter<Eur_yr> vastrecht_warmte_HT := 577.48[Eur_yr] / 135.86d * 106.96d; // maxprijzen 2025 volgens ACM, omgerekend naar eur 2020, is incl BTW
-					parameter<Eur_yr> vastrecht_warmte_LT := 321.69[Eur_yr] / 135.86d * 106.96d; 
-					parameter<Eur_yr> huur_afleverset 	  := 150.49[Eur_yr] / 135.86d * 106.96d;
-					parameter<eur_GJ> warmteprijs 		  := 43.79[Eur_GJ] / 135.86d * 106.96d;  
-					parameter<Eur_yr> meettarief	   	  := 32.80[Eur_yr] / 135.86d * 106.96d;
-					attribute<Eur>    BAK 			 (BO) := strcount(lowercase(warmtestrategie), 's2') + strcount(lowercase(warmtestrategie), 's3') > 0 ? const(5251.45[Eur], BO) / 135.86d * 106.96d : const(0[eur], BO); // BAK 2025 omgerekend naar euro2020, incl btw
+					parameter<Eur_yr> vastrecht_warmte_HT := 577.48[Eur_yr] / infl2025 * infl2020; // maxprijzen 2025 volgens ACM, omgerekend naar eur 2020, is incl BTW
+					parameter<Eur_yr> vastrecht_warmte_LT := 321.69[Eur_yr] / infl2025 * infl2020; 
+					parameter<Eur_yr> huur_afleverset 	  := 150.49[Eur_yr] / infl2025 * infl2020;
+					parameter<eur_GJ> warmteprijs 		  := 43.79[Eur_GJ] / infl2025 * infl2020;  
+					parameter<Eur_yr> meettarief	   	  := 32.80[Eur_yr] / infl2025 * infl2020;
+					attribute<Eur>    BAK 			 (BO) := strcount(lowercase(warmtestrategie), 's2') + strcount(lowercase(warmtestrategie), 's3') > 0 ? const(5251.45[Eur], BO) / infl2025 * infl2020 : const(0[eur], BO); // BAK 2025 omgerekend naar euro2020, incl btw
 
-					parameter<eur> Ki_booster := 3000[eur] / 127.81d * 106.96d * 1.21d; // omgerekend van euro2023 naar euro2020, incl btw
+					parameter<eur> Ki_booster := 3000[eur] / infl2023 * infl2020 * 1.21d; // omgerekend van euro2023 naar euro2020, incl btw
 
 					
 					attribute<float64> SPF_RV	  (Classifications/Schillabel) : [8.00, 4.20, 3.20, 3.20, 3.20, 1.00, 1.00, 1.00];
@@ -120,7 +123,7 @@ template StateNaAllocatieComponent
 					attribute<eur> Oi_LTAS      (BO) := (lowercase(warmtestrategie) == 's3a' || lowercase(warmtestrategie) == 's3d') && eigendom_rel != 0 ? 0.4 * eenmalig/incl_btw/Ki_LTAS : 0[eur]; //SAH heeft nu geen max bedrag
 					attribute<eur> Oi_KK        (BO) := strcount(lowercase(warmtestrategie), 's2') + strcount(lowercase(warmtestrategie), 's3') > 0 && eigendom_rel != 0 ? 0.4 * (eenmalig/incl_btw/Ki_KK / 2d) : 0[eur]; //SAH heeft nu geen max bedrag
 					attribute<Eur> Oi_BAK       (BO) := switch(
-																case(strcount(lowercase(warmtestrategie), 's2') + strcount(lowercase(warmtestrategie), 's3') > 0 && eigendom_rel == 0, 3775[eur] / 131.26d * 106.96d), //ISDE, omgerekend naar eur2020
+																case(strcount(lowercase(warmtestrategie), 's2') + strcount(lowercase(warmtestrategie), 's3') > 0 && eigendom_rel == 0, 3775[eur] / infl2025 * infl2020), //ISDE, omgerekend naar eur2020
 																case(strcount(lowercase(warmtestrategie), 's2') + strcount(lowercase(warmtestrategie), 's3') > 0 && eigendom_rel != 0, 0.3 * BAK), //SAH
 																0[eur]);						
 		
@@ -209,7 +212,7 @@ template StateNaAllocatieComponent
 																		case(lowercase(warmtestrategie) == 's1a' && warmtevraag_per_m2 <= 75d, warmteklasse/verhoging_ewp_lw[classify(warmtevraag, warmteklasse/warmtebehoefte)]),
 																		case(lowercase(warmtestrategie) == 's1b' && warmtevraag_per_m2 <= 75d, warmteklasse/verhoging_ewp_bw[classify(warmtevraag, warmteklasse/warmtebehoefte)]),
 																		case(strcount(lowercase(warmtestrategie), 's4') > 0 && warmtevraag_per_m2 <= 150d, warmteklasse/verhoging_hwp[classify(warmtevraag, warmteklasse/warmtebehoefte)]),
-																		0d) / 131.26d * 106.96d; // omgerekend naar euro2020
+																		0d) / infl2025 * infl2020; // omgerekend naar euro2020
 				}
 				
 				container Huurpuntgrens
