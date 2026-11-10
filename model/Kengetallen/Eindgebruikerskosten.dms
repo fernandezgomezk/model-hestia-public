@@ -80,11 +80,11 @@
 			attribute<eur_mo> minimum_basishuur;
 			attribute<eur_mo> aftoppingsgrens;
 			attribute<eur_mo> kwaliteitskortinggrens;
-			attribute<float64> factor_a;				
-			attribute<float64> factor_b;
+			attribute<eur_mo> huurgrens;			
 			attribute<ratio> afbouwratio	 	 := Afbouwpercentage[percent] / 100[percent / ratio];
 			attribute<ratio> ratio_kkg_aftopping := percentage_kwaliteit_aftopping[percent] / 100[percent / ratio];
 			attribute<ratio> ratio_aftopping	 := percentage_aftopping[percent] / 100[percent / ratio];
+			
 
 		}
 
